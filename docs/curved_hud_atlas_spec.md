@@ -26,6 +26,8 @@ Se preveen dos atlas:
 - `media/curved/arc_atlas.dds`
 - Guia tecnica:
   - [curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
+- Concepto inicial de produccion:
+  - [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
 
 Resolucion recomendada inicial:
 
@@ -46,6 +48,17 @@ Su objetivo no es ser el arte final, sino fijar:
 - regiones UV
 - jerarquia visual
 - curvas guia para las alas laterales y el nucleo de salud
+
+Existe ademas una primera base visual mas cercana a produccion en:
+
+- [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
+
+Ese fichero ya incorpora una propuesta de:
+
+- silueta del nucleo de salud
+- alas laterales
+- jerarquia de pesos visuales
+- zonas de reserva para FX e iconos
 
 ## Reticula del atlas
 

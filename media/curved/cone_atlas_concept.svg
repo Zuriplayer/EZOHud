@@ -1,0 +1,115 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <defs>
+    <linearGradient id="bgFade" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#171d24"/>
+      <stop offset="100%" stop-color="#0e1218"/>
+    </linearGradient>
+    <linearGradient id="healthFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#67121b"/>
+      <stop offset="55%" stop-color="#bf2435"/>
+      <stop offset="100%" stop-color="#ff6f7c"/>
+    </linearGradient>
+    <linearGradient id="stamFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#163920"/>
+      <stop offset="55%" stop-color="#2e9650"/>
+      <stop offset="100%" stop-color="#79ef98"/>
+    </linearGradient>
+    <linearGradient id="magFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#16294f"/>
+      <stop offset="55%" stop-color="#315fd4"/>
+      <stop offset="100%" stop-color="#9ab7ff"/>
+    </linearGradient>
+    <linearGradient id="glassEdge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+    <style>
+      .atlas-bg { fill: #0b0e13; }
+      .grid { stroke: #26303a; stroke-width: 1; opacity: 0.8; }
+      .frame { fill: url(#bgFade); stroke: url(#glassEdge); stroke-width: 3; }
+      .reserve { fill: #11161c; stroke: #4e5c6b; stroke-width: 2; stroke-dasharray: 8 6; opacity: 0.75; }
+      .label { fill: #dfe8ef; font: 15px 'Segoe UI', Arial, sans-serif; }
+      .small { fill: #90a3b4; font: 11px 'Segoe UI', Arial, sans-serif; }
+      .accent { fill: none; stroke: #a9bac7; stroke-width: 2; stroke-opacity: 0.3; }
+    </style>
+    <clipPath id="healthMask">
+      <path d="M270,442 C328,314 407,237 512,228 C617,237 696,314 754,442 L718,490 L306,490 Z"/>
+    </clipPath>
+    <clipPath id="stamMask">
+      <path d="M42,332 C60,271 109,223 184,180 L244,184 C193,236 162,294 145,362 C136,398 128,438 123,486 L45,486 Z"/>
+    </clipPath>
+    <clipPath id="magMask">
+      <path d="M982,332 C964,271 915,223 840,180 L780,184 C831,236 862,294 879,362 C888,398 896,438 901,486 L979,486 Z"/>
+    </clipPath>
+  </defs>
+
+  <rect class="atlas-bg" x="0" y="0" width="1024" height="512"/>
+
+  <g>
+    <line class="grid" x1="128" y1="0" x2="128" y2="512"/>
+    <line class="grid" x1="256" y1="0" x2="256" y2="512"/>
+    <line class="grid" x1="384" y1="0" x2="384" y2="512"/>
+    <line class="grid" x1="512" y1="0" x2="512" y2="512"/>
+    <line class="grid" x1="640" y1="0" x2="640" y2="512"/>
+    <line class="grid" x1="768" y1="0" x2="768" y2="512"/>
+    <line class="grid" x1="896" y1="0" x2="896" y2="512"/>
+    <line class="grid" x1="0" y1="128" x2="1024" y2="128"/>
+    <line class="grid" x1="0" y1="256" x2="1024" y2="256"/>
+    <line class="grid" x1="0" y1="384" x2="1024" y2="384"/>
+  </g>
+
+  <g id="health-background">
+    <path class="frame" d="M270,442 C328,314 407,237 512,228 C617,237 696,314 754,442 L718,490 L306,490 Z"/>
+    <path class="accent" d="M307,453 C352,344 423,280 512,272 C601,280 672,344 717,453"/>
+  </g>
+  <g clip-path="url(#healthMask)">
+    <rect x="256" y="0" width="256" height="512" fill="url(#healthFill)" opacity="0.18"/>
+    <rect x="384" y="0" width="128" height="256" fill="url(#healthFill)"/>
+    <rect x="384" y="256" width="128" height="256" fill="url(#healthFill)" opacity="0.92"/>
+  </g>
+
+  <g id="stamina-background">
+    <path class="frame" d="M42,332 C60,271 109,223 184,180 L244,184 C193,236 162,294 145,362 C136,398 128,438 123,486 L45,486 Z"/>
+    <path class="accent" d="M74,452 C88,311 130,247 207,195"/>
+  </g>
+  <g clip-path="url(#stamMask)">
+    <rect x="0" y="0" width="128" height="341.33" fill="url(#stamFill)" opacity="0.18"/>
+    <rect x="128" y="0" width="128" height="341.33" fill="url(#stamFill)"/>
+    <rect x="0" y="341.33" width="128" height="170.67" fill="url(#stamFill)" opacity="0.18"/>
+    <rect x="128" y="341.33" width="128" height="170.67" fill="url(#stamFill)" opacity="0.92"/>
+  </g>
+
+  <g id="magicka-background">
+    <path class="frame" d="M982,332 C964,271 915,223 840,180 L780,184 C831,236 862,294 879,362 C888,398 896,438 901,486 L979,486 Z"/>
+    <path class="accent" d="M950,452 C936,311 894,247 817,195"/>
+  </g>
+  <g clip-path="url(#magMask)">
+    <rect x="512" y="0" width="128" height="341.33" fill="url(#magFill)" opacity="0.18"/>
+    <rect x="640" y="0" width="128" height="341.33" fill="url(#magFill)"/>
+    <rect x="512" y="341.33" width="128" height="170.67" fill="url(#magFill)" opacity="0.18"/>
+    <rect x="640" y="341.33" width="128" height="170.67" fill="url(#magFill)" opacity="0.92"/>
+  </g>
+
+  <rect class="reserve" x="768" y="0" width="128" height="512"/>
+  <rect class="reserve" x="896" y="0" width="128" height="512"/>
+
+  <g>
+    <text class="label" x="20" y="24">STAM BG PRIMARY</text>
+    <text class="label" x="144" y="24">STAM FILL PRIMARY</text>
+    <text class="label" x="18" y="366">STAM BG SECONDARY</text>
+    <text class="label" x="144" y="366">STAM FILL SECONDARY</text>
+
+    <text class="label" x="278" y="24">HEALTH BACKGROUND</text>
+    <text class="label" x="392" y="24">HEALTH FILL TOP</text>
+    <text class="label" x="392" y="280">HEALTH FILL BOTTOM</text>
+
+    <text class="label" x="524" y="24">MAG BG PRIMARY</text>
+    <text class="label" x="648" y="24">MAG FILL PRIMARY</text>
+    <text class="label" x="522" y="366">MAG BG SECONDARY</text>
+    <text class="label" x="648" y="366">MAG FILL SECONDARY</text>
+
+    <text class="label" x="792" y="24">FX RESERVE</text>
+    <text class="label" x="920" y="24">ICON RESERVE</text>
+    <text class="small" x="20" y="502">Cone atlas concept for EZOhud. Keep the health core dominant and the lateral wings lighter. Export final art to cone_atlas.dds.</text>
+  </g>
+</svg>

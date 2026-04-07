@@ -12,6 +12,8 @@ La especificacion completa del atlas esta en:
 
 - `cone_atlas.dds`
 - `arc_atlas.dds`
+- base editable inicial:
+  - [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
 
 ## Estado actual
 
@@ -24,3 +26,10 @@ La especificacion completa del atlas esta en:
 
 Diseñar y exportar los atlas `.dds` respetando la reticula y regiones UV
 documentadas, y luego sustituir el placeholder por esos assets.
+
+## Flujo recomendado
+
+1. Ajustar [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
+2. Exportar a `cone_atlas.dds`
+3. Validar en juego
+4. Repetir el proceso para `arc_atlas.dds`
