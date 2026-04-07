@@ -4,6 +4,8 @@ local EZO_HUD = EZOhud
 local OVERLAY_NAME = "EZOhudOverlay"
 local PLACEHOLDER_TEXTURE = "EsoUI/Art/Miscellaneous/progressbar_genericfill.dds"
 local DEFAULT_COORDS = { 0, 1, 0, 1 }
+local FUTURE_CONE_ATLAS = "media/curved/cone_atlas.dds"
+local FUTURE_ARC_ATLAS = "media/curved/arc_atlas.dds"
 
 local POWER_TYPE_BY_NAME = {
     health = POWERTYPE_HEALTH,
@@ -25,54 +27,70 @@ local VANILLA_CONTROL_NAMES = {
     "ZO_PlayerAttribute",
 }
 
+local UV = {
+    healthBackground = { 0.250, 0.500, 0.000, 1.000 },
+    healthTop = { 0.375, 0.500, 0.000, 0.500 },
+    healthBottom = { 0.375, 0.500, 0.500, 1.000 },
+    leftPrimaryBackground = { 0.000, 0.125, 0.000, 0.667 },
+    leftPrimaryFill = { 0.125, 0.250, 0.000, 0.667 },
+    leftSecondaryBackground = { 0.000, 0.125, 0.667, 1.000 },
+    leftSecondaryFill = { 0.125, 0.250, 0.667, 1.000 },
+    rightPrimaryBackground = { 0.500, 0.625, 0.000, 0.667 },
+    rightPrimaryFill = { 0.625, 0.750, 0.000, 0.667 },
+    rightSecondaryBackground = { 0.500, 0.625, 0.667, 1.000 },
+    rightSecondaryFill = { 0.625, 0.750, 0.667, 1.000 },
+}
+
 local TEXTURE_LAYOUTS = {
     cone = {
         atlasTexture = PLACEHOLDER_TEXTURE,
+        futureAtlasTexture = FUTURE_CONE_ATLAS,
         healthLift = -18,
         sideRise = 46,
         sideDistance = 58,
         health = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.92, heightFactor = 0.92, x = 0, y = -8, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.82, heightFactor = 0.84, x = 0, y = -15, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.68, heightFactor = 0.74, x = 0, y = -21, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
+            { widthFactor = 0.92, heightFactor = 0.92, x = 0, y = -8, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
+            { widthFactor = 0.82, heightFactor = 0.84, x = 0, y = -15, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthTop },
+            { widthFactor = 0.68, heightFactor = 0.74, x = 0, y = -21, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
         },
         left = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.92, heightFactor = 0.92, x = -10, y = -8, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.80, heightFactor = 0.82, x = -20, y = -16, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.66, heightFactor = 0.72, x = -30, y = -23, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
+            { widthFactor = 0.92, heightFactor = 0.92, x = -10, y = -8, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
+            { widthFactor = 0.80, heightFactor = 0.82, x = -20, y = -16, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
+            { widthFactor = 0.66, heightFactor = 0.72, x = -30, y = -23, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
         },
         right = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.92, heightFactor = 0.92, x = 10, y = -8, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.80, heightFactor = 0.82, x = 20, y = -16, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.66, heightFactor = 0.72, x = 30, y = -23, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
+            { widthFactor = 0.92, heightFactor = 0.92, x = 10, y = -8, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
+            { widthFactor = 0.80, heightFactor = 0.82, x = 20, y = -16, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
+            { widthFactor = 0.66, heightFactor = 0.72, x = 30, y = -23, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
         },
     },
     arc = {
         atlasTexture = PLACEHOLDER_TEXTURE,
+        futureAtlasTexture = FUTURE_ARC_ATLAS,
         healthLift = -28,
         sideRise = 62,
         sideDistance = 40,
         health = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.96, heightFactor = 0.94, x = 0, y = -7, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.88, heightFactor = 0.86, x = 0, y = -14, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.76, heightFactor = 0.76, x = 0, y = -20, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.60, heightFactor = 0.66, x = 0, y = -25, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
+            { widthFactor = 0.96, heightFactor = 0.94, x = 0, y = -7, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
+            { widthFactor = 0.88, heightFactor = 0.86, x = 0, y = -14, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthTop },
+            { widthFactor = 0.76, heightFactor = 0.76, x = 0, y = -20, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
+            { widthFactor = 0.60, heightFactor = 0.66, x = 0, y = -25, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
         },
         left = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.94, heightFactor = 0.94, x = -8, y = -10, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.84, heightFactor = 0.86, x = -18, y = -20, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.70, heightFactor = 0.76, x = -32, y = -29, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
+            { widthFactor = 0.94, heightFactor = 0.94, x = -8, y = -10, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
+            { widthFactor = 0.84, heightFactor = 0.86, x = -18, y = -20, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
+            { widthFactor = 0.70, heightFactor = 0.76, x = -32, y = -29, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
         },
         right = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.94, heightFactor = 0.94, x = 8, y = -10, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.84, heightFactor = 0.86, x = 18, y = -20, fillDirection = "up", coords = DEFAULT_COORDS },
-            { widthFactor = 0.70, heightFactor = 0.76, x = 32, y = -29, fillDirection = "up", coords = DEFAULT_COORDS },
+            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
+            { widthFactor = 0.94, heightFactor = 0.94, x = 8, y = -10, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
+            { widthFactor = 0.84, heightFactor = 0.86, x = 18, y = -20, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
+            { widthFactor = 0.70, heightFactor = 0.76, x = 32, y = -29, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
         },
     },
 }
@@ -253,7 +271,7 @@ function EZO_HUD:ApplyBarTextureLayout(barData, rows, width, height)
             segment.background:ClearAnchors()
             segment.background:SetAnchor(TOPLEFT, segment.root, TOPLEFT, 0, 0)
             segment.background:SetAnchor(BOTTOMRIGHT, segment.root, BOTTOMRIGHT, 0, 0)
-            ApplyTextureCoords(segment.background, segment.coords)
+            ApplyTextureCoords(segment.background, row.backgroundCoords or segment.coords)
 
             segment.fill:SetColor(unpack(barData.color))
             ApplyTextureCoords(segment.fill, segment.coords)

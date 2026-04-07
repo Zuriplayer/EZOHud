@@ -3,31 +3,23 @@
 `EZOhud` ya usa una arquitectura basada en `CT_TEXTURE` y recorte UV para las
 barras curvas, similar al enfoque observado en `BanditsUserInterface`.
 
+La especificacion completa del atlas esta en:
+
+- [docs/curved_hud_atlas_spec.md](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_spec.md)
+
 ## Assets previstos
 
 - `cone_atlas.dds`
 - `arc_atlas.dds`
 
-## Requisitos del atlas
+## Estado actual
 
-- Un solo atlas por estilo.
-- Regiones diferenciadas para:
-  - salud centro
-  - estamina izquierda
-  - magia derecha
-- Capas separables para:
-  - fondo
-  - relleno principal
-  - brillo u overlay opcional
+- El overlay usa de momento `EsoUI/Art/Miscellaneous/progressbar_genericfill.dds`
+  como placeholder tecnico.
+- La arquitectura runtime ya esta preparada para pasar a atlas curvo real sin
+  reescribir el sistema.
 
-## Integracion tecnica
+## Siguiente paso
 
-Cada segmento del HUD se rellena mediante:
-
-- `SetTextureCoords(...)`
-- ajuste de `SetWidth(...)` o `SetHeight(...)`
-- reposicionamiento por ancla
-
-El overlay actual usa `EsoUI/Art/Miscellaneous/progressbar_genericfill.dds`
-como placeholder tecnico para validar el flujo de recorte UV hasta que existan
-los `.dds` definitivos.
+Diseñar y exportar los atlas `.dds` respetando la reticula y regiones UV
+documentadas, y luego sustituir el placeholder por esos assets.
