@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <defs>
+    <style>
+      .bg { fill: #101318; }
+      .grid { stroke: #2a3440; stroke-width: 1; }
+      .guide { stroke: #5f7488; stroke-width: 1; stroke-dasharray: 6 6; }
+      .label { fill: #e8edf2; font: 16px 'Segoe UI', Arial, sans-serif; }
+      .small { fill: #aebdca; font: 12px 'Segoe UI', Arial, sans-serif; }
+      .health-bg { fill: rgba(180, 40, 50, 0.22); stroke: #c94954; stroke-width: 2; }
+      .health-fill { fill: rgba(220, 60, 74, 0.35); stroke: #ff818f; stroke-width: 2; }
+      .stam-bg { fill: rgba(42, 127, 62, 0.22); stroke: #47aa60; stroke-width: 2; }
+      .stam-fill { fill: rgba(73, 184, 97, 0.35); stroke: #8cf0a4; stroke-width: 2; }
+      .mag-bg { fill: rgba(54, 94, 182, 0.22); stroke: #597ee0; stroke-width: 2; }
+      .mag-fill { fill: rgba(89, 126, 224, 0.35); stroke: #99b7ff; stroke-width: 2; }
+      .reserve { fill: rgba(180, 180, 180, 0.12); stroke: #7f8a94; stroke-width: 2; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1024" height="512"/>
+
+  <g id="grid">
+    <line class="grid" x1="128" y1="0" x2="128" y2="512"/>
+    <line class="grid" x1="256" y1="0" x2="256" y2="512"/>
+    <line class="grid" x1="384" y1="0" x2="384" y2="512"/>
+    <line class="grid" x1="512" y1="0" x2="512" y2="512"/>
+    <line class="grid" x1="640" y1="0" x2="640" y2="512"/>
+    <line class="grid" x1="768" y1="0" x2="768" y2="512"/>
+    <line class="grid" x1="896" y1="0" x2="896" y2="512"/>
+    <line class="grid" x1="0" y1="128" x2="1024" y2="128"/>
+    <line class="grid" x1="0" y1="256" x2="1024" y2="256"/>
+    <line class="grid" x1="0" y1="384" x2="1024" y2="384"/>
+  </g>
+
+  <g id="regions">
+    <rect class="stam-bg" x="0" y="0" width="128" height="341.33"/>
+    <rect class="stam-fill" x="128" y="0" width="128" height="341.33"/>
+    <rect class="stam-bg" x="0" y="341.33" width="128" height="170.67"/>
+    <rect class="stam-fill" x="128" y="341.33" width="128" height="170.67"/>
+
+    <rect class="health-bg" x="256" y="0" width="256" height="512"/>
+    <rect class="health-fill" x="384" y="0" width="128" height="256"/>
+    <rect class="health-fill" x="384" y="256" width="128" height="256"/>
+
+    <rect class="mag-bg" x="512" y="0" width="128" height="341.33"/>
+    <rect class="mag-fill" x="640" y="0" width="128" height="341.33"/>
+    <rect class="mag-bg" x="512" y="341.33" width="128" height="170.67"/>
+    <rect class="mag-fill" x="640" y="341.33" width="128" height="170.67"/>
+
+    <rect class="reserve" x="768" y="0" width="128" height="512"/>
+    <rect class="reserve" x="896" y="0" width="128" height="512"/>
+  </g>
+
+  <g id="guides">
+    <path class="guide" d="M 286 344 C 352 210, 416 180, 512 176 C 608 180, 672 210, 738 344"/>
+    <path class="guide" d="M 104 320 C 138 228, 190 182, 252 152"/>
+    <path class="guide" d="M 920 320 C 886 228, 834 182, 772 152"/>
+  </g>
+
+  <g id="labels">
+    <text class="label" x="18" y="28">STAMINA BG PRIMARY</text>
+    <text class="label" x="144" y="28">STAMINA FILL PRIMARY</text>
+    <text class="label" x="18" y="370">STAMINA BG SECONDARY</text>
+    <text class="label" x="144" y="370">STAMINA FILL SECONDARY</text>
+
+    <text class="label" x="278" y="28">HEALTH BACKGROUND</text>
+    <text class="label" x="394" y="28">HEALTH FILL TOP</text>
+    <text class="label" x="394" y="284">HEALTH FILL BOTTOM</text>
+
+    <text class="label" x="528" y="28">MAGICKA BG PRIMARY</text>
+    <text class="label" x="656" y="28">MAGICKA FILL PRIMARY</text>
+    <text class="label" x="528" y="370">MAGICKA BG SECONDARY</text>
+    <text class="label" x="656" y="370">MAGICKA FILL SECONDARY</text>
+
+    <text class="label" x="784" y="28">RESERVE FX</text>
+    <text class="label" x="915" y="28">RESERVE ICONS</text>
+
+    <text class="small" x="16" y="494">1024x512 atlas template. Grid: 8 columns x 4 rows. Use as production guide for cone_atlas.dds and arc_atlas.dds.</text>
+  </g>
+</svg>

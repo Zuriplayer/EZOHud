@@ -6,6 +6,7 @@ barras curvas, similar al enfoque observado en `BanditsUserInterface`.
 La especificacion completa del atlas esta en:
 
 - [docs/curved_hud_atlas_spec.md](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_spec.md)
+- [docs/curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
 
 ## Assets previstos
 

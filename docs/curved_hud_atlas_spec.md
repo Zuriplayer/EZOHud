@@ -24,6 +24,8 @@ Se preveen dos atlas:
 
 - `media/curved/cone_atlas.dds`
 - `media/curved/arc_atlas.dds`
+- Guia tecnica:
+  - [curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
 
 Resolucion recomendada inicial:
 
@@ -31,6 +33,19 @@ Resolucion recomendada inicial:
 
 Esto deja suficiente densidad para pruebas y permite subdividir regiones sin
 perder definicion.
+
+## Plantilla visual
+
+Existe una plantilla editable del atlas en:
+
+- [curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
+
+Su objetivo no es ser el arte final, sino fijar:
+
+- reticula
+- regiones UV
+- jerarquia visual
+- curvas guia para las alas laterales y el nucleo de salud
 
 ## Reticula del atlas
 
