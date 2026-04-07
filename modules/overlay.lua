@@ -120,6 +120,14 @@ local function CreateTextureLayer(name, parent, texturePath, color, drawLayer)
     return texture
 end
 
+local function GetAtlasPath(layout, atlasMode)
+    if atlasMode == "production" and layout.futureAtlasTexture then
+        return layout.futureAtlasTexture
+    end
+
+    return layout.atlasTexture or PLACEHOLDER_TEXTURE
+end
+
 local function GetOutOfCombatAlpha()
     if not (EZO_HUD.sv and EZO_HUD.sv.overlay) then
         return 1
@@ -193,6 +201,11 @@ local function BuildSegment(parent, name, texturePath, color)
     return segment
 end
 
+local function ApplySegmentTexture(segment, texturePath)
+    segment.background:SetTexture(texturePath)
+    segment.fill:SetTexture(texturePath)
+end
+
 function EZO_HUD:ApplyVanillaVisibility()
     local shouldHide = self.sv
         and self.sv.overlay
@@ -247,6 +260,19 @@ function EZO_HUD:RefreshOverlayValues()
     self:UpdateAttributeBar("magicka")
 end
 
+function EZO_HUD:ApplyAtlasTextures(texturePath)
+    if not (self.overlay and self.overlay.bars) then
+        return
+    end
+
+    for _, resourceName in ipairs({ "health", "stamina", "magicka" }) do
+        local barData = self.overlay.bars[resourceName]
+        for _, segment in ipairs(barData.segments) do
+            ApplySegmentTexture(segment, texturePath)
+        end
+    end
+end
+
 function EZO_HUD:ApplyBarTextureLayout(barData, rows, width, height)
     local alphaBase = GetOutOfCombatAlpha()
 
@@ -291,6 +317,8 @@ function EZO_HUD:ApplyOverlayLayout()
     local settings = self.sv and self.sv.overlay or self.defaults.overlay
     local style = settings.style or "cone"
     local layout = TEXTURE_LAYOUTS[style] or TEXTURE_LAYOUTS.cone
+    local atlasMode = settings.atlasMode or "placeholder"
+    local atlasTexture = GetAtlasPath(layout, atlasMode)
     local root = self.overlay.root
     local health = self.overlay.bars.health.root
     local stamina = self.overlay.bars.stamina.root
@@ -308,6 +336,8 @@ function EZO_HUD:ApplyOverlayLayout()
     root:SetAnchor(CENTER, GuiRoot, CENTER, settings.x or 0, centerOffsetY)
     root:SetDimensions(1, 1)
     root:SetAlpha(GetOutOfCombatAlpha())
+
+    self:ApplyAtlasTextures(atlasTexture)
 
     health:SetDimensions(healthWidth + 32, barHeight + 44)
     stamina:SetDimensions(sideWidth + 50, barHeight + 48)
@@ -523,6 +553,27 @@ function EZO_HUD:InitializeSettings()
                 end,
                 setFunc = function(value)
                     self.sv.overlay.style = (value == GetString(EZO_HUD_STYLE_ARC)) and "arc" or "cone"
+                    self:ApplyOverlayLayout()
+                end,
+                width = "half",
+            },
+            {
+                type = "dropdown",
+                name = GetString(EZO_HUD_OPTION_ATLAS_MODE),
+                tooltip = GetString(EZO_HUD_OPTION_ATLAS_MODE_TOOLTIP),
+                choices = {
+                    GetString(EZO_HUD_ATLAS_MODE_PLACEHOLDER),
+                    GetString(EZO_HUD_ATLAS_MODE_PRODUCTION),
+                },
+                getFunc = function()
+                    return (self.sv.overlay.atlasMode == "production")
+                        and GetString(EZO_HUD_ATLAS_MODE_PRODUCTION)
+                        or GetString(EZO_HUD_ATLAS_MODE_PLACEHOLDER)
+                end,
+                setFunc = function(value)
+                    self.sv.overlay.atlasMode = (value == GetString(EZO_HUD_ATLAS_MODE_PRODUCTION))
+                        and "production"
+                        or "placeholder"
                     self:ApplyOverlayLayout()
                 end,
                 width = "half",
