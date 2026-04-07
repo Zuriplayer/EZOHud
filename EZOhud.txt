@@ -1,6 +1,6 @@
 ## Title: E|cB040FFZ|rOhud
 ## Author: @Zuriplayer
-## Description: Base de desarrollo para componentes HUD de la familia EZO.
+## Description: HUD framework experimental de la familia EZO, orientado a overlays y utilidades visuales.
 ## Version: 0.1.0
 ## AddOnVersion: 10000
 ## APIVersion: 101049
@@ -8,7 +8,8 @@
 
 lang/en.lua
 lang/es.lua
+modules/i18n.lua
+EZOhud.lua
 modules/core.lua
 modules/persistence.lua
 modules/ui.lua
-EZOhud.lua

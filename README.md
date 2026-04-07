@@ -8,11 +8,13 @@ dentro de la familia EZO.
 - Prototipar elementos de HUD reutilizables.
 - Mantener una base limpia para iterar rapido.
 - Facilitar una posible integracion futura en `EZOTools`.
+- Seguir la arquitectura base de `EZOTools` como addon EZO de referencia.
 
 ## Estructura
 
 - `EZOhud.txt`: manifiesto del addon.
 - `EZOhud.lua`: arranque y registro del ciclo de carga.
+- `modules/i18n.lua`: aplicacion de cadenas localizadas al estilo de `EZOTools`.
 - `modules/`: logica modular del addon.
 - `lang/`: textos localizados.
 
