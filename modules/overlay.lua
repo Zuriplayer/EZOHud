@@ -430,9 +430,21 @@ function EZO_HUD:InitializeOverlay()
 end
 
 function EZO_HUD:InitializeSettings()
-    local lam = LibAddonMenu2
-    if LibStub and type(LibStub.GetLibrary) == "function" then
-        lam = LibStub:GetLibrary("LibAddonMenu-2.0", true) or lam
+    local lam = nil
+
+    if LibStub then
+        local ok, resolved = pcall(LibStub, "LibAddonMenu-2.0", true)
+        if ok and type(resolved) == "table" then
+            lam = resolved
+        elseif type(LibStub.GetLibrary) == "function" then
+            lam = LibStub:GetLibrary("LibAddonMenu-2.0", true)
+        end
+    end
+
+    if not lam and type(LibAddonMenu2) == "table"
+        and type(LibAddonMenu2.RegisterAddonPanel) == "function"
+        and type(LibAddonMenu2.RegisterOptionControls) == "function" then
+        lam = LibAddonMenu2
     end
 
     if not (lam and type(lam.RegisterAddonPanel) == "function" and type(lam.RegisterOptionControls) == "function") then
