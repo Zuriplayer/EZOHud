@@ -447,7 +447,11 @@ function EZO_HUD:InitializeSettings()
         lam = LibAddonMenu2
     end
 
-    if not (lam and type(lam.RegisterAddonPanel) == "function" and type(lam.RegisterOptionControls) == "function") then
+    local registerAddonPanel = lam and lam.RegisterAddonPanel or nil
+    local registerOptionControls = lam and lam.RegisterOptionControls or nil
+    local buildOptions = EZOhud_LAM and EZOhud_LAM.BuildOptions or nil
+
+    if not (lam and type(registerAddonPanel) == "function" and type(registerOptionControls) == "function" and type(buildOptions) == "function") then
         if self.Print then
             self.Print(GetString(EZO_HUD_MSG_LAM_MISSING))
         end
@@ -631,6 +635,6 @@ function EZO_HUD:InitializeSettings()
         registerForDefaults = true,
     }
 
-    lam:RegisterAddonPanel(self.ADDON_NAME .. "_LAM", panelData)
-    lam:RegisterOptionControls(self.ADDON_NAME .. "_LAM", EZOhud_LAM.BuildOptions())
+    registerAddonPanel(lam, self.ADDON_NAME .. "_LAM", panelData)
+    registerOptionControls(lam, self.ADDON_NAME .. "_LAM", buildOptions())
 end
