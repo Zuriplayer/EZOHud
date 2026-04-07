@@ -11,7 +11,16 @@ EZO_HUD.defaults = {
     },
     overlay = {
         enabled = true,
+        hideVanillaAttributes = false,
+        style = "cone",
+        outOfCombatAlpha = 0.85,
         locked = false,
+        centerOffsetY = 280,
+        healthWidth = 240,
+        sideWidth = 180,
+        barHeight = 18,
+        sideRise = 26,
+        centerGap = 96,
         x = nil,
         y = nil,
     },
@@ -40,6 +49,14 @@ function EZO_HUD:Initialize()
 
     if self.InitializeUI ~= nil then
         self:InitializeUI()
+    end
+
+    if self.InitializeOverlay ~= nil then
+        self:InitializeOverlay()
+    end
+
+    if self.InitializeSettings ~= nil then
+        self:InitializeSettings()
     end
 
     if self.Print then
