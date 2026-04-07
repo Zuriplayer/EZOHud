@@ -430,7 +430,12 @@ function EZO_HUD:InitializeOverlay()
 end
 
 function EZO_HUD:InitializeSettings()
-    if not (LibAddonMenu2 and LibAddonMenu2.RegisterAddonPanel) then
+    local lam = LibAddonMenu2
+    if LibStub and type(LibStub.GetLibrary) == "function" then
+        lam = LibStub:GetLibrary("LibAddonMenu-2.0", true) or lam
+    end
+
+    if not (lam and type(lam.RegisterAddonPanel) == "function" and type(lam.RegisterOptionControls) == "function") then
         if self.Print then
             self.Print(GetString(EZO_HUD_MSG_LAM_MISSING))
         end
@@ -614,6 +619,6 @@ function EZO_HUD:InitializeSettings()
         registerForDefaults = true,
     }
 
-    LibAddonMenu2:RegisterAddonPanel(self.ADDON_NAME .. "_LAM", panelData)
-    LibAddonMenu2:RegisterOptionControls(self.ADDON_NAME .. "_LAM", EZOhud_LAM.BuildOptions())
+    lam:RegisterAddonPanel(self.ADDON_NAME .. "_LAM", panelData)
+    lam:RegisterOptionControls(self.ADDON_NAME .. "_LAM", EZOhud_LAM.BuildOptions())
 end
