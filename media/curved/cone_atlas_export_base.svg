@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <defs>
+    <linearGradient id="panelBase" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2129"/>
+      <stop offset="100%" stop-color="#0d1117"/>
+    </linearGradient>
+    <linearGradient id="healthFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#5a0f19"/>
+      <stop offset="60%" stop-color="#bf2234"/>
+      <stop offset="100%" stop-color="#ff8c96"/>
+    </linearGradient>
+    <linearGradient id="staminaFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#14391e"/>
+      <stop offset="60%" stop-color="#2f8f4d"/>
+      <stop offset="100%" stop-color="#8cf0a8"/>
+    </linearGradient>
+    <linearGradient id="magickaFill" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#182a56"/>
+      <stop offset="60%" stop-color="#3a67dc"/>
+      <stop offset="100%" stop-color="#a5c0ff"/>
+    </linearGradient>
+    <linearGradient id="edgeLight" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.03"/>
+    </linearGradient>
+    <clipPath id="healthShape">
+      <path d="M270,442 C328,314 407,237 512,228 C617,237 696,314 754,442 L718,490 L306,490 Z"/>
+    </clipPath>
+    <clipPath id="staminaShape">
+      <path d="M42,332 C60,271 109,223 184,180 L244,184 C193,236 162,294 145,362 C136,398 128,438 123,486 L45,486 Z"/>
+    </clipPath>
+    <clipPath id="magickaShape">
+      <path d="M982,332 C964,271 915,223 840,180 L780,184 C831,236 862,294 879,362 C888,398 896,438 901,486 L979,486 Z"/>
+    </clipPath>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="512" fill="#0a0d12"/>
+
+  <g opacity="0.94">
+    <path d="M270,442 C328,314 407,237 512,228 C617,237 696,314 754,442 L718,490 L306,490 Z" fill="url(#panelBase)" stroke="url(#edgeLight)" stroke-width="3"/>
+    <path d="M42,332 C60,271 109,223 184,180 L244,184 C193,236 162,294 145,362 C136,398 128,438 123,486 L45,486 Z" fill="url(#panelBase)" stroke="url(#edgeLight)" stroke-width="3"/>
+    <path d="M982,332 C964,271 915,223 840,180 L780,184 C831,236 862,294 879,362 C888,398 896,438 901,486 L979,486 Z" fill="url(#panelBase)" stroke="url(#edgeLight)" stroke-width="3"/>
+  </g>
+
+  <g clip-path="url(#healthShape)">
+    <rect x="256" y="0" width="256" height="512" fill="#14181e" opacity="0.55"/>
+    <rect x="384" y="0" width="128" height="256" fill="url(#healthFill)" opacity="0.92"/>
+    <rect x="384" y="256" width="128" height="256" fill="url(#healthFill)"/>
+  </g>
+
+  <g clip-path="url(#staminaShape)">
+    <rect x="0" y="0" width="128" height="341.33" fill="#121920" opacity="0.55"/>
+    <rect x="128" y="0" width="128" height="341.33" fill="url(#staminaFill)"/>
+    <rect x="0" y="341.33" width="128" height="170.67" fill="#121920" opacity="0.55"/>
+    <rect x="128" y="341.33" width="128" height="170.67" fill="url(#staminaFill)" opacity="0.94"/>
+  </g>
+
+  <g clip-path="url(#magickaShape)">
+    <rect x="512" y="0" width="128" height="341.33" fill="#121924" opacity="0.55"/>
+    <rect x="640" y="0" width="128" height="341.33" fill="url(#magickaFill)"/>
+    <rect x="512" y="341.33" width="128" height="170.67" fill="#121924" opacity="0.55"/>
+    <rect x="640" y="341.33" width="128" height="170.67" fill="url(#magickaFill)" opacity="0.94"/>
+  </g>
+
+  <rect x="768" y="0" width="128" height="512" fill="#0e1318" opacity="0.35"/>
+  <rect x="896" y="0" width="128" height="512" fill="#0e1318" opacity="0.2"/>
+</svg>
