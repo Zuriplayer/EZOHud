@@ -1,0 +1,94 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="512" viewBox="0 0 1024 512">
+  <defs>
+    <linearGradient id="healthBgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#232a33" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#11161d" stop-opacity="0.96"/>
+    </linearGradient>
+    <linearGradient id="healthFillGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#78131f"/>
+      <stop offset="55%" stop-color="#c72539"/>
+      <stop offset="100%" stop-color="#ff9aa3"/>
+    </linearGradient>
+    <linearGradient id="stamBgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1c2721" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#101813" stop-opacity="0.96"/>
+    </linearGradient>
+    <linearGradient id="stamFillGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#184122"/>
+      <stop offset="55%" stop-color="#2f8c4b"/>
+      <stop offset="100%" stop-color="#8ceda6"/>
+    </linearGradient>
+    <linearGradient id="magBgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2130" stop-opacity="0.92"/>
+      <stop offset="100%" stop-color="#101420" stop-opacity="0.96"/>
+    </linearGradient>
+    <linearGradient id="magFillGrad" x1="0" y1="1" x2="0" y2="0">
+      <stop offset="0%" stop-color="#192e60"/>
+      <stop offset="55%" stop-color="#3b64ce"/>
+      <stop offset="100%" stop-color="#a5c0ff"/>
+    </linearGradient>
+    <linearGradient id="edgeGloss" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.02"/>
+    </linearGradient>
+
+    <clipPath id="cell_stam_bg_primary"><rect x="0" y="0" width="128" height="341.33"/></clipPath>
+    <clipPath id="cell_stam_fill_primary"><rect x="128" y="0" width="128" height="341.33"/></clipPath>
+    <clipPath id="cell_stam_bg_secondary"><rect x="0" y="341.33" width="128" height="170.67"/></clipPath>
+    <clipPath id="cell_stam_fill_secondary"><rect x="128" y="341.33" width="128" height="170.67"/></clipPath>
+
+    <clipPath id="cell_health_bg"><rect x="256" y="0" width="256" height="512"/></clipPath>
+    <clipPath id="cell_health_fill_top"><rect x="384" y="0" width="128" height="256"/></clipPath>
+    <clipPath id="cell_health_fill_bottom"><rect x="384" y="256" width="128" height="256"/></clipPath>
+
+    <clipPath id="cell_mag_bg_primary"><rect x="512" y="0" width="128" height="341.33"/></clipPath>
+    <clipPath id="cell_mag_fill_primary"><rect x="640" y="0" width="128" height="341.33"/></clipPath>
+    <clipPath id="cell_mag_bg_secondary"><rect x="512" y="341.33" width="128" height="170.67"/></clipPath>
+    <clipPath id="cell_mag_fill_secondary"><rect x="640" y="341.33" width="128" height="170.67"/></clipPath>
+
+    <path id="stamWing" d="M36,478 L42,328 C58,269 104,224 186,174 L246,178 C188,235 152,300 132,386 C124,421 118,452 114,478 Z"/>
+    <path id="magWing" d="M988,478 L982,328 C966,269 920,224 838,174 L778,178 C836,235 872,300 892,386 C900,421 906,452 910,478 Z"/>
+    <path id="healthCore" d="M270,444 C330,312 407,236 512,226 C617,236 694,312 754,444 L718,490 L306,490 Z"/>
+  </defs>
+
+  <rect x="0" y="0" width="1024" height="512" fill="#000000" fill-opacity="0"/>
+
+  <g clip-path="url(#cell_stam_bg_primary)">
+    <use href="#stamWing" fill="url(#stamBgGrad)" stroke="url(#edgeGloss)" stroke-width="3"/>
+  </g>
+  <g clip-path="url(#cell_stam_fill_primary)">
+    <use href="#stamWing" fill="url(#stamFillGrad)"/>
+  </g>
+  <g clip-path="url(#cell_stam_bg_secondary)">
+    <use href="#stamWing" fill="url(#stamBgGrad)" stroke="url(#edgeGloss)" stroke-width="3"/>
+  </g>
+  <g clip-path="url(#cell_stam_fill_secondary)">
+    <use href="#stamWing" fill="url(#stamFillGrad)"/>
+  </g>
+
+  <g clip-path="url(#cell_health_bg)">
+    <use href="#healthCore" fill="url(#healthBgGrad)" stroke="url(#edgeGloss)" stroke-width="4"/>
+  </g>
+  <g clip-path="url(#cell_health_fill_top)">
+    <use href="#healthCore" fill="url(#healthFillGrad)"/>
+  </g>
+  <g clip-path="url(#cell_health_fill_bottom)">
+    <use href="#healthCore" fill="url(#healthFillGrad)"/>
+  </g>
+
+  <g clip-path="url(#cell_mag_bg_primary)">
+    <use href="#magWing" fill="url(#magBgGrad)" stroke="url(#edgeGloss)" stroke-width="3"/>
+  </g>
+  <g clip-path="url(#cell_mag_fill_primary)">
+    <use href="#magWing" fill="url(#magFillGrad)"/>
+  </g>
+  <g clip-path="url(#cell_mag_bg_secondary)">
+    <use href="#magWing" fill="url(#magBgGrad)" stroke="url(#edgeGloss)" stroke-width="3"/>
+  </g>
+  <g clip-path="url(#cell_mag_fill_secondary)">
+    <use href="#magWing" fill="url(#magFillGrad)"/>
+  </g>
+
+  <rect x="768" y="0" width="128" height="512" fill="#000000" fill-opacity="0"/>
+  <rect x="896" y="0" width="128" height="512" fill="#000000" fill-opacity="0"/>
+</svg>
