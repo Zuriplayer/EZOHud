@@ -1,22 +1,47 @@
 EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
-local OVERLAY_NAME = "EZOhudOverlay"
-local PLACEHOLDER_TEXTURE = "EsoUI/Art/Miscellaneous/progressbar_genericfill.dds"
-local DEFAULT_COORDS = { 0, 1, 0, 1 }
-local FUTURE_CONE_ATLAS = "media/curved/cone_atlas.dds"
-local FUTURE_ARC_ATLAS = "media/curved/arc_atlas.dds"
+local SEGMENT_COUNT = 48
+local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
+local DISC_TEXTURE = "EZOhud/media/radial/stamina_disc.dds"
+local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 1.0 }
+local ALERT_DISC_COLOR = { 1.0, 0.28, 0.14, 0.95 }
 
-local POWER_TYPE_BY_NAME = {
-    health = POWERTYPE_HEALTH,
-    stamina = POWERTYPE_STAMINA,
-    magicka = POWERTYPE_MAGICKA,
-}
-
-local RESOURCE_COLORS = {
-    health = { 0.82, 0.18, 0.22, 0.98 },
-    stamina = { 0.21, 0.67, 0.29, 0.98 },
-    magicka = { 0.22, 0.46, 0.88, 0.98 },
+local RESOURCE_ORDER = { "stamina", "health", "magicka" }
+local RESOURCE_META = {
+    health = {
+        powerType = POWERTYPE_HEALTH,
+        labelString = "EZO_HUD_PREVIEW_HEALTH",
+        shapeKey = "healthShape",
+        sizeKey = "healthSize",
+        alertKey = "healthAlertThreshold",
+        colorKey = "healthColor",
+        offsetXKey = "healthOffsetX",
+        offsetYKey = "healthOffsetY",
+        reverseRect = false,
+    },
+    stamina = {
+        powerType = POWERTYPE_STAMINA,
+        labelString = "EZO_HUD_PREVIEW_STAMINA",
+        shapeKey = "staminaShape",
+        sizeKey = "staminaSize",
+        alertKey = "staminaAlertThreshold",
+        colorKey = "staminaColor",
+        offsetXKey = "staminaOffsetX",
+        offsetYKey = "staminaOffsetY",
+        reverseRect = false,
+    },
+    magicka = {
+        powerType = POWERTYPE_MAGICKA,
+        labelString = "EZO_HUD_PREVIEW_MAGICKA",
+        shapeKey = "magickaShape",
+        sizeKey = "magickaSize",
+        alertKey = "magickaAlertThreshold",
+        colorKey = "magickaColor",
+        offsetXKey = "magickaOffsetX",
+        offsetYKey = "magickaOffsetY",
+        reverseRect = true,
+    },
 }
 
 local VANILLA_CONTROL_NAMES = {
@@ -25,74 +50,6 @@ local VANILLA_CONTROL_NAMES = {
     "ZO_PlayerAttributeStamina",
     "ZO_PlayerAttributeBars",
     "ZO_PlayerAttribute",
-}
-
-local UV = {
-    healthBackground = { 0.250, 0.500, 0.000, 1.000 },
-    healthTop = { 0.375, 0.500, 0.000, 0.500 },
-    healthBottom = { 0.375, 0.500, 0.500, 1.000 },
-    leftPrimaryBackground = { 0.000, 0.125, 0.000, 0.667 },
-    leftPrimaryFill = { 0.125, 0.250, 0.000, 0.667 },
-    leftSecondaryBackground = { 0.000, 0.125, 0.667, 1.000 },
-    leftSecondaryFill = { 0.125, 0.250, 0.667, 1.000 },
-    rightPrimaryBackground = { 0.500, 0.625, 0.000, 0.667 },
-    rightPrimaryFill = { 0.625, 0.750, 0.000, 0.667 },
-    rightSecondaryBackground = { 0.500, 0.625, 0.667, 1.000 },
-    rightSecondaryFill = { 0.625, 0.750, 0.667, 1.000 },
-}
-
-local TEXTURE_LAYOUTS = {
-    cone = {
-        atlasTexture = PLACEHOLDER_TEXTURE,
-        futureAtlasTexture = FUTURE_CONE_ATLAS,
-        healthLift = -18,
-        sideRise = 46,
-        sideDistance = 58,
-        health = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
-            { widthFactor = 0.92, heightFactor = 0.92, x = 0, y = -8, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
-            { widthFactor = 0.82, heightFactor = 0.84, x = 0, y = -15, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthTop },
-            { widthFactor = 0.68, heightFactor = 0.74, x = 0, y = -21, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
-        },
-        left = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
-            { widthFactor = 0.92, heightFactor = 0.92, x = -10, y = -8, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
-            { widthFactor = 0.80, heightFactor = 0.82, x = -20, y = -16, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
-            { widthFactor = 0.66, heightFactor = 0.72, x = -30, y = -23, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
-        },
-        right = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
-            { widthFactor = 0.92, heightFactor = 0.92, x = 10, y = -8, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
-            { widthFactor = 0.80, heightFactor = 0.82, x = 20, y = -16, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
-            { widthFactor = 0.66, heightFactor = 0.72, x = 30, y = -23, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
-        },
-    },
-    arc = {
-        atlasTexture = PLACEHOLDER_TEXTURE,
-        futureAtlasTexture = FUTURE_ARC_ATLAS,
-        healthLift = -28,
-        sideRise = 62,
-        sideDistance = 40,
-        health = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
-            { widthFactor = 0.96, heightFactor = 0.94, x = 0, y = -7, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthBottom },
-            { widthFactor = 0.88, heightFactor = 0.86, x = 0, y = -14, fillDirection = "up", backgroundCoords = UV.healthBackground, coords = UV.healthTop },
-            { widthFactor = 0.76, heightFactor = 0.76, x = 0, y = -20, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
-            { widthFactor = 0.60, heightFactor = 0.66, x = 0, y = -25, fillDirection = "up", backgroundCoords = UV.healthTop, coords = UV.healthTop },
-        },
-        left = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
-            { widthFactor = 0.94, heightFactor = 0.94, x = -8, y = -10, fillDirection = "up", backgroundCoords = UV.leftPrimaryBackground, coords = UV.leftPrimaryFill },
-            { widthFactor = 0.84, heightFactor = 0.86, x = -18, y = -20, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
-            { widthFactor = 0.70, heightFactor = 0.76, x = -32, y = -29, fillDirection = "up", backgroundCoords = UV.leftSecondaryBackground, coords = UV.leftSecondaryFill },
-        },
-        right = {
-            { widthFactor = 1.00, heightFactor = 1.00, x = 0, y = 0, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
-            { widthFactor = 0.94, heightFactor = 0.94, x = 8, y = -10, fillDirection = "up", backgroundCoords = UV.rightPrimaryBackground, coords = UV.rightPrimaryFill },
-            { widthFactor = 0.84, heightFactor = 0.86, x = 18, y = -20, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
-            { widthFactor = 0.70, heightFactor = 0.76, x = 32, y = -29, fillDirection = "up", backgroundCoords = UV.rightSecondaryBackground, coords = UV.rightSecondaryFill },
-        },
-    },
 }
 
 local function Clamp(value, minValue, maxValue)
@@ -105,38 +62,42 @@ local function Clamp(value, minValue, maxValue)
     return value
 end
 
-local function CreateLabel(name, parent)
-    local label = WINDOW_MANAGER:CreateControl(name, parent, CT_LABEL)
-    label:SetFont("ZoFontGameSmall")
-    label:SetColor(0.95, 0.95, 0.98, 0.92)
-    return label
+local function CopyColor(color)
+    return {
+        r = color.r,
+        g = color.g,
+        b = color.b,
+        a = color.a or 1.0,
+    }
 end
 
-local function CreateTextureLayer(name, parent, texturePath, color, drawLayer)
-    local texture = WINDOW_MANAGER:CreateControl(name, parent, CT_TEXTURE)
-    texture:SetTexture(texturePath)
-    texture:SetColor(unpack(color))
-    texture:SetDrawLayer(drawLayer or DL_OVERLAY)
-    return texture
-end
-
-local function GetAtlasPath(layout, atlasMode)
-    if atlasMode == "production" and layout.futureAtlasTexture then
-        return layout.futureAtlasTexture
+local function DeepCopyTable(source)
+    local copy = {}
+    for key, value in pairs(source) do
+        if type(value) == "table" then
+            copy[key] = DeepCopyTable(value)
+        else
+            copy[key] = value
+        end
     end
+    return copy
+end
 
-    return layout.atlasTexture or PLACEHOLDER_TEXTURE
+local function CreateLabel(name, parent, font)
+    local label = WINDOW_MANAGER:CreateControl(name, parent, CT_LABEL)
+    label:SetFont(font or "ZoFontGameSmall")
+    label:SetColor(0.95, 0.95, 0.98, 0.92)
+    label:SetMouseEnabled(false)
+    return label
 end
 
 local function GetOutOfCombatAlpha()
     if not (EZO_HUD.sv and EZO_HUD.sv.overlay) then
         return 1
     end
-
     if IsUnitInCombat and IsUnitInCombat("player") then
         return 1
     end
-
     return EZO_HUD.sv.overlay.outOfCombatAlpha or 1
 end
 
@@ -147,63 +108,106 @@ local function SetControlHiddenByName(controlName, hidden)
     end
 end
 
-local function ApplyTextureCoords(texture, coords)
-    texture:SetTextureCoords(coords[1], coords[2], coords[3], coords[4])
-end
-
-local function LayoutTextureFill(segment, pct)
-    pct = Clamp(pct or 0, 0, 1)
-
-    local fill = segment.fill
-    local coords = segment.coords or DEFAULT_COORDS
-    local width = segment.width or 1
-    local height = segment.height or 1
-    local deltaX = coords[2] - coords[1]
-    local deltaY = coords[4] - coords[3]
-
-    fill:ClearAnchors()
-
-    if segment.fillDirection == "left" then
-        fill:SetAnchor(TOPRIGHT, segment.root, TOPRIGHT, 0, 0)
-        fill:SetAnchor(BOTTOMRIGHT, segment.root, BOTTOMRIGHT, 0, 0)
-        fill:SetWidth(width * pct)
-        fill:SetTextureCoords(coords[2] - deltaX * pct, coords[2], coords[3], coords[4])
-    elseif segment.fillDirection == "right" then
-        fill:SetAnchor(TOPLEFT, segment.root, TOPLEFT, 0, 0)
-        fill:SetAnchor(BOTTOMLEFT, segment.root, BOTTOMLEFT, 0, 0)
-        fill:SetWidth(width * pct)
-        fill:SetTextureCoords(coords[1], coords[1] + deltaX * pct, coords[3], coords[4])
-    else
-        fill:SetAnchor(BOTTOMLEFT, segment.root, BOTTOMLEFT, 0, 0)
-        fill:SetAnchor(BOTTOMRIGHT, segment.root, BOTTOMRIGHT, 0, 0)
-        fill:SetHeight(height * pct)
-        fill:SetTextureCoords(coords[1], coords[2], coords[4] - deltaY * pct, coords[4])
+local function ConstrainColor(resourceName, r, g, b, a)
+    if resourceName == "health" then
+        local primary = Clamp(r, 0.45, 1.0)
+        return primary, Clamp(g, 0.05, primary * 0.45), Clamp(b, 0.05, primary * 0.45), a or 1.0
+    elseif resourceName == "stamina" then
+        local primary = Clamp(g, 0.45, 1.0)
+        return Clamp(r, 0.05, primary * 0.55), primary, Clamp(b, 0.05, primary * 0.55), a or 1.0
     end
 
-    fill:SetHidden(pct <= 0.01)
+    local primary = Clamp(b, 0.45, 1.0)
+    return Clamp(r, 0.05, primary * 0.55), Clamp(g, 0.05, primary * 0.75), primary, a or 1.0
 end
 
-local function BuildSegment(parent, name, texturePath, color)
-    local root = WINDOW_MANAGER:CreateControl(name, parent, CT_CONTROL)
-    local segment = {
+local function GetResourceColor(settings, resourceName)
+    local color = settings[RESOURCE_META[resourceName].colorKey]
+    if type(color) ~= "table" then
+        return 1, 1, 1, 1
+    end
+    return color.r or 1, color.g or 1, color.b or 1, color.a or 1
+end
+
+local function GetResourceAnchorPosition(settings, resourceName, width, height)
+    local meta = RESOURCE_META[resourceName]
+    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+    local centerX = (guiWidth / 2) + (settings[meta.offsetXKey] or 0)
+    local centerY = (guiHeight / 2) + (settings[meta.offsetYKey] or 0)
+    return zo_floor(centerX - (width / 2)), zo_floor(centerY - (height / 2))
+end
+
+local function BuildSegment(parent, resourceName, index)
+    local root = WINDOW_MANAGER:CreateControl(
+        string.format("EZOhud_%sSegment%d", resourceName, index),
+        parent,
+        CT_CONTROL
+    )
+    local fill = WINDOW_MANAGER:CreateControl(root:GetName() .. "_Fill", root, CT_TEXTURE)
+    fill:SetTexture(WHITE_TEXTURE)
+    fill:SetMouseEnabled(false)
+    root:SetMouseEnabled(false)
+    return {
         root = root,
-        background = CreateTextureLayer(name .. "_Bg", root, texturePath, { 0.08, 0.09, 0.12, 0.48 }, DL_BACKGROUND),
-        fill = CreateTextureLayer(name .. "_Fill", root, texturePath, color, DL_OVERLAY),
-        coords = DEFAULT_COORDS,
-        fillDirection = "up",
-        width = 1,
-        height = 1,
+        fill = fill,
+    }
+end
+
+local function BuildResource(resourceName)
+    local root = WINDOW_MANAGER:CreateTopLevelWindow("EZOhud_" .. resourceName .. "_Root")
+    root:SetClampedToScreen(true)
+    root:SetMovable(false)
+    root:SetDrawLayer(DL_OVERLAY)
+    root:SetDrawTier(DT_HIGH)
+    root:SetMouseEnabled(false)
+
+    local resource = {
+        root = root,
+        caption = CreateLabel(root:GetName() .. "_Caption", root),
+        value = CreateLabel(root:GetName() .. "_Value", root),
+        percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold"),
+        centerDisc = WINDOW_MANAGER:CreateControl(root:GetName() .. "_CenterDisc", root, CT_TEXTURE),
+        segments = {},
+        meta = RESOURCE_META[resourceName],
     }
 
-    segment.background:SetAlpha(0.7)
-    segment.fill:SetAlpha(0.96)
+    resource.centerDisc:SetTexture(DISC_TEXTURE)
+    resource.centerDisc:SetMouseEnabled(false)
+    resource.percent:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    resource.value:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    resource.caption:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    resource.percent:SetScale(0.9)
 
-    return segment
+    for index = 1, SEGMENT_COUNT do
+        resource.segments[index] = BuildSegment(root, resourceName, index)
+    end
+
+    return resource
 end
 
-local function ApplySegmentTexture(segment, texturePath)
-    segment.background:SetTexture(texturePath)
-    segment.fill:SetTexture(texturePath)
+local function GetResourceSettings(settings, resourceName)
+    local meta = RESOURCE_META[resourceName]
+    return {
+        shape = settings[meta.shapeKey] or "circular",
+        size = settings[meta.sizeKey] or 100,
+        alertThreshold = settings[meta.alertKey] or 25,
+        offsetX = settings[meta.offsetXKey] or 0,
+        offsetY = settings[meta.offsetYKey] or 0,
+    }
+end
+
+local function GetRectHeight(size)
+    return math.max(16, zo_floor(size * 0.16))
+end
+
+local function ApplySegmentVisual(segment, r, g, b, alphaScale, state)
+    if state == "active" then
+        segment.fill:SetColor(r, g, b, 1.0 * alphaScale)
+    elseif state == "partial" then
+        segment.fill:SetColor(r, g, b, 0.45 * alphaScale)
+    else
+        segment.fill:SetColor(0.14, 0.15, 0.18, 0.42 * alphaScale)
+    end
 end
 
 function EZO_HUD:ApplyVanillaVisibility()
@@ -222,23 +226,111 @@ function EZO_HUD:RefreshOverlayText()
         return
     end
 
-    self.overlay.bars.health.caption:SetText(GetString(EZO_HUD_PREVIEW_HEALTH))
-    self.overlay.bars.stamina.caption:SetText(GetString(EZO_HUD_PREVIEW_STAMINA))
-    self.overlay.bars.magicka.caption:SetText(GetString(EZO_HUD_PREVIEW_MAGICKA))
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        self.overlay.resources[resourceName].caption:SetText(GetString(_G[RESOURCE_META[resourceName].labelString]))
+    end
 end
 
-function EZO_HUD:UpdateAttributeBar(resourceName)
-    if not self.overlay or not self.overlay.bars then
+function EZO_HUD:RefreshMovementState()
+    if not self.overlay then
         return
     end
 
-    local barData = self.overlay.bars[resourceName]
-    local powerType = POWER_TYPE_BY_NAME[resourceName]
-    if not (barData and powerType) then
+    local movable = self.sv and self.sv.overlay and self.sv.overlay.movable == true
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        local root = self.overlay.resources[resourceName].root
+        root:SetMovable(movable)
+        root:SetMouseEnabled(movable)
+    end
+end
+
+function EZO_HUD:SaveResourcePosition(resourceName)
+    local resource = self.overlay and self.overlay.resources and self.overlay.resources[resourceName]
+    local settings = self.sv and self.sv.overlay
+    if not (resource and settings) then
         return
     end
 
-    local current, maximum, effectiveMaximum = GetUnitPower("player", powerType)
+    local left = resource.root:GetLeft()
+    local top = resource.root:GetTop()
+    local width = resource.root:GetWidth()
+    local height = resource.root:GetHeight()
+    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+    if not (left and top and width and height) then
+        return
+    end
+
+    settings[resource.meta.offsetXKey] = zo_floor((left + (width / 2)) - (guiWidth / 2))
+    settings[resource.meta.offsetYKey] = zo_floor((top + (height / 2)) - (guiHeight / 2))
+    self:ApplyOverlayLayout()
+end
+
+function EZO_HUD:ResetAllDefaults()
+    self.sv.general = DeepCopyTable(self.defaults.general)
+    self.sv.overlay = DeepCopyTable(self.defaults.overlay)
+    EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
+    self:RefreshOverlayText()
+    self:ApplyOverlayLayout()
+    self:RefreshOverlayVisibility()
+end
+
+function EZO_HUD:ApplyCircularLayout(resource, size)
+    local ringThickness = math.max(5, zo_floor(size * 0.08))
+    local segmentLength = math.max(8, zo_floor(size * 0.14))
+    local radialOffset = math.max(8, zo_floor((size / 2) - (segmentLength / 2) - 6))
+    local centerSize = math.max(34, zo_floor(size * 0.46))
+
+    resource.root:SetDimensions(size, size)
+    resource.centerDisc:ClearAnchors()
+    resource.centerDisc:SetDimensions(centerSize, centerSize)
+    resource.centerDisc:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
+
+    for _, segment in ipairs(resource.segments) do
+        segment.root:ClearAnchors()
+        segment.root:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
+        segment.root:SetDimensions(size, size)
+        segment.root:SetTransformRotationZ(0)
+
+        segment.fill:ClearAnchors()
+        segment.fill:SetDimensions(ringThickness, segmentLength)
+        segment.fill:SetAnchor(CENTER, segment.root, CENTER, 0, -radialOffset)
+    end
+end
+
+function EZO_HUD:ApplyRectangularLayout(resource, width)
+    local barHeight = GetRectHeight(width)
+    local gap = 1
+    local totalGap = gap * (SEGMENT_COUNT - 1)
+    local segmentWidth = math.max(2, zo_floor((width - totalGap) / SEGMENT_COUNT))
+    local finalWidth = (segmentWidth * SEGMENT_COUNT) + totalGap
+    local centerWidth = math.max(46, zo_floor(finalWidth * 0.30))
+    local centerHeight = math.max(18, zo_floor(barHeight * 1.35))
+
+    resource.root:SetDimensions(finalWidth, math.max(barHeight, centerHeight))
+    resource.centerDisc:ClearAnchors()
+    resource.centerDisc:SetDimensions(centerWidth, centerHeight)
+    resource.centerDisc:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
+
+    for index, segment in ipairs(resource.segments) do
+        segment.root:ClearAnchors()
+        segment.root:SetAnchor(LEFT, resource.root, LEFT, (index - 1) * (segmentWidth + gap), 0)
+        segment.root:SetDimensions(segmentWidth, barHeight)
+        segment.root:SetTransformRotationZ(0)
+
+        segment.fill:ClearAnchors()
+        segment.fill:SetAnchorFill(segment.root)
+    end
+end
+
+function EZO_HUD:UpdateResourceDisplay(resourceName)
+    local resource = self.overlay and self.overlay.resources and self.overlay.resources[resourceName]
+    if not resource then
+        return
+    end
+
+    local settings = (self.sv and self.sv.overlay) or self.defaults.overlay
+    local resourceSettings = GetResourceSettings(settings, resourceName)
+    local current, maximum, effectiveMaximum = GetUnitPower("player", resource.meta.powerType)
     current = current or 0
     maximum = effectiveMaximum or maximum or 0
 
@@ -247,65 +339,60 @@ function EZO_HUD:UpdateAttributeBar(resourceName)
         ratio = Clamp(current / maximum, 0, 1)
     end
 
-    for _, segment in ipairs(barData.segments) do
-        LayoutTextureFill(segment, ratio)
+    local r, g, b, _ = GetResourceColor(settings, resourceName)
+    local alphaScale = GetOutOfCombatAlpha()
+    local scaled = ratio * SEGMENT_COUNT
+    local fullSegments = zo_floor(scaled)
+    local partial = scaled - fullSegments
+
+    if resourceSettings.shape == "circular" then
+        local clockwise = settings.staminaRadialClockwise ~= false
+        local originAngle = settings.staminaRadialOriginAngle or (-math.pi / 2)
+        for index, segment in ipairs(resource.segments) do
+            local zeroBased = index - 1
+            local visualIndex = clockwise and zeroBased or ((SEGMENT_COUNT - zeroBased) % SEGMENT_COUNT)
+            local angle = originAngle + ((math.pi * 2) * visualIndex / SEGMENT_COUNT)
+            segment.root:SetTransformRotationZ(angle)
+
+            local state = "inactive"
+            if zeroBased < fullSegments then
+                state = "active"
+            elseif zeroBased == fullSegments and partial > 0 then
+                state = "partial"
+            end
+            ApplySegmentVisual(segment, r, g, b, alphaScale, state)
+        end
+    else
+        for index, segment in ipairs(resource.segments) do
+            local zeroBased = index - 1
+            local visualIndex = resource.meta.reverseRect and (SEGMENT_COUNT - index) or zeroBased
+            local state = "inactive"
+            if visualIndex < fullSegments then
+                state = "active"
+            elseif visualIndex == fullSegments and partial > 0 then
+                state = "partial"
+            end
+            ApplySegmentVisual(segment, r, g, b, alphaScale, state)
+        end
     end
 
-    barData.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
+    local percentValue = zo_floor(ratio * 100)
+    resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
+    resource.percent:SetText(string.format("%d%%", percentValue))
+    resource.caption:SetAlpha(alphaScale)
+    resource.value:SetAlpha(alphaScale)
+    resource.percent:SetColor(r, g, b, 1.0)
+
+    if percentValue <= resourceSettings.alertThreshold then
+        resource.centerDisc:SetColor(unpack(ALERT_DISC_COLOR))
+    else
+        resource.centerDisc:SetColor(r, g, b, 0.22)
+    end
 end
 
 function EZO_HUD:RefreshOverlayValues()
-    self:UpdateAttributeBar("health")
-    self:UpdateAttributeBar("stamina")
-    self:UpdateAttributeBar("magicka")
-end
-
-function EZO_HUD:ApplyAtlasTextures(texturePath)
-    if not (self.overlay and self.overlay.bars) then
-        return
-    end
-
-    for _, resourceName in ipairs({ "health", "stamina", "magicka" }) do
-        local barData = self.overlay.bars[resourceName]
-        for _, segment in ipairs(barData.segments) do
-            ApplySegmentTexture(segment, texturePath)
-        end
-    end
-end
-
-function EZO_HUD:ApplyBarTextureLayout(barData, rows, width, height)
-    local alphaBase = GetOutOfCombatAlpha()
-
-    for index, row in ipairs(rows) do
-        local segment = barData.segments[index]
-        if segment then
-            local rowWidth = zo_floor(width * row.widthFactor)
-            local rowHeight = math.max(6, zo_floor(height * row.heightFactor))
-            local rowAlpha = Clamp(alphaBase - ((index - 1) * 0.08), 0.35, 1)
-
-            segment.coords = row.coords or DEFAULT_COORDS
-            segment.fillDirection = row.fillDirection or "up"
-            segment.width = rowWidth
-            segment.height = rowHeight
-
-            segment.root:ClearAnchors()
-            segment.root:SetAnchor(CENTER, segment.root:GetParent(), CENTER, row.x or 0, row.y or 0)
-            segment.root:SetDimensions(rowWidth, rowHeight)
-            segment.root:SetHidden(false)
-            segment.root:SetAlpha(rowAlpha)
-
-            segment.background:ClearAnchors()
-            segment.background:SetAnchor(TOPLEFT, segment.root, TOPLEFT, 0, 0)
-            segment.background:SetAnchor(BOTTOMRIGHT, segment.root, BOTTOMRIGHT, 0, 0)
-            ApplyTextureCoords(segment.background, row.backgroundCoords or segment.coords)
-
-            segment.fill:SetColor(unpack(barData.color))
-            ApplyTextureCoords(segment.fill, segment.coords)
-        end
-    end
-
-    for index = #rows + 1, #barData.segments do
-        barData.segments[index].root:SetHidden(true)
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        self:UpdateResourceDisplay(resourceName)
     end
 end
 
@@ -314,63 +401,30 @@ function EZO_HUD:ApplyOverlayLayout()
         return
     end
 
-    local settings = self.sv and self.sv.overlay or self.defaults.overlay
-    local style = settings.style or "cone"
-    local layout = TEXTURE_LAYOUTS[style] or TEXTURE_LAYOUTS.cone
-    local atlasMode = settings.atlasMode or "placeholder"
-    local atlasTexture = GetAtlasPath(layout, atlasMode)
-    local root = self.overlay.root
-    local health = self.overlay.bars.health.root
-    local stamina = self.overlay.bars.stamina.root
-    local magicka = self.overlay.bars.magicka.root
+    local settings = (self.sv and self.sv.overlay) or self.defaults.overlay
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        local resource = self.overlay.resources[resourceName]
+        local resourceSettings = GetResourceSettings(settings, resourceName)
 
-    local healthWidth = settings.healthWidth or 240
-    local sideWidth = settings.sideWidth or 180
-    local barHeight = settings.barHeight or 18
-    local centerGap = settings.centerGap or 96
-    local centerOffsetY = settings.centerOffsetY or 280
-    local sideRise = settings.sideRise or 26
-    local sideRiseOffset = sideRise - 26
+        if resourceSettings.shape == "rectangular" then
+            self:ApplyRectangularLayout(resource, resourceSettings.size)
+        else
+            self:ApplyCircularLayout(resource, resourceSettings.size)
+        end
 
-    root:ClearAnchors()
-    root:SetAnchor(CENTER, GuiRoot, CENTER, settings.x or 0, centerOffsetY)
-    root:SetDimensions(1, 1)
-    root:SetAlpha(GetOutOfCombatAlpha())
+        local left, top = GetResourceAnchorPosition(settings, resourceName, resource.root:GetWidth(), resource.root:GetHeight())
+        resource.root:ClearAnchors()
+        resource.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
 
-    self:ApplyAtlasTextures(atlasTexture)
+        resource.caption:ClearAnchors()
+        resource.caption:SetAnchor(BOTTOM, resource.root, TOP, 0, -8)
+        resource.value:ClearAnchors()
+        resource.value:SetAnchor(TOP, resource.root, BOTTOM, 0, 6)
+        resource.percent:ClearAnchors()
+        resource.percent:SetAnchor(CENTER, resource.centerDisc, CENTER, 0, 0)
+    end
 
-    health:SetDimensions(healthWidth + 32, barHeight + 44)
-    stamina:SetDimensions(sideWidth + 50, barHeight + 48)
-    magicka:SetDimensions(sideWidth + 50, barHeight + 48)
-
-    health:ClearAnchors()
-    stamina:ClearAnchors()
-    magicka:ClearAnchors()
-
-    health:SetAnchor(BOTTOM, root, TOP, 0, layout.healthLift)
-    stamina:SetAnchor(RIGHT, health, LEFT, -(centerGap + layout.sideDistance), -(layout.sideRise + sideRiseOffset))
-    magicka:SetAnchor(LEFT, health, RIGHT, centerGap + layout.sideDistance, -(layout.sideRise + sideRiseOffset))
-
-    self:ApplyBarTextureLayout(self.overlay.bars.health, layout.health, healthWidth, barHeight)
-    self:ApplyBarTextureLayout(self.overlay.bars.stamina, layout.left, sideWidth, barHeight)
-    self:ApplyBarTextureLayout(self.overlay.bars.magicka, layout.right, sideWidth, barHeight)
-
-    local labelY = -(barHeight + 18)
-    self.overlay.bars.health.caption:ClearAnchors()
-    self.overlay.bars.health.caption:SetAnchor(BOTTOMLEFT, health, TOPLEFT, 10, labelY)
-    self.overlay.bars.health.value:ClearAnchors()
-    self.overlay.bars.health.value:SetAnchor(BOTTOMRIGHT, health, TOPRIGHT, -10, labelY)
-
-    self.overlay.bars.stamina.caption:ClearAnchors()
-    self.overlay.bars.stamina.caption:SetAnchor(BOTTOMLEFT, stamina, TOPLEFT, 0, -10)
-    self.overlay.bars.stamina.value:ClearAnchors()
-    self.overlay.bars.stamina.value:SetAnchor(BOTTOMRIGHT, stamina, TOPRIGHT, 0, -10)
-
-    self.overlay.bars.magicka.caption:ClearAnchors()
-    self.overlay.bars.magicka.caption:SetAnchor(BOTTOMLEFT, magicka, TOPLEFT, 0, -10)
-    self.overlay.bars.magicka.value:ClearAnchors()
-    self.overlay.bars.magicka.value:SetAnchor(BOTTOMRIGHT, magicka, TOPRIGHT, 0, -10)
-
+    self:RefreshMovementState()
     self:RefreshOverlayValues()
 end
 
@@ -380,10 +434,10 @@ function EZO_HUD:RefreshOverlayVisibility()
     end
 
     local enabled = self.sv and self.sv.overlay and self.sv.overlay.enabled
-    self.overlay.root:SetHidden(not enabled)
-    if enabled then
-        self.overlay.root:SetAlpha(GetOutOfCombatAlpha())
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        self.overlay.resources[resourceName].root:SetHidden(not enabled)
     end
+    self:RefreshMovementState()
     self:ApplyVanillaVisibility()
 end
 
@@ -391,77 +445,68 @@ function EZO_HUD:OnOverlayPowerUpdate(_, unitTag, _, powerType)
     if unitTag ~= "player" then
         return
     end
-
-    if powerType == POWERTYPE_HEALTH then
-        self:UpdateAttributeBar("health")
-    elseif powerType == POWERTYPE_STAMINA then
-        self:UpdateAttributeBar("stamina")
-    elseif powerType == POWERTYPE_MAGICKA then
-        self:UpdateAttributeBar("magicka")
+    for resourceName, meta in pairs(RESOURCE_META) do
+        if powerType == meta.powerType then
+            self:UpdateResourceDisplay(resourceName)
+            return
+        end
     end
-end
-
-function EZO_HUD:BuildOverlayBar(parent, resourceName, segmentCount)
-    local root = WINDOW_MANAGER:CreateControl(OVERLAY_NAME .. "_" .. resourceName, parent, CT_CONTROL)
-    local entry = {
-        root = root,
-        caption = CreateLabel(root:GetName() .. "_Caption", root),
-        value = CreateLabel(root:GetName() .. "_Value", root),
-        segments = {},
-        color = RESOURCE_COLORS[resourceName],
-    }
-
-    entry.caption:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
-    entry.value:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-
-    for index = 1, segmentCount do
-        entry.segments[index] = BuildSegment(root, root:GetName() .. "_Segment" .. index, PLACEHOLDER_TEXTURE, entry.color)
-    end
-
-    return entry
 end
 
 function EZO_HUD:InitializeOverlay()
-    local root = WINDOW_MANAGER:CreateTopLevelWindow(OVERLAY_NAME)
-    root:SetClampedToScreen(true)
-    root:SetMouseEnabled(false)
-    root:SetMovable(false)
-    root:SetDrawLayer(DL_OVERLAY)
-    root:SetDrawTier(DT_HIGH)
-    root:SetDimensions(1, 1)
-    root:SetHidden(false)
+    self.overlay = { resources = {} }
 
-    self.overlay = {
-        root = root,
-        bars = {
-            health = self:BuildOverlayBar(root, "health", 5),
-            stamina = self:BuildOverlayBar(root, "stamina", 4),
-            magicka = self:BuildOverlayBar(root, "magicka", 4),
-        },
-    }
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        local resource = BuildResource(resourceName)
+        resource.root:SetHandler("OnMouseDown", function(control, button)
+            if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.overlay and self.sv.overlay.movable then
+                control:StartMoving()
+            end
+        end)
+        resource.root:SetHandler("OnMouseUp", function(control, button)
+            if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.overlay and self.sv.overlay.movable then
+                control:StopMovingOrResizing()
+            end
+        end)
+        resource.root:SetHandler("OnMoveStop", function()
+            self:SaveResourcePosition(resourceName)
+        end)
+        self.overlay.resources[resourceName] = resource
+    end
 
     self:RefreshOverlayText()
     self:ApplyOverlayLayout()
     self:RefreshOverlayVisibility()
 
-    EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_OverlayPower", EVENT_POWER_UPDATE, function(...)
-        self:OnOverlayPowerUpdate(...)
-    end)
+    EVENT_MANAGER:RegisterForEvent(
+        self.ADDON_NAME .. "_OverlayPower",
+        EVENT_POWER_UPDATE,
+        function(...)
+            self:OnOverlayPowerUpdate(...)
+        end
+    )
 
-    EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_OverlayActivated", EVENT_PLAYER_ACTIVATED, function()
-        self:RefreshOverlayValues()
-        self:ApplyOverlayLayout()
-        self:RefreshOverlayVisibility()
-    end)
+    EVENT_MANAGER:RegisterForEvent(
+        self.ADDON_NAME .. "_OverlayActivated",
+        EVENT_PLAYER_ACTIVATED,
+        function()
+            self:ApplyOverlayLayout()
+            self:RefreshOverlayVisibility()
+        end
+    )
 
-    EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_OverlayCombat", EVENT_PLAYER_COMBAT_STATE, function()
-        self:RefreshOverlayVisibility()
-    end)
+    EVENT_MANAGER:RegisterForEvent(
+        self.ADDON_NAME .. "_OverlayCombat",
+        EVENT_PLAYER_COMBAT_STATE,
+        function()
+            self:RefreshOverlayVisibility()
+            self:RefreshOverlayValues()
+        end
+    )
 end
 
 function EZO_HUD:InitializeSettings()
     local lam = nil
-
     if LibStub then
         local ok, resolved = pcall(LibStub, "LibAddonMenu-2.0", true)
         if ok and type(resolved) == "table" then
@@ -470,7 +515,6 @@ function EZO_HUD:InitializeSettings()
             lam = LibStub:GetLibrary("LibAddonMenu-2.0", true)
         end
     end
-
     if not lam and type(LibAddonMenu2) == "table"
         and type(LibAddonMenu2.RegisterAddonPanel) == "function"
         and type(LibAddonMenu2.RegisterOptionControls) == "function" then
@@ -480,7 +524,6 @@ function EZO_HUD:InitializeSettings()
     local registerAddonPanel = lam and lam.RegisterAddonPanel or nil
     local registerOptionControls = lam and lam.RegisterOptionControls or nil
     local buildOptions = EZOhud_LAM and EZOhud_LAM.BuildOptions or nil
-
     if not (lam and type(registerAddonPanel) == "function" and type(registerOptionControls) == "function" and type(buildOptions) == "function") then
         if self.Print then
             self.Print(GetString(EZO_HUD_MSG_LAM_MISSING))
@@ -488,12 +531,94 @@ function EZO_HUD:InitializeSettings()
         return
     end
 
+    local function ResourceShapeChoice(shape)
+        if shape == "rectangular" then
+            return GetString(EZO_HUD_SHAPE_RECTANGULAR)
+        end
+        return GetString(EZO_HUD_SHAPE_CIRCULAR)
+    end
+
+    local function LanguageDefaultChoice()
+        return (self.defaultLanguage == "es") and "Español" or "English"
+    end
+
+    local function BuildResourceOptions(resourceName)
+        local meta = RESOURCE_META[resourceName]
+        local headerId = _G["EZO_HUD_OPTION_RESOURCE_" .. string.upper(resourceName)] or _G[meta.labelString]
+        local defaultColor = CopyColor(self.defaults.overlay[meta.colorKey])
+        local shapeDefault = ResourceShapeChoice(self.defaults.overlay[meta.shapeKey])
+        return {
+            { type = "header", name = GetString(headerId) },
+            {
+                type = "dropdown",
+                name = GetString(EZO_HUD_OPTION_SHAPE),
+                tooltip = GetString(EZO_HUD_OPTION_SHAPE_TOOLTIP),
+                choices = { GetString(EZO_HUD_SHAPE_CIRCULAR), GetString(EZO_HUD_SHAPE_RECTANGULAR) },
+                getFunc = function()
+                    return ResourceShapeChoice(self.sv.overlay[meta.shapeKey])
+                end,
+                setFunc = function(value)
+                    self.sv.overlay[meta.shapeKey] = (value == GetString(EZO_HUD_SHAPE_RECTANGULAR)) and "rectangular" or "circular"
+                    self:ApplyOverlayLayout()
+                end,
+                default = shapeDefault,
+                width = "half",
+            },
+            {
+                type = "slider",
+                name = GetString(EZO_HUD_OPTION_SIZE),
+                tooltip = GetString(EZO_HUD_OPTION_SIZE_TOOLTIP),
+                min = 60,
+                max = 220,
+                step = 4,
+                getFunc = function()
+                    return self.sv.overlay[meta.sizeKey]
+                end,
+                setFunc = function(value)
+                    self.sv.overlay[meta.sizeKey] = value
+                    self:ApplyOverlayLayout()
+                end,
+                default = self.defaults.overlay[meta.sizeKey],
+                width = "half",
+            },
+            {
+                type = "slider",
+                name = GetString(EZO_HUD_OPTION_ALERT_THRESHOLD),
+                tooltip = GetString(EZO_HUD_OPTION_ALERT_THRESHOLD_TOOLTIP),
+                min = 0,
+                max = 100,
+                step = 1,
+                getFunc = function()
+                    return self.sv.overlay[meta.alertKey]
+                end,
+                setFunc = function(value)
+                    self.sv.overlay[meta.alertKey] = value
+                    self:RefreshOverlayValues()
+                end,
+                default = self.defaults.overlay[meta.alertKey],
+                width = "half",
+            },
+            {
+                type = "colorpicker",
+                name = GetString(EZO_HUD_OPTION_COLOR),
+                tooltip = GetString(EZO_HUD_OPTION_COLOR_TOOLTIP),
+                getFunc = function()
+                    return GetResourceColor(self.sv.overlay, resourceName)
+                end,
+                setFunc = function(r, g, b, a)
+                    r, g, b, a = ConstrainColor(resourceName, r, g, b, a)
+                    self.sv.overlay[meta.colorKey] = { r = r, g = g, b = b, a = a }
+                    self:RefreshOverlayValues()
+                end,
+                default = defaultColor,
+                width = "half",
+            },
+        }
+    end
+
     EZOhud_LAM.RegisterSection("general", 10, function()
         return {
-            {
-                type = "header",
-                name = GetString(EZO_HUD_OPTION_GENERAL),
-            },
+            { type = "header", name = GetString(EZO_HUD_OPTION_GENERAL) },
             {
                 type = "dropdown",
                 name = GetString(EZO_HUD_OPTION_LANGUAGE),
@@ -506,27 +631,53 @@ function EZO_HUD:InitializeSettings()
                     self.sv.general.language = (value == "Español") and "es" or "en"
                     EZOHUD_Lang.Apply(self.sv.general.language)
                     self:RefreshOverlayText()
+                    self:ApplyOverlayLayout()
                 end,
+                default = LanguageDefaultChoice,
+                width = "half",
+            },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_DEBUG_ENABLE),
+                tooltip = GetString(EZO_HUD_OPTION_DEBUG_ENABLE_TOOLTIP),
+                getFunc = function()
+                    return self.sv.general.debugEnabled
+                end,
+                setFunc = function(value)
+                    self.sv.general.debugEnabled = value
+                    if value and self.InitializeDebug then
+                        self:InitializeDebug()
+                    end
+                end,
+                default = self.defaults.general.debugEnabled,
+                width = "half",
+            },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_DEBUG_CHAT),
+                tooltip = GetString(EZO_HUD_OPTION_DEBUG_CHAT_TOOLTIP),
+                getFunc = function()
+                    return self.sv.general.debugToChat
+                end,
+                setFunc = function(value)
+                    self.sv.general.debugToChat = value
+                end,
+                default = self.defaults.general.debugToChat,
                 width = "half",
             },
         }
     end)
 
     EZOhud_LAM.RegisterSection("overlay", 20, function()
-        return {
-            {
-                type = "header",
-                name = GetString(EZO_HUD_OPTION_OVERLAY),
-            },
+        local options = {
+            { type = "header", name = GetString(EZO_HUD_OPTION_OVERLAY) },
             {
                 type = "checkbox",
                 name = GetString(EZO_HUD_OPTION_OVERLAY_ENABLE),
                 tooltip = GetString(EZO_HUD_OPTION_OVERLAY_ENABLE_TOOLTIP),
                 getFunc = function() return self.sv.overlay.enabled end,
-                setFunc = function(value)
-                    self.sv.overlay.enabled = value
-                    self:RefreshOverlayVisibility()
-                end,
+                setFunc = function(value) self.sv.overlay.enabled = value; self:RefreshOverlayVisibility() end,
+                default = self.defaults.overlay.enabled,
                 width = "full",
             },
             {
@@ -534,129 +685,38 @@ function EZO_HUD:InitializeSettings()
                 name = GetString(EZO_HUD_OPTION_HIDE_VANILLA),
                 tooltip = GetString(EZO_HUD_OPTION_HIDE_VANILLA_TOOLTIP),
                 getFunc = function() return self.sv.overlay.hideVanillaAttributes end,
-                setFunc = function(value)
-                    self.sv.overlay.hideVanillaAttributes = value
-                    self:ApplyVanillaVisibility()
-                end,
+                setFunc = function(value) self.sv.overlay.hideVanillaAttributes = value; self:ApplyVanillaVisibility() end,
+                default = self.defaults.overlay.hideVanillaAttributes,
                 width = "full",
             },
             {
-                type = "dropdown",
-                name = GetString(EZO_HUD_OPTION_STYLE),
-                tooltip = GetString(EZO_HUD_OPTION_STYLE_TOOLTIP),
-                choices = {
-                    GetString(EZO_HUD_STYLE_CONE),
-                    GetString(EZO_HUD_STYLE_ARC),
-                },
-                getFunc = function()
-                    return (self.sv.overlay.style == "arc") and GetString(EZO_HUD_STYLE_ARC) or GetString(EZO_HUD_STYLE_CONE)
-                end,
-                setFunc = function(value)
-                    self.sv.overlay.style = (value == GetString(EZO_HUD_STYLE_ARC)) and "arc" or "cone"
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_MOVE_HUD),
+                tooltip = GetString(EZO_HUD_OPTION_MOVE_HUD_TOOLTIP),
+                getFunc = function() return self.sv.overlay.movable end,
+                setFunc = function(value) self.sv.overlay.movable = value; self:RefreshMovementState() end,
+                default = self.defaults.overlay.movable,
+                width = "full",
             },
             {
-                type = "dropdown",
-                name = GetString(EZO_HUD_OPTION_ATLAS_MODE),
-                tooltip = GetString(EZO_HUD_OPTION_ATLAS_MODE_TOOLTIP),
-                choices = {
-                    GetString(EZO_HUD_ATLAS_MODE_PLACEHOLDER),
-                    GetString(EZO_HUD_ATLAS_MODE_PRODUCTION),
-                },
-                getFunc = function()
-                    return (self.sv.overlay.atlasMode == "production")
-                        and GetString(EZO_HUD_ATLAS_MODE_PRODUCTION)
-                        or GetString(EZO_HUD_ATLAS_MODE_PLACEHOLDER)
-                end,
-                setFunc = function(value)
-                    self.sv.overlay.atlasMode = (value == GetString(EZO_HUD_ATLAS_MODE_PRODUCTION))
-                        and "production"
-                        or "placeholder"
-                    self:ApplyOverlayLayout()
-                end,
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_STAMINA_CLOCKWISE),
+                tooltip = GetString(EZO_HUD_OPTION_STAMINA_CLOCKWISE_TOOLTIP),
+                getFunc = function() return self.sv.overlay.staminaRadialClockwise end,
+                setFunc = function(value) self.sv.overlay.staminaRadialClockwise = value; self:ApplyOverlayLayout() end,
+                default = self.defaults.overlay.staminaRadialClockwise,
                 width = "half",
             },
             {
                 type = "slider",
-                name = GetString(EZO_HUD_OPTION_CENTER_OFFSET),
-                tooltip = GetString(EZO_HUD_OPTION_CENTER_OFFSET_TOOLTIP),
-                min = 150,
-                max = 420,
-                step = 5,
-                getFunc = function() return self.sv.overlay.centerOffsetY end,
-                setFunc = function(value)
-                    self.sv.overlay.centerOffsetY = value
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_CENTER_GAP),
-                tooltip = GetString(EZO_HUD_OPTION_CENTER_GAP_TOOLTIP),
-                min = 40,
-                max = 180,
-                step = 2,
-                getFunc = function() return self.sv.overlay.centerGap end,
-                setFunc = function(value)
-                    self.sv.overlay.centerGap = value
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_HEALTH_WIDTH),
-                min = 120,
-                max = 360,
-                step = 5,
-                getFunc = function() return self.sv.overlay.healthWidth end,
-                setFunc = function(value)
-                    self.sv.overlay.healthWidth = value
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_SIDE_WIDTH),
-                min = 120,
-                max = 300,
-                step = 5,
-                getFunc = function() return self.sv.overlay.sideWidth end,
-                setFunc = function(value)
-                    self.sv.overlay.sideWidth = value
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_BAR_HEIGHT),
-                min = 10,
-                max = 36,
-                step = 1,
-                getFunc = function() return self.sv.overlay.barHeight end,
-                setFunc = function(value)
-                    self.sv.overlay.barHeight = value
-                    self:ApplyOverlayLayout()
-                end,
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_SIDE_RISE),
-                tooltip = GetString(EZO_HUD_OPTION_SIDE_RISE_TOOLTIP),
-                min = 0,
-                max = 120,
-                step = 2,
-                getFunc = function() return self.sv.overlay.sideRise end,
-                setFunc = function(value)
-                    self.sv.overlay.sideRise = value
-                    self:ApplyOverlayLayout()
-                end,
+                name = GetString(EZO_HUD_OPTION_STAMINA_ORIGIN),
+                tooltip = GetString(EZO_HUD_OPTION_STAMINA_ORIGIN_TOOLTIP),
+                min = -3.14,
+                max = 3.14,
+                step = 0.17,
+                getFunc = function() return self.sv.overlay.staminaRadialOriginAngle end,
+                setFunc = function(value) self.sv.overlay.staminaRadialOriginAngle = value; self:ApplyOverlayLayout() end,
+                default = self.defaults.overlay.staminaRadialOriginAngle,
                 width = "half",
             },
             {
@@ -666,14 +726,19 @@ function EZO_HUD:InitializeSettings()
                 max = 1.0,
                 step = 0.05,
                 getFunc = function() return self.sv.overlay.outOfCombatAlpha end,
-                setFunc = function(value)
-                    self.sv.overlay.outOfCombatAlpha = value
-                    self:RefreshOverlayVisibility()
-                    self:ApplyOverlayLayout()
-                end,
+                setFunc = function(value) self.sv.overlay.outOfCombatAlpha = value; self:RefreshOverlayValues() end,
+                default = self.defaults.overlay.outOfCombatAlpha,
                 width = "half",
             },
         }
+
+        for _, resourceName in ipairs({ "health", "stamina", "magicka" }) do
+            local resourceOptions = BuildResourceOptions(resourceName)
+            for _, option in ipairs(resourceOptions) do
+                options[#options + 1] = option
+            end
+        end
+        return options
     end)
 
     local panelData = {
@@ -684,6 +749,9 @@ function EZO_HUD:InitializeSettings()
         version = self.ADDON_VERSION,
         registerForRefresh = true,
         registerForDefaults = true,
+        resetFunc = function()
+            self:ResetAllDefaults()
+        end,
     }
 
     registerAddonPanel(lam, self.ADDON_NAME .. "_LAM", panelData)

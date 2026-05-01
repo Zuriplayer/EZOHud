@@ -5,7 +5,7 @@
 ## AddOnVersion: 10000
 ## APIVersion: 101049
 ## DependsOn: LibAddonMenu-2.0
-## OptionalDependsOn: LibChatMessage
+## OptionalDependsOn: LibChatMessage LibDebugLogger
 ## SavedVariables: EZOhud_Saved
 
 lang/en.lua
@@ -13,6 +13,7 @@ lang/es.lua
 modules/i18n.lua
 EZOhud.lua
 modules/core.lua
+modules/debug.lua
 modules/lam_registry.lua
 modules/persistence.lua
 modules/ui.lua
