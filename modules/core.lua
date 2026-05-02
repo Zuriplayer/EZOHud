@@ -1,6 +1,17 @@
 EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
+local function RegisterWithEZOBindings()
+    if not (EZOBindings and type(EZOBindings.RegisterAddon) == "function") then
+        return
+    end
+
+    EZOBindings:RegisterAddon(EZO_HUD.ADDON_NAME or "EZOhud", {
+        version = 1,
+        actions = {},
+    })
+end
+
 EZO_HUD.ADDON_NAME = "EZOhud"
 EZO_HUD.ADDON_VERSION = "0.1.0"
 EZO_HUD.AUTHOR = "@Zuriplayer"
@@ -81,4 +92,6 @@ function EZO_HUD:Initialize()
     if self.Print then
         self.Print(GetString(EZO_HUD_MSG_INIT))
     end
+
+    RegisterWithEZOBindings()
 end
