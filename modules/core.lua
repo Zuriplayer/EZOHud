@@ -1,24 +1,14 @@
 EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
-
-local function RegisterWithEZOBindings()
-    if not (EZOBindings and type(EZOBindings.RegisterAddon) == "function") then
-        return
-    end
-
-    EZOBindings:RegisterAddon(EZO_HUD.ADDON_NAME or "EZOhud", {
-        version = 1,
-        actions = {},
-    })
-end
+local LANGUAGE_AUTO = "auto"
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.0"
+EZO_HUD.ADDON_VERSION = "0.1.8"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {
     general = {
-        language = "en",
+        language = LANGUAGE_AUTO,
         debugEnabled = false,
         debugToChat = false,
     },
@@ -32,9 +22,9 @@ EZO_HUD.defaults = {
         healthShape = "circular",
         staminaShape = "circular",
         magickaShape = "circular",
-        healthSize = 120,
-        staminaSize = 104,
-        magickaSize = 104,
+        healthSize = 128,
+        staminaSize = 128,
+        magickaSize = 128,
         healthAlertThreshold = 35,
         staminaAlertThreshold = 25,
         magickaAlertThreshold = 25,
@@ -50,27 +40,63 @@ EZO_HUD.defaults = {
         magickaOffsetX = 150,
         magickaOffsetY = 155,
     },
+    ultimate = {
+        enabled = true,
+        movable = false,
+        displayMode = "both",
+        size = 54,
+        mainOffsetX = -70,
+        mainOffsetY = 265,
+        backupOffsetX = 70,
+        backupOffsetY = 265,
+    },
 }
 
-local function ResolveLocale()
-    local language = GetCVar and zo_strlower(tostring(GetCVar("Language.2") or ""))
-    if language == "es" or language == "en" then
-        return language
+local function GetClientLanguage()
+    if type(GetCVar) == "function" then
+        local language = zo_strlower(tostring(GetCVar("Language.2") or ""))
+        local prefix = language:sub(1, 2)
+        if prefix == "es" then
+            return "es"
+        end
+        if prefix == "en" then
+            return "en"
+        end
     end
 
     return "en"
 end
 
+function EZO_HUD.GetDefaultLanguage()
+    return LANGUAGE_AUTO
+end
+
+function EZO_HUD.GetClientLanguage()
+    return GetClientLanguage()
+end
+
+function EZO_HUD.GetEffectiveLanguage(language)
+    language = tostring(language or LANGUAGE_AUTO)
+    if language == "es" or language == "en" then
+        return language
+    end
+    return GetClientLanguage()
+end
+
+function EZO_HUD.IsForcedLanguage(language)
+    language = tostring(language or LANGUAGE_AUTO)
+    return language == "es" or language == "en"
+end
+
 function EZO_HUD:Initialize()
-    self.defaultLanguage = ResolveLocale()
-    self.defaults.general.language = self.defaultLanguage
+    self.defaultLanguage = LANGUAGE_AUTO
 
     if self.InitializeSavedVariables ~= nil then
         self:InitializeSavedVariables()
     end
 
     if EZOHUD_Lang and EZOHUD_Lang.Apply then
-        EZOHUD_Lang.Apply((self.sv and self.sv.general and self.sv.general.language) or self.defaultLanguage)
+        EZOHUD_Lang.Apply((self.sv and self.sv.general and self.sv.general.language) or LANGUAGE_AUTO)
     end
 
     if self.InitializeDebug ~= nil then
@@ -85,6 +111,10 @@ function EZO_HUD:Initialize()
         self:InitializeOverlay()
     end
 
+    if self.InitializeUltimate ~= nil then
+        self:InitializeUltimate()
+    end
+
     if self.InitializeSettings ~= nil then
         self:InitializeSettings()
     end
@@ -93,5 +123,4 @@ function EZO_HUD:Initialize()
         self.Print(GetString(EZO_HUD_MSG_INIT))
     end
 
-    RegisterWithEZOBindings()
 end

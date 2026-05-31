@@ -2,6 +2,7 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
 local SEGMENT_COUNT = 48
+local DOMINANCE_MIN_SIZE = 48
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local DISC_TEXTURE = "EZOhud/media/radial/stamina_disc.dds"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 1.0 }
@@ -176,6 +177,7 @@ local function BuildResource(resourceName)
     resource.percent:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
     resource.value:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
     resource.caption:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    resource.caption:SetHidden(true)
     resource.percent:SetScale(0.9)
 
     for index = 1, SEGMENT_COUNT do
@@ -196,6 +198,33 @@ local function GetResourceSettings(settings, resourceName)
     }
 end
 
+local function GetResourceMaximum(resourceName)
+    local meta = RESOURCE_META[resourceName]
+    if not meta then
+        return 0
+    end
+
+    local _, maximum, effectiveMaximum = GetUnitPower("player", meta.powerType)
+    return effectiveMaximum or maximum or 0
+end
+
+local function GetDominantMaximum()
+    local dominantMaximum = 0
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        dominantMaximum = math.max(dominantMaximum, GetResourceMaximum(resourceName))
+    end
+    return dominantMaximum
+end
+
+local function GetDominanceScaledSize(baseSize, resourceName, dominantMaximum)
+    local maximum = GetResourceMaximum(resourceName)
+    if maximum <= 0 or dominantMaximum <= 0 then
+        return baseSize
+    end
+
+    return math.max(DOMINANCE_MIN_SIZE, zo_floor(baseSize * Clamp(maximum / dominantMaximum, 0, 1)))
+end
+
 local function GetRectHeight(size)
     return math.max(16, zo_floor(size * 0.16))
 end
@@ -213,7 +242,6 @@ end
 function EZO_HUD:ApplyVanillaVisibility()
     local shouldHide = self.sv
         and self.sv.overlay
-        and self.sv.overlay.enabled
         and self.sv.overlay.hideVanillaAttributes
 
     for _, controlName in ipairs(VANILLA_CONTROL_NAMES) do
@@ -268,10 +296,19 @@ end
 function EZO_HUD:ResetAllDefaults()
     self.sv.general = DeepCopyTable(self.defaults.general)
     self.sv.overlay = DeepCopyTable(self.defaults.overlay)
+    self.sv.ultimate = DeepCopyTable(self.defaults.ultimate)
     EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
     self:RefreshOverlayText()
+    if self.RefreshUltimateText then
+        self:RefreshUltimateText()
+    end
     self:ApplyOverlayLayout()
     self:RefreshOverlayVisibility()
+    if self.ApplyUltimateLayout then
+        self:ApplyUltimateLayout()
+        self:RefreshUltimateVisibility()
+        self:RefreshUltimateValues()
+    end
 end
 
 function EZO_HUD:ApplyCircularLayout(resource, size)
@@ -333,6 +370,12 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     local current, maximum, effectiveMaximum = GetUnitPower("player", resource.meta.powerType)
     current = current or 0
     maximum = effectiveMaximum or maximum or 0
+    if resource.lastMaximum ~= nil and resource.lastMaximum ~= maximum then
+        resource.lastMaximum = maximum
+        self:ApplyOverlayLayout()
+        return
+    end
+    resource.lastMaximum = maximum
 
     local ratio = 0
     if maximum > 0 then
@@ -379,7 +422,6 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     local percentValue = zo_floor(ratio * 100)
     resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
     resource.percent:SetText(string.format("%d%%", percentValue))
-    resource.caption:SetAlpha(alphaScale)
     resource.value:SetAlpha(alphaScale)
     resource.percent:SetColor(r, g, b, 1.0)
 
@@ -402,22 +444,22 @@ function EZO_HUD:ApplyOverlayLayout()
     end
 
     local settings = (self.sv and self.sv.overlay) or self.defaults.overlay
+    local dominantMaximum = GetDominantMaximum()
     for _, resourceName in ipairs(RESOURCE_ORDER) do
         local resource = self.overlay.resources[resourceName]
         local resourceSettings = GetResourceSettings(settings, resourceName)
+        local scaledSize = GetDominanceScaledSize(resourceSettings.size, resourceName, dominantMaximum)
 
         if resourceSettings.shape == "rectangular" then
-            self:ApplyRectangularLayout(resource, resourceSettings.size)
+            self:ApplyRectangularLayout(resource, scaledSize)
         else
-            self:ApplyCircularLayout(resource, resourceSettings.size)
+            self:ApplyCircularLayout(resource, scaledSize)
         end
 
         local left, top = GetResourceAnchorPosition(settings, resourceName, resource.root:GetWidth(), resource.root:GetHeight())
         resource.root:ClearAnchors()
         resource.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
 
-        resource.caption:ClearAnchors()
-        resource.caption:SetAnchor(BOTTOM, resource.root, TOP, 0, -8)
         resource.value:ClearAnchors()
         resource.value:SetAnchor(TOP, resource.root, BOTTOM, 0, 6)
         resource.percent:ClearAnchors()
@@ -539,7 +581,13 @@ function EZO_HUD:InitializeSettings()
     end
 
     local function LanguageDefaultChoice()
-        return (self.defaultLanguage == "es") and "Español" or "English"
+        return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "auto"
+    end
+
+    local function WarnForcedLanguage()
+        if self.Print then
+            self.Print(GetString(EZO_HUD_MSG_LANGUAGE_FORCED_WARNING))
+        end
     end
 
     local function BuildResourceOptions(resourceName)
@@ -623,17 +671,27 @@ function EZO_HUD:InitializeSettings()
                 type = "dropdown",
                 name = GetString(EZO_HUD_OPTION_LANGUAGE),
                 tooltip = GetString(EZO_HUD_OPTION_LANGUAGE_TOOLTIP),
-                choices = { "English", "Español" },
+                choices = { GetString(EZO_HUD_OPTION_LANGUAGE_AUTO), "English", "Español" },
+                choicesValues = { "auto", "en", "es" },
                 getFunc = function()
-                    return (self.sv.general.language == "es") and "Español" or "English"
+                    return self.sv.general.language or "auto"
                 end,
                 setFunc = function(value)
-                    self.sv.general.language = (value == "Español") and "es" or "en"
-                    EZOHUD_Lang.Apply(self.sv.general.language)
+                    value = tostring(value or "auto")
+                    self.sv.general.language = value
+                    if EZOHUD_Lang and EZOHUD_Lang.Apply then
+                        EZOHUD_Lang.Apply(value)
+                    end
                     self:RefreshOverlayText()
+                    if self.RefreshUltimateText then
+                        self:RefreshUltimateText()
+                    end
                     self:ApplyOverlayLayout()
+                    if self.IsForcedLanguage and self.IsForcedLanguage(value) then
+                        WarnForcedLanguage()
+                    end
                 end,
-                default = LanguageDefaultChoice,
+                default = LanguageDefaultChoice(),
                 width = "half",
             },
             {
