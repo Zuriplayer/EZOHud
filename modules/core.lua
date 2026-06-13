@@ -3,7 +3,7 @@ local EZO_HUD = EZOhud
 local LANGUAGE_AUTO = "auto"
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.8"
+EZO_HUD.ADDON_VERSION = "0.1.12"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {
@@ -49,6 +49,14 @@ EZO_HUD.defaults = {
         mainOffsetY = 265,
         backupOffsetX = 70,
         backupOffsetY = 265,
+    },
+    execute = {
+        enabled = true,
+        movable = false,
+        mode = "active",
+        size = 42,
+        offsetX = 0,
+        offsetY = 80,
     },
 }
 
@@ -107,12 +115,20 @@ function EZO_HUD:Initialize()
         self:InitializeUI()
     end
 
+    if self.InitializeHudVisibility ~= nil then
+        self:InitializeHudVisibility()
+    end
+
     if self.InitializeOverlay ~= nil then
         self:InitializeOverlay()
     end
 
     if self.InitializeUltimate ~= nil then
         self:InitializeUltimate()
+    end
+
+    if self.InitializeExecute ~= nil then
+        self:InitializeExecute()
     end
 
     if self.InitializeSettings ~= nil then

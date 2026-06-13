@@ -62,8 +62,15 @@ local function ShouldShowBar(barName)
     if not settings.enabled then
         return false
     end
+    if EZO_HUD.IsHudSceneVisible and not EZO_HUD:IsHudSceneVisible() then
+        return false
+    end
 
     local mode = settings.displayMode or "both"
+    if mode == "inactive" then
+        local meta = ULTIMATE_BARS[barName]
+        return meta and meta.hotbarCategory ~= GetActiveHotbarCategory()
+    end
     return mode == "both" or mode == barName
 end
 
@@ -297,6 +304,9 @@ function EZO_HUD:InitializeUltimate()
         entry.root:SetHandler("OnMoveStop", function()
             self:SaveUltimatePosition(barName)
         end)
+        if self.RegisterHudSceneControl then
+            self:RegisterHudSceneControl(entry.root)
+        end
         self.ultimate.bars[barName] = entry
     end
 
@@ -324,6 +334,7 @@ function EZO_HUD:InitializeUltimate()
         self.ADDON_NAME .. "_UltimateHotbar",
         EVENT_ACTION_SLOTS_ACTIVE_HOTBAR_UPDATED,
         function()
+            self:RefreshUltimateVisibility()
             self:RefreshUltimateValues()
         end
     )
@@ -351,12 +362,15 @@ function EZO_HUD:InitializeUltimate()
                 GetString(EZO_HUD_ULTIMATE_DISPLAY_MAIN),
                 GetString(EZO_HUD_ULTIMATE_DISPLAY_BACKUP),
                 GetString(EZO_HUD_ULTIMATE_DISPLAY_BOTH),
+                GetString(EZO_HUD_ULTIMATE_DISPLAY_INACTIVE),
             }
             local function DisplayModeChoice(mode)
                 if mode == "main" then
                     return GetString(EZO_HUD_ULTIMATE_DISPLAY_MAIN)
                 elseif mode == "backup" then
                     return GetString(EZO_HUD_ULTIMATE_DISPLAY_BACKUP)
+                elseif mode == "inactive" then
+                    return GetString(EZO_HUD_ULTIMATE_DISPLAY_INACTIVE)
                 end
                 return GetString(EZO_HUD_ULTIMATE_DISPLAY_BOTH)
             end
@@ -404,6 +418,8 @@ function EZO_HUD:InitializeUltimate()
                             self.sv.ultimate.displayMode = "main"
                         elseif value == GetString(EZO_HUD_ULTIMATE_DISPLAY_BACKUP) then
                             self.sv.ultimate.displayMode = "backup"
+                        elseif value == GetString(EZO_HUD_ULTIMATE_DISPLAY_INACTIVE) then
+                            self.sv.ultimate.displayMode = "inactive"
                         else
                             self.sv.ultimate.displayMode = "both"
                         end

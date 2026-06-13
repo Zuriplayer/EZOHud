@@ -297,6 +297,7 @@ function EZO_HUD:ResetAllDefaults()
     self.sv.general = DeepCopyTable(self.defaults.general)
     self.sv.overlay = DeepCopyTable(self.defaults.overlay)
     self.sv.ultimate = DeepCopyTable(self.defaults.ultimate)
+    self.sv.execute = DeepCopyTable(self.defaults.execute)
     EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
     self:RefreshOverlayText()
     if self.RefreshUltimateText then
@@ -308,6 +309,9 @@ function EZO_HUD:ResetAllDefaults()
         self:ApplyUltimateLayout()
         self:RefreshUltimateVisibility()
         self:RefreshUltimateValues()
+    end
+    if self.ApplyExecuteLayout then
+        self:ApplyExecuteLayout()
     end
 end
 
@@ -476,8 +480,9 @@ function EZO_HUD:RefreshOverlayVisibility()
     end
 
     local enabled = self.sv and self.sv.overlay and self.sv.overlay.enabled
+    local hudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
     for _, resourceName in ipairs(RESOURCE_ORDER) do
-        self.overlay.resources[resourceName].root:SetHidden(not enabled)
+        self.overlay.resources[resourceName].root:SetHidden(not enabled or not hudVisible)
     end
     self:RefreshMovementState()
     self:ApplyVanillaVisibility()
@@ -513,6 +518,9 @@ function EZO_HUD:InitializeOverlay()
         resource.root:SetHandler("OnMoveStop", function()
             self:SaveResourcePosition(resourceName)
         end)
+        if self.RegisterHudSceneControl then
+            self:RegisterHudSceneControl(resource.root)
+        end
         self.overlay.resources[resourceName] = resource
     end
 
