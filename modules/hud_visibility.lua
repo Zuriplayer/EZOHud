@@ -60,6 +60,9 @@ function EZO_HUD:RefreshHudContextVisibility()
     if self.RefreshExecute then
         self:RefreshExecute()
     end
+    if self.RefreshCruxDisplay then
+        self:RefreshCruxDisplay()
+    end
 end
 
 function EZO_HUD:InitializeHudVisibility()

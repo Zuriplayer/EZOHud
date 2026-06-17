@@ -3,7 +3,7 @@ local EZO_HUD = EZOhud
 local LANGUAGE_AUTO = "auto"
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.12"
+EZO_HUD.ADDON_VERSION = "0.1.21"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {
@@ -19,26 +19,26 @@ EZO_HUD.defaults = {
         outOfCombatAlpha = 0.85,
         locked = false,
         centerOffsetY = 120,
-        healthShape = "circular",
-        staminaShape = "circular",
-        magickaShape = "circular",
-        healthSize = 128,
-        staminaSize = 128,
-        magickaSize = 128,
+        hudOffsetX = 0,
+        hudOffsetY = 170,
+        healthShape = "rectangular",
+        staminaShape = "rectangular",
+        magickaShape = "rectangular",
+        healthSize = 220,
+        staminaSize = 180,
+        magickaSize = 180,
         healthAlertThreshold = 35,
         staminaAlertThreshold = 25,
         magickaAlertThreshold = 25,
         healthColor = { r = 0.82, g = 0.18, b = 0.22, a = 1.0 },
         staminaColor = { r = 0.21, g = 0.67, b = 0.29, a = 1.0 },
         magickaColor = { r = 0.22, g = 0.46, b = 0.88, a = 1.0 },
-        staminaRadialClockwise = true,
-        staminaRadialOriginAngle = -1.5708,
         healthOffsetX = 0,
-        healthOffsetY = 140,
-        staminaOffsetX = -150,
-        staminaOffsetY = 155,
-        magickaOffsetX = 150,
-        magickaOffsetY = 155,
+        healthOffsetY = 170,
+        staminaOffsetX = 94,
+        staminaOffsetY = 192,
+        magickaOffsetX = -94,
+        magickaOffsetY = 192,
     },
     ultimate = {
         enabled = true,
@@ -57,6 +57,14 @@ EZO_HUD.defaults = {
         size = 42,
         offsetX = 0,
         offsetY = 80,
+    },
+    crux = {
+        enabled = true,
+        movable = false,
+        hideWhenZero = true,
+        size = 58,
+        offsetX = 0,
+        offsetY = 95,
     },
 }
 
@@ -111,6 +119,10 @@ function EZO_HUD:Initialize()
         self:InitializeDebug()
     end
 
+    if self.InitializeCruxDebug ~= nil then
+        self:InitializeCruxDebug()
+    end
+
     if self.InitializeUI ~= nil then
         self:InitializeUI()
     end
@@ -129,6 +141,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeExecute ~= nil then
         self:InitializeExecute()
+    end
+
+    if self.InitializeCrux ~= nil then
+        self:InitializeCrux()
     end
 
     if self.InitializeSettings ~= nil then
