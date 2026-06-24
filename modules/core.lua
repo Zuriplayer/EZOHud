@@ -1,9 +1,10 @@
 EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_AUTO = "auto"
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.21"
+EZO_HUD.ADDON_VERSION = "0.1.38"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {
@@ -21,15 +22,9 @@ EZO_HUD.defaults = {
         centerOffsetY = 120,
         hudOffsetX = 0,
         hudOffsetY = 170,
-        healthShape = "rectangular",
-        staminaShape = "rectangular",
-        magickaShape = "rectangular",
         healthSize = 220,
         staminaSize = 180,
         magickaSize = 180,
-        healthAlertThreshold = 35,
-        staminaAlertThreshold = 25,
-        magickaAlertThreshold = 25,
         healthColor = { r = 0.82, g = 0.18, b = 0.22, a = 1.0 },
         staminaColor = { r = 0.21, g = 0.67, b = 0.29, a = 1.0 },
         magickaColor = { r = 0.22, g = 0.46, b = 0.88, a = 1.0 },
@@ -63,6 +58,7 @@ EZO_HUD.defaults = {
         movable = false,
         hideWhenZero = true,
         size = 58,
+        barGap = 1,
         offsetX = 0,
         offsetY = 95,
     },
@@ -104,12 +100,42 @@ function EZO_HUD.IsForcedLanguage(language)
     return language == "es" or language == "en"
 end
 
+function EZO_HUD:InitializeRuntimeState()
+    self.runtime = self.runtime or {}
+    self.runtime.moveMode = self.runtime.moveMode or {}
+
+    for _, sectionName in ipairs(MOVE_MODE_SECTIONS) do
+        self.runtime.moveMode[sectionName] = false
+        if self.sv and self.sv[sectionName] then
+            self.sv[sectionName].movable = false
+        end
+    end
+end
+
+function EZO_HUD:IsMoveModeEnabled(sectionName)
+    return self.runtime
+        and self.runtime.moveMode
+        and self.runtime.moveMode[sectionName] == true
+end
+
+function EZO_HUD:SetMoveModeEnabled(sectionName, enabled)
+    self.runtime = self.runtime or {}
+    self.runtime.moveMode = self.runtime.moveMode or {}
+    self.runtime.moveMode[sectionName] = enabled == true
+
+    if self.sv and self.sv[sectionName] then
+        self.sv[sectionName].movable = false
+    end
+end
+
 function EZO_HUD:Initialize()
     self.defaultLanguage = LANGUAGE_AUTO
 
     if self.InitializeSavedVariables ~= nil then
         self:InitializeSavedVariables()
     end
+
+    self:InitializeRuntimeState()
 
     if EZOHUD_Lang and EZOHUD_Lang.Apply then
         EZOHUD_Lang.Apply((self.sv and self.sv.general and self.sv.general.language) or LANGUAGE_AUTO)

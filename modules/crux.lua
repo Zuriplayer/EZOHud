@@ -138,8 +138,9 @@ function EZO_HUD:RefreshCruxMovementState()
     end
 
     local settings = GetCruxSettings()
-    self.crux.root:SetMovable(settings.movable == true)
-    self.crux.root:SetMouseEnabled(settings.movable == true)
+    local movable = self:IsMoveModeEnabled("crux")
+    self.crux.root:SetMovable(movable)
+    self.crux.root:SetMouseEnabled(movable)
 end
 
 function EZO_HUD:SaveCruxPosition()
@@ -173,7 +174,7 @@ function EZO_HUD:ApplyCruxLayout()
     local countVisualSize = zo_floor(countBaseSize * textScale)
     local progressHeight = math.max(5, zo_floor(size * 0.09))
     local progressWidth = math.max(34, zo_floor(countVisualSize * 0.78))
-    local gap = math.max(1, zo_floor(size * 0.015))
+    local gap = Clamp(settings.barGap or EZO_HUD.defaults.crux.barGap or 1, 0, 80)
     local width = math.max(countVisualSize, progressWidth)
     local height = countVisualSize + gap + progressHeight
     local progressTop = countVisualSize + gap
@@ -231,7 +232,7 @@ function EZO_HUD:RefreshCruxDisplay()
     local duration = math.max(1, (CRUX_DURATION_MS or 30000) / 1000)
     local ratio = Clamp(remaining / duration, 0, 1)
     local hudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
-    local movable = settings.movable == true
+    local movable = self:IsMoveModeEnabled("crux")
     local showEmpty = settings.hideWhenZero == false
 
     if settings.enabled == false or not hudVisible then
@@ -279,12 +280,12 @@ function EZO_HUD:InitializeCrux()
     }
 
     self.crux.root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.crux and self.sv.crux.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
             control:StartMoving()
         end
     end)
     self.crux.root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.crux and self.sv.crux.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
             control:StopMovingOrResizing()
         end
     end)
@@ -345,10 +346,10 @@ function EZO_HUD:InitializeCrux()
                     name = GetString(EZO_HUD_OPTION_CRUX_MOVE),
                     tooltip = GetString(EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP),
                     getFunc = function()
-                        return GetCruxSettings().movable == true
+                        return self:IsMoveModeEnabled("crux")
                     end,
                     setFunc = function(value)
-                        GetCruxSettings().movable = value
+                        self:SetMoveModeEnabled("crux", value)
                         self:RefreshCruxMovementState()
                         self:RefreshCruxDisplay()
                     end,
@@ -367,7 +368,7 @@ function EZO_HUD:InitializeCrux()
                         self:RefreshCruxDisplay()
                     end,
                     default = self.defaults.crux.hideWhenZero,
-                    width = "half",
+                    width = "full",
                 },
                 {
                     type = "slider",
@@ -384,7 +385,24 @@ function EZO_HUD:InitializeCrux()
                         self:ApplyCruxLayout()
                     end,
                     default = self.defaults.crux.size,
-                    width = "half",
+                    width = "full",
+                },
+                {
+                    type = "slider",
+                    name = GetString(EZO_HUD_OPTION_CRUX_BAR_GAP),
+                    tooltip = GetString(EZO_HUD_OPTION_CRUX_BAR_GAP_TOOLTIP),
+                    min = 0,
+                    max = 80,
+                    step = 1,
+                    getFunc = function()
+                        return GetCruxSettings().barGap or self.defaults.crux.barGap
+                    end,
+                    setFunc = function(value)
+                        GetCruxSettings().barGap = value
+                        self:ApplyCruxLayout()
+                    end,
+                    default = self.defaults.crux.barGap,
+                    width = "full",
                 },
             }
         end)

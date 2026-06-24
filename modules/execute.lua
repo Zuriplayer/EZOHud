@@ -241,7 +241,7 @@ function EZO_HUD:RefreshExecuteMovementState()
         return
     end
 
-    local movable = self.sv and self.sv.execute and self.sv.execute.movable == true
+    local movable = self:IsMoveModeEnabled("execute")
     self.execute.root:SetMovable(movable)
     self.execute.root:SetMouseEnabled(movable)
 end
@@ -282,7 +282,7 @@ function EZO_HUD:RefreshExecute()
         return
     end
 
-    local movable = settings.movable == true
+    local movable = self:IsMoveModeEnabled("execute")
     if (settings.enabled == false and not movable) or (settings.mode or EXECUTE_MODE_ACTIVE) ~= EXECUTE_MODE_ACTIVE then
         self.execute.root:SetHidden(true)
         return
@@ -329,12 +329,12 @@ function EZO_HUD:InitializeExecute()
     self.execute = BuildExecuteIndicator()
 
     self.execute.root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.execute and self.sv.execute.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
             control:StartMoving()
         end
     end)
     self.execute.root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.execute and self.sv.execute.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
             control:StopMovingOrResizing()
         end
     end)
@@ -419,10 +419,10 @@ function EZO_HUD:InitializeExecute()
                     name = GetString(EZO_HUD_OPTION_EXECUTE_MOVE),
                     tooltip = GetString(EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP),
                     getFunc = function()
-                        return self.sv.execute.movable == true
+                        return self:IsMoveModeEnabled("execute")
                     end,
                     setFunc = function(value)
-                        GetExecuteSettings().movable = value
+                        self:SetMoveModeEnabled("execute", value)
                         self:RefreshExecuteMovementState()
                         self:RefreshExecute()
                     end,

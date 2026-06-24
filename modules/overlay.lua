@@ -1,53 +1,45 @@
 EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
-local BAR_TEXTURE = "EsoUI/Art/Miscellaneous/progressbar_genericfill_tall.dds"
-local FRAME_EDGE_TEXTURE = "EsoUI/Art/Tooltips/UI-Border.dds"
+local BAR_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_fill.dds"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
-local ALERT_COLOR = { 1.0, 0.28, 0.14, 0.92 }
 local DOMINANCE_MIN_SCALE = 0.82
-local BAR_INSET = 5
-local FILL_INSET = 2
+local TEXT_INSET = 12
 local SIDE_GAP = 6
 local ROW_GAP = 10
+local LEGACY_RESOURCE_LAYER_SUFFIXES = { "_Shadow", "_Frame", "_Background", "_Alert" }
 
 local RESOURCE_ORDER = { "health", "magicka", "stamina" }
 local RESOURCE_META = {
     health = {
         powerType = POWERTYPE_HEALTH,
         labelString = "EZO_HUD_PREVIEW_HEALTH",
-        shapeKey = "healthShape",
         sizeKey = "healthSize",
-        alertKey = "healthAlertThreshold",
         colorKey = "healthColor",
         offsetXKey = "healthOffsetX",
         offsetYKey = "healthOffsetY",
         minimumWidth = 190,
-        barHeight = 32,
+        barHeight = 24,
     },
     stamina = {
         powerType = POWERTYPE_STAMINA,
         labelString = "EZO_HUD_PREVIEW_STAMINA",
-        shapeKey = "staminaShape",
         sizeKey = "staminaSize",
-        alertKey = "staminaAlertThreshold",
         colorKey = "staminaColor",
         offsetXKey = "staminaOffsetX",
         offsetYKey = "staminaOffsetY",
         minimumWidth = 150,
-        barHeight = 30,
+        barHeight = 24,
     },
     magicka = {
         powerType = POWERTYPE_MAGICKA,
         labelString = "EZO_HUD_PREVIEW_MAGICKA",
-        shapeKey = "magickaShape",
         sizeKey = "magickaSize",
-        alertKey = "magickaAlertThreshold",
         colorKey = "magickaColor",
         offsetXKey = "magickaOffsetX",
         offsetYKey = "magickaOffsetY",
         minimumWidth = 150,
-        barHeight = 30,
+        barHeight = 24,
     },
 }
 
@@ -96,6 +88,7 @@ local function CreateLabel(name, parent, font)
     label:SetColor(unpack(NORMAL_TEXT_COLOR))
     label:SetMouseEnabled(false)
     label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     return label
 end
 
@@ -148,25 +141,36 @@ local function GetAnchorFromCenter(centerX, centerY, width, height)
     return zo_floor(centerX - (width / 2)), zo_floor(centerY - (height / 2))
 end
 
-local function CreateBackdrop(name, parent)
-    local backdrop = WINDOW_MANAGER:CreateControl(name, parent, CT_BACKDROP)
-    backdrop:SetMouseEnabled(false)
-    backdrop:SetEdgeTexture(FRAME_EDGE_TEXTURE, 128, 16)
-    return backdrop
+local function HideLegacyResourceLayers(rootName)
+    for _, suffix in ipairs(LEGACY_RESOURCE_LAYER_SUFFIXES) do
+        local control = _G[rootName .. suffix]
+        if control then
+            control:SetHidden(true)
+            if control.SetAlpha then
+                control:SetAlpha(0)
+            end
+            if control.ClearAnchors then
+                control:ClearAnchors()
+            end
+            if control.SetDimensions then
+                control:SetDimensions(1, 1)
+            end
+        end
+    end
 end
 
 local function CreateStatusBar(name, parent)
     local bar = WINDOW_MANAGER:CreateControl(name, parent, CT_STATUSBAR)
+    bar:SetMouseEnabled(false)
     bar:SetTexture(BAR_TEXTURE)
     bar:SetOrientation(ORIENTATION_HORIZONTAL)
     bar:SetMinMax(0, 1)
     bar:SetValue(1)
-    bar:SetMouseEnabled(false)
+    if type(bar.SetTextureCoords) == "function" then
+        bar:SetTextureCoords(0, 1, 0, 0.53125)
+    end
     if type(bar.SetBarAlignment) == "function" and BAR_ALIGNMENT_NORMAL then
         bar:SetBarAlignment(BAR_ALIGNMENT_NORMAL)
-    end
-    if type(bar.SetGradientColors) == "function" then
-        bar:SetGradientColors(1, 1, 1, 1, 0.65, 0.65, 0.65, 1)
     end
     return bar
 end
@@ -174,16 +178,13 @@ end
 local function BuildResource(parent, resourceName)
     local root = WINDOW_MANAGER:CreateControl("EZOhud_" .. resourceName .. "_Root", parent, CT_CONTROL)
     root:SetMouseEnabled(false)
+    HideLegacyResourceLayers(root:GetName())
 
     return {
         root = root,
-        shadow = CreateBackdrop(root:GetName() .. "_Shadow", root),
-        frame = CreateBackdrop(root:GetName() .. "_Frame", root),
-        background = CreateBackdrop(root:GetName() .. "_Background", root),
-        alert = CreateBackdrop(root:GetName() .. "_Alert", root),
         fill = CreateStatusBar(root:GetName() .. "_Fill", root),
         caption = CreateLabel(root:GetName() .. "_Caption", root),
-        value = CreateLabel(root:GetName() .. "_Value", root),
+        value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold"),
         percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold"),
         meta = RESOURCE_META[resourceName],
     }
@@ -192,9 +193,7 @@ end
 local function GetResourceSettings(settings, resourceName)
     local meta = RESOURCE_META[resourceName]
     return {
-        shape = settings[meta.shapeKey] or "rectangular",
         size = settings[meta.sizeKey] or 180,
-        alertThreshold = settings[meta.alertKey] or 25,
         offsetX = settings[meta.offsetXKey] or 0,
         offsetY = settings[meta.offsetYKey] or 0,
     }
@@ -229,60 +228,35 @@ local function GetDominanceScaledSize(baseSize, resourceName, dominantMaximum)
     return zo_floor(baseSize * scale)
 end
 
-local function GetCleanBarDimensions(resource, resourceSettings, scaledSize)
+local function GetCleanBarDimensions(resource, scaledSize)
     local meta = resource.meta
-    local compact = resourceSettings.shape == "circular"
-    local widthMultiplier = compact and 1.22 or 1.0
-    local width = math.max(meta.minimumWidth, zo_floor(scaledSize * widthMultiplier))
+    local width = math.max(meta.minimumWidth, zo_floor(scaledSize))
     return width, meta.barHeight
 end
 
 local function ApplyCleanBarLayout(resource, width, height)
-    local innerWidth = math.max(1, width - (BAR_INSET * 2))
-    local innerHeight = math.max(1, height - (BAR_INSET * 2))
-
     resource.root:SetDimensions(width, height)
 
-    resource.shadow:ClearAnchors()
-    resource.shadow:SetDimensions(width + 12, height + 12)
-    resource.shadow:SetAnchor(CENTER, resource.root, CENTER, 0, 3)
-    resource.shadow:SetCenterColor(0, 0, 0, 0.38)
-    resource.shadow:SetEdgeColor(0, 0, 0, 0)
-
-    resource.frame:ClearAnchors()
-    resource.frame:SetAnchorFill(resource.root)
-    resource.frame:SetCenterColor(0.018, 0.02, 0.026, 0.88)
-    resource.frame:SetEdgeColor(0.38, 0.38, 0.42, 0.84)
-
-    resource.background:ClearAnchors()
-    resource.background:SetDimensions(innerWidth, innerHeight)
-    resource.background:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
-    resource.background:SetCenterColor(0.01, 0.012, 0.016, 0.96)
-    resource.background:SetEdgeColor(0.86, 0.86, 0.9, 0.28)
-
     resource.fill:ClearAnchors()
-    resource.fill:SetAnchor(TOPLEFT, resource.background, TOPLEFT, FILL_INSET, FILL_INSET)
-    resource.fill:SetAnchor(BOTTOMRIGHT, resource.background, BOTTOMRIGHT, -FILL_INSET, -FILL_INSET)
+    resource.fill:SetAnchorFill(resource.root)
 
     resource.caption:ClearAnchors()
     resource.caption:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
     resource.caption:SetHidden(true)
 
     resource.percent:ClearAnchors()
-    resource.percent:SetAnchor(RIGHT, resource.background, RIGHT, -8, 0)
-    resource.percent:SetScale(0.72)
+    resource.percent:SetAnchor(RIGHT, resource.root, RIGHT, -TEXT_INSET, 0)
+    resource.percent:SetDimensions(math.max(48, zo_floor(width * 0.32)), height)
+    resource.percent:SetScale(1.05)
     resource.percent:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+    resource.percent:SetVerticalAlignment(TEXT_ALIGN_CENTER)
 
     resource.value:ClearAnchors()
-    resource.value:SetAnchor(LEFT, resource.background, LEFT, 8, 0)
-    resource.value:SetScale(0.72)
+    resource.value:SetAnchor(LEFT, resource.root, LEFT, TEXT_INSET, 0)
+    resource.value:SetDimensions(math.max(70, zo_floor(width * 0.52)), height)
+    resource.value:SetScale(1.05)
     resource.value:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
-
-    resource.alert:ClearAnchors()
-    resource.alert:SetDimensions(width + 18, height + 14)
-    resource.alert:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
-    resource.alert:SetCenterColor(0, 0, 0, 0)
-    resource.alert:SetEdgeColor(0, 0, 0, 0)
+    resource.value:SetVerticalAlignment(TEXT_ALIGN_CENTER)
 end
 
 function EZO_HUD:ApplyVanillaVisibility()
@@ -310,7 +284,7 @@ function EZO_HUD:RefreshMovementState()
         return
     end
 
-    local movable = self.sv and self.sv.overlay and self.sv.overlay.movable == true
+    local movable = self:IsMoveModeEnabled("overlay")
     self.overlay.root:SetMovable(movable)
     self.overlay.root:SetMouseEnabled(movable)
 end
@@ -342,6 +316,7 @@ function EZO_HUD:ResetAllDefaults()
     self.sv.ultimate = DeepCopyTable(self.defaults.ultimate)
     self.sv.execute = DeepCopyTable(self.defaults.execute)
     self.sv.crux = DeepCopyTable(self.defaults.crux)
+    self:InitializeRuntimeState()
     EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
     self:RefreshOverlayText()
     if self.RefreshUltimateText then
@@ -370,7 +345,6 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     end
 
     local settings = (self.sv and self.sv.overlay) or self.defaults.overlay
-    local resourceSettings = GetResourceSettings(settings, resourceName)
     local current, maximum, effectiveMaximum = GetUnitPower("player", resource.meta.powerType)
     current = current or 0
     maximum = effectiveMaximum or maximum or 0
@@ -386,24 +360,13 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
         ratio = Clamp(current / maximum, 0, 1)
     end
 
-    local r, g, b, _ = GetResourceColor(settings, resourceName)
+    local r, g, b = GetResourceColor(settings, resourceName)
     local alphaScale = GetOutOfCombatAlpha()
     local percentValue = zo_floor(ratio * 100)
-    local isAlert = percentValue <= resourceSettings.alertThreshold
 
-    resource.fill:SetMinMax(0, 1)
-    resource.fill:SetValue(ratio)
-    resource.fill:SetColor(r, g, b, 0.92 * alphaScale)
-
-    if isAlert then
-        resource.alert:SetCenterColor(ALERT_COLOR[1], ALERT_COLOR[2], ALERT_COLOR[3], 0.08)
-        resource.alert:SetEdgeColor(ALERT_COLOR[1], ALERT_COLOR[2], ALERT_COLOR[3], 0.55)
-        resource.background:SetEdgeColor(r, g, b, 0.7)
-    else
-        resource.alert:SetCenterColor(0, 0, 0, 0)
-        resource.alert:SetEdgeColor(0, 0, 0, 0)
-        resource.background:SetEdgeColor(r, g, b, 0.34)
-    end
+    resource.fill:SetColor(r, g, b, 1)
+    resource.fill:SetMinMax(0, math.max(1, maximum))
+    resource.fill:SetValue(current)
 
     resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
     resource.percent:SetText(string.format("%d%%", percentValue))
@@ -430,7 +393,7 @@ function EZO_HUD:ApplyOverlayLayout()
         local resource = self.overlay.resources[resourceName]
         local resourceSettings = GetResourceSettings(settings, resourceName)
         local scaledSize = GetDominanceScaledSize(resourceSettings.size, resourceName, dominantMaximum)
-        local width, height = GetCleanBarDimensions(resource, resourceSettings, scaledSize)
+        local width, height = GetCleanBarDimensions(resource, scaledSize)
 
         ApplyCleanBarLayout(resource, width, height)
 
@@ -504,12 +467,12 @@ function EZO_HUD:InitializeOverlay()
     }
 
     root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.overlay and self.sv.overlay.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
             control:StartMoving()
         end
     end)
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.overlay and self.sv.overlay.movable then
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
             control:StopMovingOrResizing()
         end
     end)
@@ -582,13 +545,6 @@ function EZO_HUD:InitializeSettings()
         return
     end
 
-    local function ResourceShapeChoice(shape)
-        if shape == "rectangular" then
-            return GetString(EZO_HUD_SHAPE_RECTANGULAR)
-        end
-        return GetString(EZO_HUD_SHAPE_CIRCULAR)
-    end
-
     local function LanguageDefaultChoice()
         return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "auto"
     end
@@ -603,24 +559,8 @@ function EZO_HUD:InitializeSettings()
         local meta = RESOURCE_META[resourceName]
         local headerId = _G["EZO_HUD_OPTION_RESOURCE_" .. string.upper(resourceName)] or _G[meta.labelString]
         local defaultColor = CopyColor(self.defaults.overlay[meta.colorKey])
-        local shapeDefault = ResourceShapeChoice(self.defaults.overlay[meta.shapeKey])
         return {
             { type = "header", name = GetString(headerId) },
-            {
-                type = "dropdown",
-                name = GetString(EZO_HUD_OPTION_SHAPE),
-                tooltip = GetString(EZO_HUD_OPTION_SHAPE_TOOLTIP),
-                choices = { GetString(EZO_HUD_SHAPE_CIRCULAR), GetString(EZO_HUD_SHAPE_RECTANGULAR) },
-                getFunc = function()
-                    return ResourceShapeChoice(self.sv.overlay[meta.shapeKey])
-                end,
-                setFunc = function(value)
-                    self.sv.overlay[meta.shapeKey] = (value == GetString(EZO_HUD_SHAPE_RECTANGULAR)) and "rectangular" or "circular"
-                    self:ApplyOverlayLayout()
-                end,
-                default = shapeDefault,
-                width = "half",
-            },
             {
                 type = "slider",
                 name = GetString(EZO_HUD_OPTION_SIZE),
@@ -636,23 +576,6 @@ function EZO_HUD:InitializeSettings()
                     self:ApplyOverlayLayout()
                 end,
                 default = self.defaults.overlay[meta.sizeKey],
-                width = "half",
-            },
-            {
-                type = "slider",
-                name = GetString(EZO_HUD_OPTION_ALERT_THRESHOLD),
-                tooltip = GetString(EZO_HUD_OPTION_ALERT_THRESHOLD_TOOLTIP),
-                min = 0,
-                max = 100,
-                step = 1,
-                getFunc = function()
-                    return self.sv.overlay[meta.alertKey]
-                end,
-                setFunc = function(value)
-                    self.sv.overlay[meta.alertKey] = value
-                    self:RefreshOverlayValues()
-                end,
-                default = self.defaults.overlay[meta.alertKey],
                 width = "half",
             },
             {
@@ -760,8 +683,8 @@ function EZO_HUD:InitializeSettings()
                 type = "checkbox",
                 name = GetString(EZO_HUD_OPTION_MOVE_HUD),
                 tooltip = GetString(EZO_HUD_OPTION_MOVE_HUD_TOOLTIP),
-                getFunc = function() return self.sv.overlay.movable end,
-                setFunc = function(value) self.sv.overlay.movable = value; self:RefreshMovementState() end,
+                getFunc = function() return self:IsMoveModeEnabled("overlay") end,
+                setFunc = function(value) self:SetMoveModeEnabled("overlay", value); self:RefreshMovementState() end,
                 default = self.defaults.overlay.movable,
                 width = "full",
             },

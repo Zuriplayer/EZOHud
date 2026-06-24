@@ -129,7 +129,7 @@ function EZO_HUD:RefreshUltimateMovementState()
         return
     end
 
-    local movable = self.sv and self.sv.ultimate and self.sv.ultimate.movable == true
+    local movable = self:IsMoveModeEnabled("ultimate")
     for _, barName in ipairs(ULTIMATE_ORDER) do
         local root = self.ultimate.bars[barName].root
         root:SetMovable(movable)
@@ -292,12 +292,12 @@ function EZO_HUD:InitializeUltimate()
     for _, barName in ipairs(ULTIMATE_ORDER) do
         local entry = BuildUltimateBar(barName)
         entry.root:SetHandler("OnMouseDown", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.ultimate and self.sv.ultimate.movable then
+            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
                 control:StartMoving()
             end
         end)
         entry.root:SetHandler("OnMouseUp", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self.sv and self.sv.ultimate and self.sv.ultimate.movable then
+            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
                 control:StopMovingOrResizing()
             end
         end)
@@ -396,10 +396,10 @@ function EZO_HUD:InitializeUltimate()
                     name = GetString(EZO_HUD_OPTION_ULTIMATE_MOVE),
                     tooltip = GetString(EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP),
                     getFunc = function()
-                        return self.sv.ultimate.movable == true
+                        return self:IsMoveModeEnabled("ultimate")
                     end,
                     setFunc = function(value)
-                        self.sv.ultimate.movable = value
+                        self:SetMoveModeEnabled("ultimate", value)
                         self:RefreshUltimateMovementState()
                     end,
                     default = self.defaults.ultimate.movable,
