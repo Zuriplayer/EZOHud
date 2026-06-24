@@ -196,7 +196,7 @@ local function CreateSheenBar(name, parent)
     return bar
 end
 
-local function BuildResource(parent, resourceName)
+local function CreateResourceBar(parent, resourceName)
     local root = WINDOW_MANAGER:CreateControl("EZOhud_" .. resourceName .. "_Root", parent, CT_CONTROL)
     root:SetMouseEnabled(false)
     HideLegacyResourceLayers(root:GetName())
@@ -258,7 +258,7 @@ local function GetCleanBarDimensions(resource, scaledSize)
     return width, meta.barHeight
 end
 
-local function ApplyCleanBarLayout(resource, width, height)
+local function ApplyResourceBarStyle(resource, width, height)
     resource.root:SetDimensions(width, height)
 
     resource.consumed:ClearAnchors()
@@ -292,6 +292,33 @@ local function ApplyCleanBarLayout(resource, width, height)
     resource.value:SetScale(1.05)
     resource.value:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
     resource.value:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+end
+
+local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale)
+    local percentValue = 0
+    if maximum > 0 then
+        percentValue = zo_floor(Clamp(current / maximum, 0, 1) * 100)
+    end
+
+    resource.consumed:SetColor(unpack(CONSUMED_BAR_COLOR))
+    resource.consumed:SetMinMax(0, math.max(1, maximum))
+    resource.consumed:SetValue(math.max(1, maximum))
+
+    resource.fill:SetColor(r, g, b, 1)
+    resource.fill:SetMinMax(0, math.max(1, maximum))
+    resource.fill:SetValue(current)
+
+    resource.sheen:SetColor(unpack(FILL_SHEEN_COLOR))
+    resource.sheen:SetMinMax(0, math.max(1, maximum))
+    resource.sheen:SetValue(current)
+
+    resource.shade:SetColor(unpack(INNER_SHADE_COLOR))
+
+    resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
+    resource.percent:SetText(string.format("%d%%", percentValue))
+    resource.value:SetAlpha(alphaScale)
+    resource.value:SetColor(1, 1, 1, 0.92 * alphaScale)
+    resource.percent:SetColor(1, 1, 1, 0.92 * alphaScale)
 end
 
 function EZO_HUD:ApplyVanillaVisibility()
@@ -390,34 +417,9 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     end
     resource.lastMaximum = maximum
 
-    local ratio = 0
-    if maximum > 0 then
-        ratio = Clamp(current / maximum, 0, 1)
-    end
-
     local r, g, b = GetResourceColor(settings, resourceName)
     local alphaScale = GetOutOfCombatAlpha()
-    local percentValue = zo_floor(ratio * 100)
-
-    resource.consumed:SetColor(unpack(CONSUMED_BAR_COLOR))
-    resource.consumed:SetMinMax(0, math.max(1, maximum))
-    resource.consumed:SetValue(math.max(1, maximum))
-
-    resource.fill:SetColor(r, g, b, 1)
-    resource.fill:SetMinMax(0, math.max(1, maximum))
-    resource.fill:SetValue(current)
-
-    resource.sheen:SetColor(unpack(FILL_SHEEN_COLOR))
-    resource.sheen:SetMinMax(0, math.max(1, maximum))
-    resource.sheen:SetValue(current)
-
-    resource.shade:SetColor(unpack(INNER_SHADE_COLOR))
-
-    resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
-    resource.percent:SetText(string.format("%d%%", percentValue))
-    resource.value:SetAlpha(alphaScale)
-    resource.value:SetColor(1, 1, 1, 0.92 * alphaScale)
-    resource.percent:SetColor(1, 1, 1, 0.92 * alphaScale)
+    UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale)
 end
 
 function EZO_HUD:RefreshOverlayValues()
@@ -440,7 +442,7 @@ function EZO_HUD:ApplyOverlayLayout()
         local scaledSize = GetDominanceScaledSize(resourceSettings.size, resourceName, dominantMaximum)
         local width, height = GetCleanBarDimensions(resource, scaledSize)
 
-        ApplyCleanBarLayout(resource, width, height)
+        ApplyResourceBarStyle(resource, width, height)
 
         layout[resourceName] = {
             resource = resource,
@@ -534,7 +536,7 @@ function EZO_HUD:InitializeOverlay()
     end
 
     for _, resourceName in ipairs(RESOURCE_ORDER) do
-        local resource = BuildResource(root, resourceName)
+        local resource = CreateResourceBar(root, resourceName)
         self.overlay.resources[resourceName] = resource
     end
 
