@@ -4,7 +4,7 @@ local LANGUAGE_AUTO = "auto"
 local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.38"
+EZO_HUD.ADDON_VERSION = "0.1.39"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {

@@ -3,6 +3,7 @@ local EZO_HUD = EZOhud
 
 local BAR_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_fill.dds"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
+local CONSUMED_BAR_COLOR = { 0.24, 0.24, 0.24, 0.88 }
 local DOMINANCE_MIN_SCALE = 0.82
 local TEXT_INSET = 12
 local SIDE_GAP = 6
@@ -182,6 +183,7 @@ local function BuildResource(parent, resourceName)
 
     return {
         root = root,
+        consumed = CreateStatusBar(root:GetName() .. "_Consumed", root),
         fill = CreateStatusBar(root:GetName() .. "_Fill", root),
         caption = CreateLabel(root:GetName() .. "_Caption", root),
         value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold"),
@@ -236,6 +238,9 @@ end
 
 local function ApplyCleanBarLayout(resource, width, height)
     resource.root:SetDimensions(width, height)
+
+    resource.consumed:ClearAnchors()
+    resource.consumed:SetAnchorFill(resource.root)
 
     resource.fill:ClearAnchors()
     resource.fill:SetAnchorFill(resource.root)
@@ -363,6 +368,10 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     local r, g, b = GetResourceColor(settings, resourceName)
     local alphaScale = GetOutOfCombatAlpha()
     local percentValue = zo_floor(ratio * 100)
+
+    resource.consumed:SetColor(unpack(CONSUMED_BAR_COLOR))
+    resource.consumed:SetMinMax(0, math.max(1, maximum))
+    resource.consumed:SetValue(math.max(1, maximum))
 
     resource.fill:SetColor(r, g, b, 1)
     resource.fill:SetMinMax(0, math.max(1, maximum))

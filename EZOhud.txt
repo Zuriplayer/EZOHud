@@ -1,8 +1,8 @@
 ## Title: E|cB040FFZ|rOhud
 ## Author: @Zuriplayer
 ## Description: HUD framework experimental de la familia EZO, orientado a overlays y utilidades visuales.
-## Version: 0.1.38
-## AddOnVersion: 10038
+## Version: 0.1.39
+## AddOnVersion: 10039
 ## APIVersion: 101049 101050
 ## DependsOn: LibAddonMenu-2.0
 ## OptionalDependsOn: LibChatMessage LibDebugLogger
