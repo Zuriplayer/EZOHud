@@ -2,8 +2,11 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
 local BAR_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_fill.dds"
+local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
 local CONSUMED_BAR_COLOR = { 0.24, 0.24, 0.24, 0.88 }
+local FILL_SHEEN_COLOR = { 1.0, 1.0, 1.0, 0.12 }
+local INNER_SHADE_COLOR = { 0, 0, 0, 0.16 }
 local DOMINANCE_MIN_SCALE = 0.82
 local TEXT_INSET = 12
 local SIDE_GAP = 6
@@ -176,6 +179,23 @@ local function CreateStatusBar(name, parent)
     return bar
 end
 
+local function CreateFlatTexture(name, parent, color)
+    local texture = WINDOW_MANAGER:CreateControl(name, parent, CT_TEXTURE)
+    texture:SetMouseEnabled(false)
+    texture:SetTexture(WHITE_TEXTURE)
+    texture:SetColor(unpack(color))
+    return texture
+end
+
+local function CreateSheenBar(name, parent)
+    local bar = CreateStatusBar(name, parent)
+    bar:SetTexture(WHITE_TEXTURE)
+    if type(bar.SetTextureCoords) == "function" then
+        bar:SetTextureCoords(0, 1, 0, 1)
+    end
+    return bar
+end
+
 local function BuildResource(parent, resourceName)
     local root = WINDOW_MANAGER:CreateControl("EZOhud_" .. resourceName .. "_Root", parent, CT_CONTROL)
     root:SetMouseEnabled(false)
@@ -185,6 +205,8 @@ local function BuildResource(parent, resourceName)
         root = root,
         consumed = CreateStatusBar(root:GetName() .. "_Consumed", root),
         fill = CreateStatusBar(root:GetName() .. "_Fill", root),
+        sheen = CreateSheenBar(root:GetName() .. "_Sheen", root),
+        shade = CreateFlatTexture(root:GetName() .. "_Shade", root, INNER_SHADE_COLOR),
         caption = CreateLabel(root:GetName() .. "_Caption", root),
         value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold"),
         percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold"),
@@ -244,6 +266,14 @@ local function ApplyCleanBarLayout(resource, width, height)
 
     resource.fill:ClearAnchors()
     resource.fill:SetAnchorFill(resource.root)
+
+    resource.sheen:ClearAnchors()
+    resource.sheen:SetAnchor(TOPLEFT, resource.root, TOPLEFT, 0, 0)
+    resource.sheen:SetDimensions(width, math.max(4, zo_floor(height * 0.42)))
+
+    resource.shade:ClearAnchors()
+    resource.shade:SetAnchor(BOTTOMLEFT, resource.root, BOTTOMLEFT, 0, 0)
+    resource.shade:SetDimensions(width, math.max(5, zo_floor(height * 0.45)))
 
     resource.caption:ClearAnchors()
     resource.caption:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
@@ -377,6 +407,12 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
     resource.fill:SetMinMax(0, math.max(1, maximum))
     resource.fill:SetValue(current)
 
+    resource.sheen:SetColor(unpack(FILL_SHEEN_COLOR))
+    resource.sheen:SetMinMax(0, math.max(1, maximum))
+    resource.sheen:SetValue(current)
+
+    resource.shade:SetColor(unpack(INNER_SHADE_COLOR))
+
     resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
     resource.percent:SetText(string.format("%d%%", percentValue))
     resource.value:SetAlpha(alphaScale)
@@ -427,12 +463,17 @@ function EZO_HUD:ApplyOverlayLayout()
     layout.health.resource.root:ClearAnchors()
     layout.health.resource.root:SetAnchor(TOP, self.overlay.root, TOP, 0, 0)
 
-    local bottomLeft = zo_floor((groupWidth - bottomWidth) / 2)
     local bottomTop = layout.health.height + ROW_GAP
+    local centerLine = zo_floor(groupWidth / 2)
+    local leftGap = zo_floor(SIDE_GAP / 2)
+    local rightGap = SIDE_GAP - leftGap
+    local magickaLeft = centerLine - leftGap - layout.magicka.width
+    local staminaLeft = centerLine + rightGap
+
     layout.magicka.resource.root:ClearAnchors()
-    layout.magicka.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, bottomLeft, bottomTop)
+    layout.magicka.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, magickaLeft, bottomTop)
     layout.stamina.resource.root:ClearAnchors()
-    layout.stamina.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, bottomLeft + layout.magicka.width + SIDE_GAP, bottomTop)
+    layout.stamina.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, staminaLeft, bottomTop)
 
     self:RefreshMovementState()
     self:RefreshOverlayValues()
