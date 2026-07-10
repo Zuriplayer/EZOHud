@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "addon": {
+    "id": "ezohud",
+    "name": "EZOhud",
+    "version": "0.1.46",
+    "status": "beta",
+    "phase": "public-beta",
+    "visibility": "public",
+    "manifest": "EZOhud.txt",
+    "package": {
+      "rootFolderName": "EZOhud",
+      "zipName": "EZOhud_v0.1.46.zip",
+      "outputPath": "dist",
+      "include": [
+        "*.txt",
+        "*.lua",
+        "*.xml",
+        "modules/**",
+        "lang/**",
+        "libs/**",
+        "media/**",
+        "textures/**",
+        "fonts/**",
+        "bindings/**"
+      ],
+      "exclude": [
+        ".codex/**",
+        ".github/**",
+        ".git/**",
+        ".vscode/**",
+        "dev/**",
+        "docs/**",
+        "scripts/**",
+        "tests/**",
+        "test/**",
+        "node_modules/**",
+        "build/**",
+        "dist/**",
+        "*.md",
+        "*.ps1",
+        "*.sh",
+        "*.log",
+        "*.tmp",
+        "*.bak"
+      ]
+    }
+  }
+}

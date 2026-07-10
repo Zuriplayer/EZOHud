@@ -10,6 +10,13 @@ Soporte, errores y sugerencias: <https://discord.gg/ekw8zUAcRm>
 
 EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero el diseño, el aspecto visual, las opciones y el comportamiento de los indicadores todavía pueden cambiar. No debe considerarse un reemplazo final de suites de HUD maduras.
 
+## Metadatos de versión
+
+- Versión del addon: `0.1.46`
+- AddOnVersion: `10046`
+- APIVersion: `101049 101050`
+- Estado: beta pública
+
 ## Requisitos
 
 - The Elder Scrolls Online.
