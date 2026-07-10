@@ -25,11 +25,11 @@ Se preveen dos atlas:
 - `media/curved/cone_atlas.dds`
 - `media/curved/arc_atlas.dds`
 - Guia tecnica:
-  - [curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
+  - [curved_hud_atlas_template.svg](curved_hud_atlas_template.svg)
 - Concepto inicial de produccion:
-  - [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
+  - [cone_atlas_concept.svg](../media/curved/cone_atlas_concept.svg)
 - Base limpia de exportacion:
-  - [cone_atlas_export_base.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_export_base.svg)
+  - [cone_atlas_export_base.svg](../media/curved/cone_atlas_export_base.svg)
 
 Resolucion recomendada inicial:
 
@@ -42,7 +42,7 @@ perder definicion.
 
 Existe una plantilla editable del atlas en:
 
-- [curved_hud_atlas_template.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\docs\curved_hud_atlas_template.svg)
+- [curved_hud_atlas_template.svg](curved_hud_atlas_template.svg)
 
 Su objetivo no es ser el arte final, sino fijar:
 
@@ -53,7 +53,7 @@ Su objetivo no es ser el arte final, sino fijar:
 
 Existe ademas una primera base visual mas cercana a produccion en:
 
-- [cone_atlas_concept.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_concept.svg)
+- [cone_atlas_concept.svg](../media/curved/cone_atlas_concept.svg)
 
 Ese fichero ya incorpora una propuesta de:
 
@@ -64,7 +64,7 @@ Ese fichero ya incorpora una propuesta de:
 
 Existe tambien una base mas limpia para exportacion directa:
 
-- [cone_atlas_export_base.svg](\\RZRNAS\Zuriplayer\Dev\EZOhud\media\curved\cone_atlas_export_base.svg)
+- [cone_atlas_export_base.svg](../media/curved/cone_atlas_export_base.svg)
 
 Ese fichero elimina etiquetas tecnicas y sirve como punto de partida mas cercano
 al `.dds` final.
