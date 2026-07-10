@@ -4,7 +4,7 @@ local LANGUAGE_AUTO = "auto"
 local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.41"
+EZO_HUD.ADDON_VERSION = "0.1.46"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 
 EZO_HUD.defaults = {
@@ -25,6 +25,9 @@ EZO_HUD.defaults = {
         healthSize = 220,
         staminaSize = 180,
         magickaSize = 180,
+        healthWarningPercent = 35,
+        staminaWarningPercent = 20,
+        magickaWarningPercent = 20,
         healthColor = { r = 0.82, g = 0.18, b = 0.22, a = 1.0 },
         staminaColor = { r = 0.21, g = 0.67, b = 0.29, a = 1.0 },
         magickaColor = { r = 0.22, g = 0.46, b = 0.88, a = 1.0 },

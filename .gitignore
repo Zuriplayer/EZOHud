@@ -1,6 +1,55 @@
+AGENTS.md
+AGENTS.local.md
+
+# Local ESO/runtime data
 SavedVariables/
-*.log
+
+# Local assistant/agent workspaces
+.codex/
+.agents/
+.cursor/
+.continue/
+.aider*
+.claude/
+
+# Editor and OS files
 .vscode/
 .idea/
 Thumbs.db
 .DS_Store
+desktop.ini
+
+# Environment, local overrides, and private material
+.env
+.env.*
+*.env
+*.secret*
+secrets.*
+*.local*
+local/
+private/
+scratch/
+tmp/
+temp/
+notes/private/
+private-notes/
+
+# Logs, backups, and temporary files
+*.log
+*.bak
+*.backup
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+*.orig
+*.rej
+
+# Build/release artifacts
+dist/
+build/
+release/
+releases/
+packages/
+*.zip

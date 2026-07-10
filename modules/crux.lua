@@ -3,6 +3,7 @@ local EZO_HUD = EZOhud
 
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local CRUX_ABILITY_ID = 184220
+local ARCANIST_CLASS_ID = 117
 local CRUX_NAME = "EZOhud_Crux"
 local UPDATE_NAME = CRUX_NAME .. "_Update"
 local MAX_CRUX = 3
@@ -25,6 +26,11 @@ local function GetCruxDurationMs()
 end
 
 local CRUX_DURATION_MS = GetCruxDurationMs()
+
+local function IsPlayerArcanist()
+    return type(GetUnitClassId) == "function"
+        and GetUnitClassId("player") == ARCANIST_CLASS_ID
+end
 
 local function Clamp(value, minValue, maxValue)
     if value < minValue then
@@ -172,12 +178,15 @@ function EZO_HUD:ApplyCruxLayout()
     local textScale = Clamp(size / 58, 0.85, 4.2)
     local countBaseSize = 42
     local countVisualSize = zo_floor(countBaseSize * textScale)
-    local progressHeight = math.max(5, zo_floor(size * 0.09))
+    local progressHeight = math.max(7, zo_floor(size * 0.11))
     local progressWidth = math.max(34, zo_floor(countVisualSize * 0.78))
     local gap = Clamp(settings.barGap or EZO_HUD.defaults.crux.barGap or 1, 0, 80)
+    local glyphHeight = zo_floor(countVisualSize * 0.68)
+    local countTop = math.min(0, zo_floor(countVisualSize * -0.10))
+    local minimumClearance = math.max(4, zo_floor(size * 0.06))
     local width = math.max(countVisualSize, progressWidth)
-    local height = countVisualSize + gap + progressHeight
-    local progressTop = countVisualSize + gap
+    local progressTop = math.max(0, countTop + glyphHeight + minimumClearance + gap)
+    local height = progressTop + progressHeight
     local left, top = GetCruxAnchorPosition(settings, width, height)
 
     self.crux.root:SetDimensions(width, height)
@@ -189,7 +198,7 @@ function EZO_HUD:ApplyCruxLayout()
     self.crux.frame:SetColor(0, 0, 0, 0)
 
     self.crux.count:ClearAnchors()
-    self.crux.count:SetAnchor(TOP, self.crux.root, TOP, 0, 0)
+    self.crux.count:SetAnchor(TOP, self.crux.root, TOP, 0, countTop)
     self.crux.count:SetDimensions(countBaseSize, countBaseSize)
     self.crux.count:SetScale(textScale)
 
@@ -201,8 +210,11 @@ function EZO_HUD:ApplyCruxLayout()
     self.crux.progress:SetAnchorFill(self.crux.progressBg)
 
     self.crux.timer:ClearAnchors()
-    self.crux.timer:SetAnchor(TOP, self.crux.progressBg, BOTTOM, 0, 1)
-    self.crux.timer:SetHidden(true)
+    self.crux.timer:SetAnchor(RIGHT, self.crux.progressBg, RIGHT, -2, 0)
+    self.crux.timer:SetDimensions(progressWidth - 4, progressHeight)
+    self.crux.timer:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+    self.crux.timer:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    self.crux.timer:SetScale(Clamp(size / 120, 0.55, 1.15))
 
     self:RefreshCruxMovementState()
     self:RefreshCruxDisplay()
@@ -222,6 +234,11 @@ end
 
 function EZO_HUD:RefreshCruxDisplay()
     if not self.crux then
+        return
+    end
+
+    if not IsPlayerArcanist() then
+        self.crux.root:SetHidden(true)
         return
     end
 
@@ -255,7 +272,14 @@ function EZO_HUD:RefreshCruxDisplay()
     self.crux.count:SetText(stackCount > 0 and tostring(stackCount) or ((movable or showEmpty) and "0" or ""))
     self.crux.count:SetColor(color[1], color[2], color[3], alpha)
 
-    self.crux.timer:SetText("")
+    if stackCount > 0 and remaining > 0 then
+        self.crux.timer:SetText(tostring(math.ceil(remaining)))
+        self.crux.timer:SetColor(0.96, 0.98, 1.0, 0.92)
+        self.crux.timer:SetHidden(false)
+    else
+        self.crux.timer:SetText("")
+        self.crux.timer:SetHidden(true)
+    end
 end
 
 function EZO_HUD:OnCruxEffectChanged(_, changeType, _, _, unitTag, _, _, stackCount)

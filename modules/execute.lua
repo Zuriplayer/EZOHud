@@ -11,9 +11,9 @@ local EXECUTE_MODE_ACTIVE = "active"
 local EXECUTE_BY_ID = {
     [34838] = { threshold = 25 }, -- Assassin's Blade
     [34851] = { threshold = 25 }, -- Impale
-    [63029] = { threshold = 50 }, -- Radiant Destruction
-    [63044] = { threshold = 50 }, -- Radiant Glory
-    [63046] = { threshold = 50 }, -- Radiant Oppression
+    [63029] = { threshold = 33 }, -- Radiant Destruction
+    [63044] = { threshold = 33 }, -- Radiant Glory
+    [63046] = { threshold = 40 }, -- Radiant Oppression
 }
 
 local EXECUTE_BY_NAME = {
@@ -26,11 +26,21 @@ local EXECUTE_BY_NAME = {
     ["reverse slash"] = 50,
     ["reverse slice"] = 50,
     ["executioner"] = 50,
-    ["radiant destruction"] = 50,
-    ["radiant glory"] = 50,
-    ["radiant oppression"] = 50,
+    ["radiant destruction"] = 33,
+    ["radiant glory"] = 33,
+    ["radiant oppression"] = 40,
     ["poison injection"] = 50,
+    ["whirlwind"] = 50,
+    ["steel tornado"] = 50,
     ["whirling blades"] = 50,
+    ["gnash"] = 25,
+    ["bloody gnash"] = 25,
+    ["rip and tear"] = 25,
+    ["vengeance assassin's blade"] = 25,
+    ["vengeance radiant destruction"] = 33,
+    ["vengeance mages' fury"] = 20,
+    ["vengeance reverse slash"] = 50,
+    ["vengeance whirlwind"] = 50,
     ["hoja del asesino"] = 25,
     ["empalar"] = 25,
     ["hoja asesina"] = 50,
@@ -39,15 +49,33 @@ local EXECUTE_BY_NAME = {
     ["ira del mago"] = 20,
     ["corte inverso"] = 50,
     ["ejecutor"] = 50,
-    ["destruccion radiante"] = 50,
-    ["destrucción radiante"] = 50,
-    ["gloria radiante"] = 50,
-    ["opresion radiante"] = 50,
-    ["opresión radiante"] = 50,
+    ["destruccion radiante"] = 33,
+    ["destrucción radiante"] = 33,
+    ["gloria radiante"] = 33,
+    ["opresion radiante"] = 40,
+    ["opresión radiante"] = 40,
     ["inyeccion de veneno"] = 50,
     ["inyección de veneno"] = 50,
+    ["torbellino"] = 50,
+    ["tornado de acero"] = 50,
     ["cuchillas giratorias"] = 50,
 }
+
+local EXECUTE_DESCRIPTION_PATTERNS = {
+    "enemies?[^%.;]*below%s+(%d+)%%%s+health",
+    "enemies?[^%.;]*less%s+than%s+(%d+)%%%s+health",
+    "enemies?[^%.;]*under%s+(%d+)%%%s+health",
+    "enemy[^%.;]*was%s+below%s+(%d+)%%%s+health",
+    "enemy[^%.;]*falls%s+to%s+or%s+below%s+(%d+)%%%s+health",
+    "target[^%.;]*falls%s+to%s+or%s+below%s+(%d+)%%%s+health",
+    "cae[^%.;]*por%s+debajo%s+de?l?%s*(%d+)%%[^%.;]*salud",
+    "enemig[oa]s?[^%.;]*por%s+debajo%s+de?l?%s*(%d+)%%[^%.;]*salud",
+    "enemig[oa]s?[^%.;]*menos%s+de?l?%s*(%d+)%%[^%.;]*salud",
+    "objetivo[^%.;]*por%s+debajo%s+de?l?%s*(%d+)%%[^%.;]*salud",
+    "objetivo[^%.;]*menos%s+de?l?%s*(%d+)%%[^%.;]*salud",
+}
+
+local executeThresholdCache = {}
 
 local function Clamp(value, minValue, maxValue)
     if value < minValue then
@@ -76,6 +104,42 @@ local function NormalizeName(value)
     value = value:gsub("%^%a+", "")
     value = value:gsub("^%s+", ""):gsub("%s+$", "")
     return value
+end
+
+local function ExtractExecuteThresholdFromDescription(description)
+    description = NormalizeName(description)
+    if description == "" then
+        return nil
+    end
+
+    for _, pattern in ipairs(EXECUTE_DESCRIPTION_PATTERNS) do
+        local value = description:match(pattern)
+        value = tonumber(value)
+        if value and value > 0 and value <= 100 then
+            return value
+        end
+    end
+end
+
+local function GetAbilityExecuteThreshold(abilityId)
+    if not (abilityId and type(GetAbilityDescription) == "function") then
+        return nil
+    end
+
+    local cached = executeThresholdCache[abilityId]
+    if cached ~= nil then
+        return cached or nil
+    end
+
+    local ok, description = pcall(GetAbilityDescription, abilityId)
+    if not (ok and description and description ~= "") then
+        executeThresholdCache[abilityId] = false
+        return nil
+    end
+
+    local threshold = ExtractExecuteThresholdFromDescription(description)
+    executeThresholdCache[abilityId] = threshold or false
+    return threshold
 end
 
 local function GetExecuteSettings()
@@ -123,17 +187,18 @@ local function GetExecuteForSlot(slotIndex, hotbarCategory)
     local abilityId, rawAbilityId = GetEffectiveSlotAbilityId(slotIndex, hotbarCategory)
     local data = abilityId and EXECUTE_BY_ID[abilityId]
     if data then
+        local dynamicThreshold = GetAbilityExecuteThreshold(abilityId)
         return {
             abilityId = abilityId,
             rawAbilityId = rawAbilityId,
             name = GetSlotAbilityName(slotIndex, hotbarCategory, abilityId),
-            threshold = data.threshold,
+            threshold = dynamicThreshold or data.threshold,
             slotIndex = slotIndex,
         }
     end
 
     local name = GetSlotAbilityName(slotIndex, hotbarCategory, abilityId)
-    local threshold = EXECUTE_BY_NAME[NormalizeName(name)]
+    local threshold = GetAbilityExecuteThreshold(abilityId) or EXECUTE_BY_NAME[NormalizeName(name)]
     if threshold then
         return {
             abilityId = abilityId,

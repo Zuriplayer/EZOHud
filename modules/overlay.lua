@@ -2,11 +2,13 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
 local BAR_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_fill.dds"
+local BAR_CAP_TEXTURE = "EsoUI/Art/Miscellaneous/progressbar_genericfill_leadingedge_blunt.dds"
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
 local CONSUMED_BAR_COLOR = { 0.24, 0.24, 0.24, 0.88 }
 local FILL_SHEEN_COLOR = { 1.0, 1.0, 1.0, 0.12 }
 local INNER_SHADE_COLOR = { 0, 0, 0, 0.16 }
+local WARNING_TEXT_COLOR = { 1.0, 0.72, 0.18, 0.96 }
 local DOMINANCE_MIN_SCALE = 0.82
 local TEXT_INSET = 12
 local SIDE_GAP = 6
@@ -20,6 +22,7 @@ local RESOURCE_META = {
         labelString = "EZO_HUD_PREVIEW_HEALTH",
         sizeKey = "healthSize",
         colorKey = "healthColor",
+        warningKey = "healthWarningPercent",
         offsetXKey = "healthOffsetX",
         offsetYKey = "healthOffsetY",
         minimumWidth = 190,
@@ -30,6 +33,7 @@ local RESOURCE_META = {
         labelString = "EZO_HUD_PREVIEW_STAMINA",
         sizeKey = "staminaSize",
         colorKey = "staminaColor",
+        warningKey = "staminaWarningPercent",
         offsetXKey = "staminaOffsetX",
         offsetYKey = "staminaOffsetY",
         minimumWidth = 150,
@@ -40,6 +44,7 @@ local RESOURCE_META = {
         labelString = "EZO_HUD_PREVIEW_MAGICKA",
         sizeKey = "magickaSize",
         colorKey = "magickaColor",
+        warningKey = "magickaWarningPercent",
         offsetXKey = "magickaOffsetX",
         offsetYKey = "magickaOffsetY",
         minimumWidth = 150,
@@ -187,6 +192,16 @@ local function CreateFlatTexture(name, parent, color)
     return texture
 end
 
+local function CreateBarCap(name, parent, mirrored)
+    local texture = WINDOW_MANAGER:CreateControl(name, parent, CT_TEXTURE)
+    texture:SetMouseEnabled(false)
+    texture:SetTexture(BAR_CAP_TEXTURE)
+    if mirrored and type(texture.SetTextureCoords) == "function" then
+        texture:SetTextureCoords(1, 0, 0, 1)
+    end
+    return texture
+end
+
 local function CreateSheenBar(name, parent)
     local bar = CreateStatusBar(name, parent)
     bar:SetTexture(WHITE_TEXTURE)
@@ -207,6 +222,10 @@ local function CreateResourceBar(parent, resourceName)
         fill = CreateStatusBar(root:GetName() .. "_Fill", root),
         sheen = CreateSheenBar(root:GetName() .. "_Sheen", root),
         shade = CreateFlatTexture(root:GetName() .. "_Shade", root, INNER_SHADE_COLOR),
+        consumedLeftCap = CreateBarCap(root:GetName() .. "_ConsumedLeftCap", root, true),
+        consumedRightCap = CreateBarCap(root:GetName() .. "_ConsumedRightCap", root, false),
+        fillLeftCap = CreateBarCap(root:GetName() .. "_FillLeftCap", root, true),
+        fillRightCap = CreateBarCap(root:GetName() .. "_FillRightCap", root, false),
         caption = CreateLabel(root:GetName() .. "_Caption", root),
         value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold"),
         percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold"),
@@ -259,21 +278,42 @@ local function GetCleanBarDimensions(resource, scaledSize)
 end
 
 local function ApplyResourceBarStyle(resource, width, height)
+    local capSize = height
+    local innerWidth = math.max(1, width - capSize)
+
+    resource.capSize = capSize
+    resource.innerWidth = innerWidth
     resource.root:SetDimensions(width, height)
 
     resource.consumed:ClearAnchors()
-    resource.consumed:SetAnchorFill(resource.root)
+    resource.consumed:SetAnchor(LEFT, resource.root, LEFT, zo_floor(capSize / 2), 0)
+    resource.consumed:SetDimensions(innerWidth, height)
 
     resource.fill:ClearAnchors()
-    resource.fill:SetAnchorFill(resource.root)
+    resource.fill:SetAnchor(LEFT, resource.root, LEFT, zo_floor(capSize / 2), 0)
+    resource.fill:SetDimensions(innerWidth, height)
 
     resource.sheen:ClearAnchors()
-    resource.sheen:SetAnchor(TOPLEFT, resource.root, TOPLEFT, 0, 0)
-    resource.sheen:SetDimensions(width, math.max(4, zo_floor(height * 0.42)))
+    resource.sheen:SetAnchor(LEFT, resource.root, LEFT, zo_floor(capSize / 2), 0)
+    resource.sheen:SetDimensions(innerWidth, math.max(4, zo_floor(height * 0.42)))
 
     resource.shade:ClearAnchors()
-    resource.shade:SetAnchor(BOTTOMLEFT, resource.root, BOTTOMLEFT, 0, 0)
-    resource.shade:SetDimensions(width, math.max(5, zo_floor(height * 0.45)))
+    resource.shade:SetAnchor(BOTTOMLEFT, resource.root, BOTTOMLEFT, zo_floor(capSize / 2), 0)
+    resource.shade:SetDimensions(innerWidth, math.max(5, zo_floor(height * 0.45)))
+
+    resource.consumedLeftCap:ClearAnchors()
+    resource.consumedLeftCap:SetAnchor(TOPLEFT, resource.root, TOPLEFT, 0, 0)
+    resource.consumedLeftCap:SetDimensions(capSize, height)
+
+    resource.consumedRightCap:ClearAnchors()
+    resource.consumedRightCap:SetAnchor(TOPRIGHT, resource.root, TOPRIGHT, 0, 0)
+    resource.consumedRightCap:SetDimensions(capSize, height)
+
+    resource.fillLeftCap:ClearAnchors()
+    resource.fillLeftCap:SetAnchor(TOPLEFT, resource.root, TOPLEFT, 0, 0)
+    resource.fillLeftCap:SetDimensions(capSize, height)
+
+    resource.fillRightCap:SetDimensions(capSize, height)
 
     resource.caption:ClearAnchors()
     resource.caption:SetAnchor(CENTER, resource.root, CENTER, 0, 0)
@@ -294,19 +334,25 @@ local function ApplyResourceBarStyle(resource, width, height)
     resource.value:SetVerticalAlignment(TEXT_ALIGN_CENTER)
 end
 
-local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale)
+local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale, warningActive)
     local percentValue = 0
+    local ratio = 0
     if maximum > 0 then
-        percentValue = zo_floor(Clamp(current / maximum, 0, 1) * 100)
+        ratio = Clamp(current / maximum, 0, 1)
+        percentValue = zo_floor(ratio * 100)
     end
 
     resource.consumed:SetColor(unpack(CONSUMED_BAR_COLOR))
     resource.consumed:SetMinMax(0, math.max(1, maximum))
     resource.consumed:SetValue(math.max(1, maximum))
+    resource.consumedLeftCap:SetColor(unpack(CONSUMED_BAR_COLOR))
+    resource.consumedRightCap:SetColor(unpack(CONSUMED_BAR_COLOR))
 
     resource.fill:SetColor(r, g, b, 1)
     resource.fill:SetMinMax(0, math.max(1, maximum))
     resource.fill:SetValue(current)
+    resource.fillLeftCap:SetColor(r, g, b, 1)
+    resource.fillRightCap:SetColor(r, g, b, 1)
 
     resource.sheen:SetColor(unpack(FILL_SHEEN_COLOR))
     resource.sheen:SetMinMax(0, math.max(1, maximum))
@@ -314,11 +360,25 @@ local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alpha
 
     resource.shade:SetColor(unpack(INNER_SHADE_COLOR))
 
+    local hasValue = current > 0 and maximum > 0
+    resource.fillLeftCap:SetHidden(not hasValue)
+    resource.fillRightCap:SetHidden(not hasValue)
+    if hasValue then
+        local capX = zo_floor((resource.innerWidth or 1) * ratio)
+        resource.fillRightCap:ClearAnchors()
+        resource.fillRightCap:SetAnchor(TOPLEFT, resource.root, TOPLEFT, capX, 0)
+    end
+
     resource.value:SetText(string.format("%d / %d", zo_floor(current), zo_floor(maximum)))
     resource.percent:SetText(string.format("%d%%", percentValue))
     resource.value:SetAlpha(alphaScale)
-    resource.value:SetColor(1, 1, 1, 0.92 * alphaScale)
-    resource.percent:SetColor(1, 1, 1, 0.92 * alphaScale)
+    if warningActive then
+        resource.value:SetColor(WARNING_TEXT_COLOR[1], WARNING_TEXT_COLOR[2], WARNING_TEXT_COLOR[3], WARNING_TEXT_COLOR[4] * alphaScale)
+        resource.percent:SetColor(WARNING_TEXT_COLOR[1], WARNING_TEXT_COLOR[2], WARNING_TEXT_COLOR[3], WARNING_TEXT_COLOR[4] * alphaScale)
+    else
+        resource.value:SetColor(1, 1, 1, 0.92 * alphaScale)
+        resource.percent:SetColor(1, 1, 1, 0.92 * alphaScale)
+    end
 end
 
 function EZO_HUD:ApplyVanillaVisibility()
@@ -419,7 +479,9 @@ function EZO_HUD:UpdateResourceDisplay(resourceName)
 
     local r, g, b = GetResourceColor(settings, resourceName)
     local alphaScale = GetOutOfCombatAlpha()
-    UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale)
+    local warningPercent = tonumber(settings[resource.meta.warningKey]) or 0
+    local warningActive = warningPercent > 0 and maximum > 0 and (current / maximum) <= (warningPercent / 100)
+    UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale, warningActive)
 end
 
 function EZO_HUD:RefreshOverlayValues()
@@ -509,8 +571,8 @@ function EZO_HUD:InitializeOverlay()
     local root = WINDOW_MANAGER:CreateTopLevelWindow("EZOhudOverlayRoot")
     root:SetClampedToScreen(true)
     root:SetMovable(false)
-    root:SetDrawLayer(DL_OVERLAY)
-    root:SetDrawTier(DT_HIGH)
+    root:SetDrawLayer(DL_BACKGROUND)
+    root:SetDrawTier(DT_LOW)
     root:SetMouseEnabled(false)
 
     self.overlay = {
@@ -645,6 +707,23 @@ function EZO_HUD:InitializeSettings()
                 default = defaultColor,
                 width = "half",
             },
+            {
+                type = "slider",
+                name = GetString(EZO_HUD_OPTION_RESOURCE_WARNING),
+                tooltip = GetString(EZO_HUD_OPTION_RESOURCE_WARNING_TOOLTIP),
+                min = 0,
+                max = 100,
+                step = 1,
+                getFunc = function()
+                    return self.sv.overlay[meta.warningKey] or self.defaults.overlay[meta.warningKey] or 0
+                end,
+                setFunc = function(value)
+                    self.sv.overlay[meta.warningKey] = value
+                    self:RefreshOverlayValues()
+                end,
+                default = self.defaults.overlay[meta.warningKey],
+                width = "half",
+            },
         }
     end
 
@@ -676,35 +755,6 @@ function EZO_HUD:InitializeSettings()
                     end
                 end,
                 default = LanguageDefaultChoice(),
-                width = "half",
-            },
-            {
-                type = "checkbox",
-                name = GetString(EZO_HUD_OPTION_DEBUG_ENABLE),
-                tooltip = GetString(EZO_HUD_OPTION_DEBUG_ENABLE_TOOLTIP),
-                getFunc = function()
-                    return self.sv.general.debugEnabled
-                end,
-                setFunc = function(value)
-                    self.sv.general.debugEnabled = value
-                    if value and self.InitializeDebug then
-                        self:InitializeDebug()
-                    end
-                end,
-                default = self.defaults.general.debugEnabled,
-                width = "half",
-            },
-            {
-                type = "checkbox",
-                name = GetString(EZO_HUD_OPTION_DEBUG_CHAT),
-                tooltip = GetString(EZO_HUD_OPTION_DEBUG_CHAT_TOOLTIP),
-                getFunc = function()
-                    return self.sv.general.debugToChat
-                end,
-                setFunc = function(value)
-                    self.sv.general.debugToChat = value
-                end,
-                default = self.defaults.general.debugToChat,
                 width = "half",
             },
         }
@@ -760,6 +810,41 @@ function EZO_HUD:InitializeSettings()
             end
         end
         return options
+    end)
+
+    EZOhud_LAM.RegisterSection("debug", 90, function()
+        return {
+            { type = "header", name = GetString(EZO_HUD_OPTION_DEBUG) },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_DEBUG_ENABLE),
+                tooltip = GetString(EZO_HUD_OPTION_DEBUG_ENABLE_TOOLTIP),
+                getFunc = function()
+                    return self.sv.general.debugEnabled
+                end,
+                setFunc = function(value)
+                    self.sv.general.debugEnabled = value
+                    if value and self.InitializeDebug then
+                        self:InitializeDebug()
+                    end
+                end,
+                default = self.defaults.general.debugEnabled,
+                width = "half",
+            },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_DEBUG_CHAT),
+                tooltip = GetString(EZO_HUD_OPTION_DEBUG_CHAT_TOOLTIP),
+                getFunc = function()
+                    return self.sv.general.debugToChat
+                end,
+                setFunc = function(value)
+                    self.sv.general.debugToChat = value
+                end,
+                default = self.defaults.general.debugToChat,
+                width = "half",
+            },
+        }
     end)
 
     local panelData = {

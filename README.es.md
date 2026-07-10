@@ -1,0 +1,95 @@
+# EZOhud
+
+¿Prefieres inglés? Lee el [README en inglés](README.md).
+
+EZOhud es un addon beta de HUD para The Elder Scrolls Online dentro de la familia de addons EZO. Su propósito actual es ofrecer indicadores visuales configurables para recursos del jugador, disponibilidad de ultimate, oportunidades de execute y seguimiento de Crux del arcanista, manteniendo una implementación pequeña y fácil de probar.
+
+Soporte, errores y sugerencias: <https://discord.gg/ekw8zUAcRm>
+
+## Estado Beta
+
+EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero el diseño, el aspecto visual, las opciones y el comportamiento de los indicadores todavía pueden cambiar. No debe considerarse un reemplazo final de suites de HUD maduras.
+
+## Requisitos
+
+- The Elder Scrolls Online.
+- `LibAddonMenu-2.0` es obligatorio para el panel de configuración.
+- `LibChatMessage` es opcional y se usa para mensajes de chat más limpios cuando está disponible.
+- `LibDebugLogger` es opcional y se usa por las opciones de debug cuando está disponible.
+
+## Instalación
+
+1. Descarga o clona este repositorio.
+2. Coloca la carpeta `EZOhud` en el directorio de AddOns de ESO:
+   `Documents/Elder Scrolls Online/live/AddOns/EZOhud`
+3. Activa `EZOhud` desde la pantalla de AddOns de ESO.
+4. Abre Ajustes > Addons > EZOhud para configurar el addon.
+
+## Funciones Implementadas
+
+- HUD de atributos para Salud, Magia y Estamina.
+- Ocultación opcional de las barras de atributos del jugador por defecto de ESO.
+- Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
+- Ajustes de anchura de barra para Salud, Magia y Estamina.
+- Selectores de color de recurso limitados a la familia de color de cada recurso.
+- Umbrales de aviso por recurso que cambian solo los números del recurso a un color de alarma.
+- Alpha fuera de combate para el HUD de atributos personalizado.
+- Escalado de barras basado en el valor máximo de cada recurso, para que el recurso máximo dominante pueda verse más grande.
+- Indicadores de HUD de ultimate para los slots de ultimate principal y secundaria.
+- Modos de visualización de ultimate: principal, secundaria, ambas o solo barra no activa.
+- Indicadores de ultimate movibles, con posiciones independientes para principal y secundaria.
+- Ajuste de tamaño del icono de ultimate, barra de progreso, valor actual de ultimate, coste, estado de lista y estado de barra activa.
+- HUD de execute que analiza las habilidades de execute equipadas en la barra activa y muestra un aviso cuando el objetivo actual está dentro del umbral detectado.
+- Umbrales de execute para habilidades conocidas, con detección adicional basada en el tooltip cuando está disponible.
+- Aviso de execute movible y ajuste de tamaño del aviso.
+- HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
+- Visibilidad del HUD de Crux limitada a personajes arcanistas.
+- Opción para ocultar el HUD de Crux cuando no hay stacks activos.
+- Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
+- Localización en inglés y español con selección de idioma Automático, Inglés y Español.
+- Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
+- Comando local `/ezohudcrux` para diagnóstico puntual de Crux.
+- Restablecimiento de ajustes mediante el mecanismo de valores por defecto de LibAddonMenu.
+
+## Opciones Principales
+
+- General: selección de idioma.
+- HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.
+- HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
+- HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
+- HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
+- Debug: activar registro de debug y, opcionalmente, reflejar la salida de debug en el chat.
+
+## Límites de Seguridad
+
+- EZOhud es únicamente visual.
+- No lanza habilidades, no pulsa teclas, no automatiza rotaciones, no bloquea, no esquiva, no interrumpe, no selecciona objetivos ni toma decisiones de juego.
+- Los indicadores de execute, ultimate, recursos y Crux son solo informativos.
+- Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir.
+- EZOhud no añade atajos de teclado ni gestión de input y está pensado para mantener compatibilidad con juego en teclado y gamepad.
+- Las herramientas de debug son solo diagnósticas y deberían permanecer desactivadas durante el juego normal salvo que se esté investigando un problema.
+
+## Notas de Prueba
+
+Comprobaciones recomendadas para la beta:
+
+- Probar en personajes arcanistas y no arcanistas para confirmar que la visibilidad del HUD de Crux es correcta.
+- Probar HUD normal, HUD UI, menús, puntos de campeón, Tales of Tribute y otras escenas que no sean HUD.
+- Probar el comportamiento en combate y el alpha fuera de combate.
+- Probar la ocultación de las barras de atributos de EZOhud independientemente de la ocultación de las barras vanilla de ESO.
+- Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
+- Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
+- Probar los modos de idioma Inglés, Español y Automático.
+- Probar distintas resoluciones y valores de escala de UI.
+- Probar `/reloadui` después de mover elementos del HUD.
+
+Al informar de problemas de diseño o comportamiento, incluye la versión del addon, versión de API de ESO, clase del personaje, modo de idioma, ajustes activos y una captura de pantalla.
+
+## Notas del Repositorio
+
+- `AGENTS.md` se ignora intencionadamente y se mantiene local para instrucciones de agentes de desarrollo.
+- Esta preparación del repositorio no genera ZIP, artefacto de release ni anuncio en Discord.
+
+## Licencia
+
+EZOhud se publica bajo la [licencia MIT](LICENSE).
