@@ -1,7 +1,6 @@
 # EZOhud
 
-Prefer Spanish? Read the [Spanish README](README.es.md).
-
+¿Prefieres español? Lee el [README en español](README.es.md).
 EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, execute opportunities, and Arcanist Crux tracking while keeping the implementation small and testable.
 
 Support, bug reports, and suggestions: <https://discord.gg/ekw8zUAcRm>
