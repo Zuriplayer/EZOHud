@@ -5,7 +5,7 @@
 ## AddOnVersion: 10046
 ## APIVersion: 101049 101050
 ## DependsOn: LibAddonMenu-2.0
-## OptionalDependsOn: LibChatMessage LibDebugLogger
+## OptionalDependsOn: LibChatMessage LibDebugLogger DebugLogViewer
 ## SavedVariables: EZOhud_Saved
 
 lang/en.lua
