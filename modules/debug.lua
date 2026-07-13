@@ -28,15 +28,25 @@ local function EnsureDebugLogger()
     if EZO_HUD.runtime.debugLogger then
         return EZO_HUD.runtime.debugLogger
     end
+    if EZO_HUD.runtime.debugLoggerUnavailable == true then
+        return nil
+    end
+
+    local lib = _G.LibDebugLogger
+    if type(lib) ~= "function" and type(lib) ~= "table" then
+        EZO_HUD.runtime.debugLoggerUnavailable = true
+        return nil
+    end
 
     local ok, logger = pcall(function()
-        if not LibDebugLogger then
-            return nil
+        local created = nil
+        if type(lib) == "function" then
+            created = lib(EZO_HUD.ADDON_NAME or "EZOhud")
+        elseif type(lib.Create) == "function" then
+            created = lib:Create(EZO_HUD.ADDON_NAME or "EZOhud")
         end
-
-        local created = LibDebugLogger(EZO_HUD.ADDON_NAME or "EZOhud")
-        if created and type(created.SetMinLevelOverride) == "function" and LibDebugLogger.LOG_LEVEL_DEBUG ~= nil then
-            created:SetMinLevelOverride(LibDebugLogger.LOG_LEVEL_DEBUG)
+        if created and type(created.SetMinLevelOverride) == "function" and type(lib) == "table" and lib.LOG_LEVEL_DEBUG ~= nil then
+            created:SetMinLevelOverride(lib.LOG_LEVEL_DEBUG)
         end
         if created and type(created.SetLogTracesOverride) == "function" then
             created:SetLogTracesOverride(false)
@@ -46,9 +56,11 @@ local function EnsureDebugLogger()
 
     if ok and logger then
         EZO_HUD.runtime.debugLogger = logger
+        EZO_HUD.runtime.debugLoggerUnavailable = false
         return logger
     end
 
+    EZO_HUD.runtime.debugLoggerUnavailable = true
     return nil
 end
 
@@ -88,7 +100,7 @@ local function WriteToViewer(level, msg, subTag)
 end
 
 local function DebugLog(level, msg, subTag)
-    if DebugToChatEnabled() then
+    if DebugEnabled() and DebugToChatEnabled() then
         SafeChat(msg)
     end
     WriteToViewer(level, msg, subTag)
@@ -109,7 +121,7 @@ local function DebugBatchAdd(batch, msg)
     end
 
     batch.lines[#batch.lines + 1] = tostring(msg)
-    if DebugToChatEnabled() then
+    if DebugEnabled() and DebugToChatEnabled() then
         SafeChat(msg)
     end
 end
