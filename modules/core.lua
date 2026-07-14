@@ -5,9 +5,10 @@ local LANGUAGE_AUTO = "auto"
 local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
+local layoutSurfacesRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.49"
+EZO_HUD.ADDON_VERSION = "0.1.50"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -177,10 +178,11 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = 10049,
+            addOnVersion = 10050,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",
+                "family.layout.consumer",
                 "family.settings.consumer",
                 "hud.attributes",
                 "hud.visualOverlay",
@@ -190,6 +192,76 @@ function EZO_HUD:RegisterWithEZOCore()
 
     ezocoreRegistered = ok and result == true
     return ezocoreRegistered
+end
+
+function EZO_HUD:RefreshMoveModeSection(sectionName)
+    if sectionName == "overlay" then
+        self:RefreshMovementState()
+        self:RefreshOverlayVisibility()
+    elseif sectionName == "ultimate" then
+        self:RefreshUltimateMovementState()
+        self:RefreshUltimateVisibility()
+    elseif sectionName == "execute" then
+        self:RefreshExecuteMovementState()
+        self:RefreshExecute()
+    elseif sectionName == "crux" then
+        self:RefreshCruxMovementState()
+        self:RefreshCruxDisplay()
+    end
+end
+
+function EZO_HUD:SetLayoutEditMode(sectionName, enabled)
+    self:SetMoveModeEnabled(sectionName, enabled)
+    self:RefreshMoveModeSection(sectionName)
+    return self:IsMoveModeEnabled(sectionName)
+end
+
+function EZO_HUD:RegisterLayoutWithEZOCore()
+    if layoutSurfacesRegistered
+        or not (EZOCore and type(EZOCore.GetService) == "function") then
+        return false
+    end
+
+    local service = EZOCore:GetService("family.layout", 1)
+    if not service or type(service.RegisterSurface) ~= "function" then
+        return false
+    end
+
+    local definitions = {
+        { id = "ezohud.attributes", section = "overlay", order = 10, name = EZO_HUD_OPTION_MOVE_HUD, tooltip = EZO_HUD_OPTION_MOVE_HUD_TOOLTIP },
+        { id = "ezohud.ultimate", section = "ultimate", order = 20, name = EZO_HUD_OPTION_ULTIMATE_MOVE, tooltip = EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP },
+        { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
+        { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
+    }
+
+    for _, definition in ipairs(definitions) do
+        local sectionName = definition.section
+        local nameStringId = definition.name
+        local tooltipStringId = definition.tooltip
+        local ok, result = pcall(function()
+            return service:RegisterSurface({
+                id = definition.id,
+                addonId = "ezohud",
+                addonName = "EZOhud",
+                name = function() return GetString(nameStringId) end,
+                tooltip = function() return GetString(tooltipStringId) end,
+                sortOrder = definition.order,
+                setEditMode = function(enabled)
+                    self:SetLayoutEditMode(sectionName, enabled)
+                    return self:IsMoveModeEnabled(sectionName) == (enabled == true)
+                end,
+                isEditMode = function()
+                    return self:IsMoveModeEnabled(sectionName)
+                end,
+            })
+        end)
+        if not ok or result ~= true then
+            return false
+        end
+    end
+
+    layoutSurfacesRegistered = true
+    return true
 end
 
 function EZO_HUD:InitializeRuntimeState()
@@ -264,6 +336,8 @@ function EZO_HUD:Initialize()
     if self.InitializeCrux ~= nil then
         self:InitializeCrux()
     end
+
+    self:RegisterLayoutWithEZOCore()
 
     if self.InitializeSettings ~= nil then
         self:InitializeSettings()

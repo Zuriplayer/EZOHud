@@ -237,7 +237,8 @@ function EZO_HUD:RefreshCruxDisplay()
         return
     end
 
-    if not IsPlayerArcanist() then
+    local movable = self:IsMoveModeEnabled("crux")
+    if not IsPlayerArcanist() and not movable then
         self.crux.root:SetHidden(true)
         return
     end
@@ -249,10 +250,9 @@ function EZO_HUD:RefreshCruxDisplay()
     local duration = math.max(1, (CRUX_DURATION_MS or 30000) / 1000)
     local ratio = Clamp(remaining / duration, 0, 1)
     local hudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
-    local movable = self:IsMoveModeEnabled("crux")
     local showEmpty = settings.hideWhenZero == false
 
-    if settings.enabled == false or not hudVisible then
+    if (settings.enabled == false and not movable) or not hudVisible then
         self.crux.root:SetHidden(true)
         return
     end

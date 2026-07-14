@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.49`
-- AddOnVersion: `10049`
+- Addon version: `0.1.50`
+- AddOnVersion: `10050`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -22,7 +22,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - `LibAddonMenu-2.0` is required for the settings panel.
 - `LibChatMessage` is optional and used for cleaner addon chat messages when available.
 - `LibDebugLogger` is optional and used by the debug options when available.
-- `EZOCore` is optional and provides the central `Settings > EZO` panel and shared EZO-family language preference when installed.
+- `EZOCore` is optional and provides the central `Settings > EZO` panel, shared EZO-family language preference and global or per-surface interface layout mode when installed.
 
 ## Installation
 
@@ -63,7 +63,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
 
-When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Without EZOCore, the same options remain available through the normal LibAddonMenu panel.
+When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute and Crux surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, hide vanilla bars, enable HUD movement, out-of-combat alpha, and per-resource size, color, and warning threshold.

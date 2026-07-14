@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.50 - Shared Layout Integration
+
+- Registers Attribute, Ultimate, Execute and Crux HUD surfaces independently with EZOCore `family.layout`.
+- Allows central global or per-surface movement without persisting edit state.
+- Keeps movement previews restricted to HUD/HUD_UI, including previews for currently disabled or context-inactive surfaces.
+
 ## 0.1.49 - EZOCore Settings Integration
 
 - Registered the complete EZOhud settings panel in the native `Settings > EZO` hub when EZOCore is available.

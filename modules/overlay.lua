@@ -553,7 +553,8 @@ function EZO_HUD:RefreshOverlayVisibility()
         return
     end
 
-    local enabled = self.sv and self.sv.overlay and self.sv.overlay.enabled
+    local enabled = (self.sv and self.sv.overlay and self.sv.overlay.enabled)
+        or self:IsMoveModeEnabled("overlay")
     local hudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
     self.overlay.root:SetHidden(not enabled or not hudVisible)
     self:RefreshMovementState()

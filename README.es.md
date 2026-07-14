@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.49`
-- AddOnVersion: `10049`
+- Versión del addon: `0.1.50`
+- AddOnVersion: `10050`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -22,7 +22,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - `LibAddonMenu-2.0` es obligatorio para el panel de configuración.
 - `LibChatMessage` es opcional y se usa para mensajes de chat más limpios cuando está disponible.
 - `LibDebugLogger` es opcional y se usa por las opciones de debug cuando está disponible.
-- `EZOCore` es opcional y proporciona el panel central `Ajustes > EZO` y la preferencia de idioma común de la familia EZO cuando está instalado.
+- `EZOCore` es opcional y proporciona el panel central `Ajustes > EZO`, la preferencia de idioma común de la familia EZO y el modo global o individual de disposición de interfaz cuando está instalado.
 
 ## Instalación
 
@@ -63,7 +63,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
 
-Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Sin EZOCore, las mismas opciones siguen disponibles mediante el panel normal de LibAddonMenu.
+Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute y Crux se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.

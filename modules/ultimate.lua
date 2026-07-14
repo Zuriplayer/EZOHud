@@ -59,10 +59,13 @@ end
 
 local function ShouldShowBar(barName)
     local settings = GetUltimateSettings()
-    if not settings.enabled then
+    if EZO_HUD.IsHudSceneVisible and not EZO_HUD:IsHudSceneVisible() then
         return false
     end
-    if EZO_HUD.IsHudSceneVisible and not EZO_HUD:IsHudSceneVisible() then
+    if EZO_HUD:IsMoveModeEnabled("ultimate") then
+        return true
+    end
+    if not settings.enabled then
         return false
     end
 
