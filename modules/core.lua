@@ -4,6 +4,7 @@ local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
 local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 local languageCallbackRegistered = false
+local ezocoreRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
 EZO_HUD.ADDON_VERSION = "0.1.49"
@@ -165,6 +166,32 @@ function EZO_HUD:RegisterEZOCoreLanguageCallback()
     return languageCallbackRegistered
 end
 
+function EZO_HUD:RegisterWithEZOCore()
+    if ezocoreRegistered
+        or not (EZOCore and type(EZOCore.RegisterAddon) == "function") then
+        return false
+    end
+
+    local ok, result = pcall(function()
+        return EZOCore:RegisterAddon({
+            id = "ezohud",
+            name = self.ADDON_NAME or "EZOhud",
+            version = self.ADDON_VERSION or "0.0.0",
+            addOnVersion = 10049,
+            apiVersion = 1,
+            capabilities = {
+                "family.language.consumer",
+                "family.settings.consumer",
+                "hud.attributes",
+                "hud.visualOverlay",
+            },
+        })
+    end)
+
+    ezocoreRegistered = ok and result == true
+    return ezocoreRegistered
+end
+
 function EZO_HUD:InitializeRuntimeState()
     self.runtime = self.runtime or {}
     self.runtime.moveMode = self.runtime.moveMode or {}
@@ -204,6 +231,7 @@ function EZO_HUD:Initialize()
 
     self:ApplyLanguagePreference((self.sv and self.sv.general and self.sv.general.language) or self.defaultLanguage)
     self:RegisterEZOCoreLanguageCallback()
+    self:RegisterWithEZOCore()
 
     if self.InitializeDebug ~= nil then
         self:InitializeDebug()
