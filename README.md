@@ -1,6 +1,6 @@
 # EZOhud
 
-¿Prefieres español? Lee el [README en español](README.es.md).
+Prefer Spanish? Read the [Spanish README](README.es.md).
 EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, execute opportunities, and Arcanist Crux tracking while keeping the implementation small and testable.
 
 Support, bug reports, and suggestions: <https://discord.gg/ekw8zUAcRm>
@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.46`
-- AddOnVersion: `10046`
+- Addon version: `0.1.48`
+- AddOnVersion: `10048`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -22,6 +22,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - `LibAddonMenu-2.0` is required for the settings panel.
 - `LibChatMessage` is optional and used for cleaner addon chat messages when available.
 - `LibDebugLogger` is optional and used by the debug options when available.
+- `EZOCore` is optional and provides the shared EZO-family language preference when installed.
 
 ## Installation
 
@@ -52,14 +53,16 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
-- English and Spanish localization with Automatic, English, and Spanish language selection.
+- English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection.
 - Debug options in a dedicated settings section, with optional LibDebugLogger output and optional chat output.
 - Local `/ezohudcrux` debug command for focused Crux diagnostics.
 - Settings reset through the LibAddonMenu defaults mechanism.
 
 ## Main Settings
 
-- General: language selection.
+EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
+
+- General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, hide vanilla bars, enable HUD movement, out-of-combat alpha, and per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Execute HUD: enable alert, enable movement, and set alert size.
@@ -85,7 +88,7 @@ Recommended beta checks:
 - Test hiding EZOhud attribute bars independently from hiding vanilla ESO bars.
 - Test each ultimate display mode and active/inactive bar state.
 - Test execute alert behavior with known execute abilities on the active bar.
-- Test English, Spanish, and Automatic language modes.
+- Test shared EZOCore, English, Spanish, and Automatic language modes.
 - Test different resolutions and UI scale values.
 - Test `/reloadui` after moving HUD elements.
 

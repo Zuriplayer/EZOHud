@@ -439,7 +439,11 @@ function EZO_HUD:ResetAllDefaults()
     self.sv.execute = DeepCopyTable(self.defaults.execute)
     self.sv.crux = DeepCopyTable(self.defaults.crux)
     self:InitializeRuntimeState()
-    EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
+    if self.ApplyLanguagePreference then
+        self:ApplyLanguagePreference(self.sv.general.language or self.defaultLanguage or "inherit")
+    else
+        EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
+    end
     self:RefreshOverlayText()
     if self.RefreshUltimateText then
         self:RefreshUltimateText()
@@ -634,25 +638,12 @@ function EZO_HUD:InitializeOverlay()
 end
 
 function EZO_HUD:InitializeSettings()
-    local lam = nil
-    if LibStub then
-        local ok, resolved = pcall(LibStub, "LibAddonMenu-2.0", true)
-        if ok and type(resolved) == "table" then
-            lam = resolved
-        elseif type(LibStub.GetLibrary) == "function" then
-            lam = LibStub:GetLibrary("LibAddonMenu-2.0", true)
-        end
-    end
-    if not lam and type(LibAddonMenu2) == "table"
-        and type(LibAddonMenu2.RegisterAddonPanel) == "function"
-        and type(LibAddonMenu2.RegisterOptionControls) == "function" then
-        lam = LibAddonMenu2
-    end
-
-    local registerAddonPanel = lam and lam.RegisterAddonPanel or nil
-    local registerOptionControls = lam and lam.RegisterOptionControls or nil
+    local lam = _G.LibAddonMenu2 or LibAddonMenu2
     local buildOptions = EZOhud_LAM and EZOhud_LAM.BuildOptions or nil
-    if not (lam and type(registerAddonPanel) == "function" and type(registerOptionControls) == "function" and type(buildOptions) == "function") then
+    if not (lam
+        and type(lam.RegisterAddonPanel) == "function"
+        and type(lam.RegisterOptionControls) == "function"
+        and type(buildOptions) == "function") then
         if self.Print then
             self.Print(GetString(EZO_HUD_MSG_LAM_MISSING))
         end
@@ -660,7 +651,7 @@ function EZO_HUD:InitializeSettings()
     end
 
     local function LanguageDefaultChoice()
-        return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "auto"
+        return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "inherit"
     end
 
     local function WarnForcedLanguage()
@@ -672,9 +663,10 @@ function EZO_HUD:InitializeSettings()
     local function BuildResourceOptions(resourceName)
         local meta = RESOURCE_META[resourceName]
         local headerId = _G["EZO_HUD_OPTION_RESOURCE_" .. string.upper(resourceName)] or _G[meta.labelString]
+        local headerTooltipId = _G["EZO_HUD_OPTION_RESOURCE_" .. string.upper(resourceName) .. "_HEADER_TOOLTIP"]
         local defaultColor = CopyColor(self.defaults.overlay[meta.colorKey])
         return {
-            { type = "header", name = GetString(headerId) },
+            EZOhud_LAM.CreateInfoHeader(GetString(headerId), GetString(headerTooltipId)),
             {
                 type = "slider",
                 name = GetString(EZO_HUD_OPTION_SIZE),
@@ -729,20 +721,30 @@ function EZO_HUD:InitializeSettings()
 
     EZOhud_LAM.RegisterSection("general", 10, function()
         return {
-            { type = "header", name = GetString(EZO_HUD_OPTION_GENERAL) },
+            EZOhud_LAM.CreateInfoHeader(
+                GetString(EZO_HUD_OPTION_GENERAL),
+                GetString(EZO_HUD_OPTION_GENERAL_HEADER_TOOLTIP)
+            ),
             {
                 type = "dropdown",
                 name = GetString(EZO_HUD_OPTION_LANGUAGE),
                 tooltip = GetString(EZO_HUD_OPTION_LANGUAGE_TOOLTIP),
-                choices = { GetString(EZO_HUD_OPTION_LANGUAGE_AUTO), "English", "Español" },
-                choicesValues = { "auto", "en", "es" },
+                choices = {
+                    GetString(EZO_HUD_OPTION_LANGUAGE_INHERIT),
+                    GetString(EZO_HUD_OPTION_LANGUAGE_AUTO),
+                    "English",
+                    "Español",
+                },
+                choicesValues = { "inherit", "auto", "en", "es" },
                 getFunc = function()
-                    return self.sv.general.language or "auto"
+                    return self.sv.general.language or LanguageDefaultChoice()
                 end,
                 setFunc = function(value)
-                    value = tostring(value or "auto")
+                    value = tostring(value or LanguageDefaultChoice())
                     self.sv.general.language = value
-                    if EZOHUD_Lang and EZOHUD_Lang.Apply then
+                    if self.ApplyLanguagePreference then
+                        self:ApplyLanguagePreference(value)
+                    elseif EZOHUD_Lang and EZOHUD_Lang.Apply then
                         EZOHUD_Lang.Apply(value)
                     end
                     self:RefreshOverlayText()
@@ -762,7 +764,10 @@ function EZO_HUD:InitializeSettings()
 
     EZOhud_LAM.RegisterSection("overlay", 20, function()
         local options = {
-            { type = "header", name = GetString(EZO_HUD_OPTION_OVERLAY) },
+            EZOhud_LAM.CreateInfoHeader(
+                GetString(EZO_HUD_OPTION_OVERLAY),
+                GetString(EZO_HUD_OPTION_OVERLAY_HEADER_TOOLTIP)
+            ),
             {
                 type = "checkbox",
                 name = GetString(EZO_HUD_OPTION_OVERLAY_ENABLE),
@@ -814,7 +819,10 @@ function EZO_HUD:InitializeSettings()
 
     EZOhud_LAM.RegisterSection("debug", 90, function()
         return {
-            { type = "header", name = GetString(EZO_HUD_OPTION_DEBUG) },
+            EZOhud_LAM.CreateInfoHeader(
+                GetString(EZO_HUD_OPTION_DEBUG),
+                GetString(EZO_HUD_OPTION_DEBUG_HEADER_TOOLTIP)
+            ),
             {
                 type = "checkbox",
                 name = GetString(EZO_HUD_OPTION_DEBUG_ENABLE),
@@ -860,6 +868,8 @@ function EZO_HUD:InitializeSettings()
         end,
     }
 
-    registerAddonPanel(lam, self.ADDON_NAME .. "_LAM", panelData)
-    registerOptionControls(lam, self.ADDON_NAME .. "_LAM", buildOptions())
+    local panel = lam:RegisterAddonPanel(self.ADDON_NAME .. "_LAM", panelData)
+    self._lamPanel = panel
+    _G[self.ADDON_NAME .. "_LAM"] = panel
+    lam:RegisterOptionControls(self.ADDON_NAME .. "_LAM", buildOptions())
 end

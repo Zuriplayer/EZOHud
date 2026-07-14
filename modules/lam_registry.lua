@@ -3,6 +3,20 @@ local REG = EZOhud_LAM
 
 REG.sections = REG.sections or {}
 
+local INFO_HEADER_TEXTURE = "EsoUI/Art/Miscellaneous/help_icon.dds"
+
+function REG.CreateInfoHeader(name, tooltip)
+    return {
+        type = "header",
+        name = zo_strformat(
+            "<<1>> |cB040FF|t26:26:<<2>>:inheritcolor|t|r",
+            tostring(name or ""),
+            INFO_HEADER_TEXTURE
+        ),
+        tooltip = tooltip,
+    }
+end
+
 function REG.RegisterSection(name, order, provider)
     REG.sections[name] = {
         order = order or 100,
@@ -31,6 +45,8 @@ function REG.BuildOptions()
             for _, option in ipairs(payload) do
                 options[#options + 1] = option
             end
+        elseif EZOhud and type(EZOhud.DebugError) == "function" then
+            EZOhud.DebugError("LAM section failed: " .. tostring(section.name) .. " - " .. tostring(payload), "LAM")
         end
     end
 

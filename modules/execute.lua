@@ -464,7 +464,10 @@ function EZO_HUD:InitializeExecute()
     if EZOhud_LAM and EZOhud_LAM.RegisterSection then
         EZOhud_LAM.RegisterSection("execute", 40, function()
             return {
-                { type = "header", name = GetString(EZO_HUD_OPTION_EXECUTE) },
+                EZOhud_LAM.CreateInfoHeader(
+                    GetString(EZO_HUD_OPTION_EXECUTE),
+                    GetString(EZO_HUD_OPTION_EXECUTE_HEADER_TOOLTIP)
+                ),
                 {
                     type = "checkbox",
                     name = GetString(EZO_HUD_OPTION_EXECUTE_ENABLE),
@@ -492,11 +495,6 @@ function EZO_HUD:InitializeExecute()
                         self:RefreshExecute()
                     end,
                     default = self.defaults.execute.movable,
-                    width = "full",
-                },
-                {
-                    type = "description",
-                    text = GetString(EZO_HUD_OPTION_EXECUTE_MODE_ACTIVE),
                     width = "full",
                 },
                 {

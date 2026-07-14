@@ -350,7 +350,10 @@ function EZO_HUD:InitializeCrux()
     if EZOhud_LAM and EZOhud_LAM.RegisterSection then
         EZOhud_LAM.RegisterSection("crux", 45, function()
             return {
-                { type = "header", name = GetString(EZO_HUD_OPTION_CRUX) },
+                EZOhud_LAM.CreateInfoHeader(
+                    GetString(EZO_HUD_OPTION_CRUX),
+                    GetString(EZO_HUD_OPTION_CRUX_HEADER_TOOLTIP)
+                ),
                 {
                     type = "checkbox",
                     name = GetString(EZO_HUD_OPTION_CRUX_ENABLE),

@@ -376,7 +376,10 @@ function EZO_HUD:InitializeUltimate()
             end
 
             return {
-                { type = "header", name = GetString(EZO_HUD_OPTION_ULTIMATE) },
+                EZOhud_LAM.CreateInfoHeader(
+                    GetString(EZO_HUD_OPTION_ULTIMATE),
+                    GetString(EZO_HUD_OPTION_ULTIMATE_HEADER_TOOLTIP)
+                ),
                 {
                     type = "checkbox",
                     name = GetString(EZO_HUD_OPTION_ULTIMATE_ENABLE),
