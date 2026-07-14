@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.48`
-- AddOnVersion: `10048`
+- Versión del addon: `0.1.49`
+- AddOnVersion: `10049`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -22,7 +22,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - `LibAddonMenu-2.0` es obligatorio para el panel de configuración.
 - `LibChatMessage` es opcional y se usa para mensajes de chat más limpios cuando está disponible.
 - `LibDebugLogger` es opcional y se usa por las opciones de debug cuando está disponible.
-- `EZOCore` es opcional y proporciona la preferencia de idioma común de la familia EZO cuando está instalado.
+- `EZOCore` es opcional y proporciona el panel central `Ajustes > EZO` y la preferencia de idioma común de la familia EZO cuando está instalado.
 
 ## Instalación
 
@@ -30,7 +30,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 2. Coloca la carpeta `EZOhud` en el directorio de AddOns de ESO:
    `Documents/Elder Scrolls Online/live/AddOns/EZOhud`
 3. Activa `EZOhud` desde la pantalla de AddOns de ESO.
-4. Abre Ajustes > Addons > EZOhud para configurar el addon.
+4. Con EZOCore instalado, abre Ajustes > EZO > EZOhud. Sin EZOCore, usa Ajustes > Addons > EZOhud.
 
 ## Funciones Implementadas
 
@@ -57,10 +57,13 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
 - Comando local `/ezohudcrux` para diagnóstico puntual de Crux.
 - Restablecimiento de ajustes mediante el mecanismo de valores por defecto de LibAddonMenu.
+- Integración nativa en `Ajustes > EZO` mediante EZOCore, conservando el panel estándar de LibAddonMenu como fallback independiente.
 
 ## Opciones Principales
 
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
+
+Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Sin EZOCore, las mismas opciones siguen disponibles mediante el panel normal de LibAddonMenu.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.
@@ -89,6 +92,7 @@ Comprobaciones recomendadas para la beta:
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
 - Probar los modos de idioma compartido de EZOCore, Inglés, Español y Automático.
+- Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.
 - Probar distintas resoluciones y valores de escala de UI.
 - Probar `/reloadui` después de mover elementos del HUD.
 

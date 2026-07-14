@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.49 - EZOCore Settings Integration
+
+- Registered the complete EZOhud settings panel in the native `Settings > EZO` hub when EZOCore is available.
+- Kept the standard LibAddonMenu panel as a standalone fallback when EZOCore is absent or rejects registration.
+- Added the permanent EZO Discord feedback link to the settings panel header.
+
 ## 0.1.48 - LAM Registration Robustness
 
 - Aligned LibAddonMenu registration with the EZOTools pattern.

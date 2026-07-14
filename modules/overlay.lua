@@ -4,6 +4,7 @@ local EZO_HUD = EZOhud
 local BAR_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_fill.dds"
 local BAR_CAP_TEXTURE = "EsoUI/Art/Miscellaneous/progressbar_genericfill_leadingedge_blunt.dds"
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
+local FEEDBACK_URL = "https://discord.gg/ekw8zUAcRm"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
 local CONSUMED_BAR_COLOR = { 0.24, 0.24, 0.24, 0.88 }
 local FILL_SHEEN_COLOR = { 1.0, 1.0, 1.0, 0.12 }
@@ -440,7 +441,7 @@ function EZO_HUD:ResetAllDefaults()
     self.sv.crux = DeepCopyTable(self.defaults.crux)
     self:InitializeRuntimeState()
     if self.ApplyLanguagePreference then
-        self:ApplyLanguagePreference(self.sv.general.language or self.defaultLanguage or "inherit")
+        self:ApplyLanguagePreference(self.sv.general.language or self.defaultLanguage or "auto")
     else
         EZOHUD_Lang.Apply(self.sv.general.language or self.defaultLanguage or "en")
     end
@@ -651,7 +652,7 @@ function EZO_HUD:InitializeSettings()
     end
 
     local function LanguageDefaultChoice()
-        return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "inherit"
+        return (self.GetDefaultLanguage and self.GetDefaultLanguage()) or "auto"
     end
 
     local function WarnForcedLanguage()
@@ -730,17 +731,19 @@ function EZO_HUD:InitializeSettings()
                 name = GetString(EZO_HUD_OPTION_LANGUAGE),
                 tooltip = GetString(EZO_HUD_OPTION_LANGUAGE_TOOLTIP),
                 choices = {
-                    GetString(EZO_HUD_OPTION_LANGUAGE_INHERIT),
                     GetString(EZO_HUD_OPTION_LANGUAGE_AUTO),
                     "English",
                     "Español",
                 },
-                choicesValues = { "inherit", "auto", "en", "es" },
+                choicesValues = { "auto", "en", "es" },
                 getFunc = function()
-                    return self.sv.general.language or LanguageDefaultChoice()
+                    local value = self.sv.general.language or LanguageDefaultChoice()
+                    if value == "inherit" then value = "auto" end
+                    return value
                 end,
                 setFunc = function(value)
                     value = tostring(value or LanguageDefaultChoice())
+                    if value == "inherit" then value = "auto" end
                     self.sv.general.language = value
                     if self.ApplyLanguagePreference then
                         self:ApplyLanguagePreference(value)
@@ -755,6 +758,9 @@ function EZO_HUD:InitializeSettings()
                     if self.IsForcedLanguage and self.IsForcedLanguage(value) then
                         WarnForcedLanguage()
                     end
+                end,
+                disabled = function()
+                    return self.IsLanguageManagedByEZOCore and self.IsLanguageManagedByEZOCore()
                 end,
                 default = LanguageDefaultChoice(),
                 width = "half",
@@ -861,6 +867,8 @@ function EZO_HUD:InitializeSettings()
         displayName = GetString(EZO_HUD_LABEL_NAME),
         author = GetString(EZO_HUD_PANEL_AUTHOR),
         version = self.ADDON_VERSION,
+        ezoStage = "beta",
+        feedback = FEEDBACK_URL,
         registerForRefresh = true,
         registerForDefaults = true,
         resetFunc = function()
@@ -868,8 +876,18 @@ function EZO_HUD:InitializeSettings()
         end,
     }
 
-    local panel = lam:RegisterAddonPanel(self.ADDON_NAME .. "_LAM", panelData)
+    local panelId = self.ADDON_NAME .. "_LAM"
+    local options = buildOptions()
+    if EZOCore and type(EZOCore.RegisterSettingsPanel) == "function" then
+        local registered = EZOCore:RegisterSettingsPanel(self.ADDON_NAME, panelId, panelData, options)
+        if registered then
+            self.ezoSettingsRegistered = true
+            return
+        end
+    end
+
+    local panel = lam:RegisterAddonPanel(panelId, panelData)
     self._lamPanel = panel
-    _G[self.ADDON_NAME .. "_LAM"] = panel
-    lam:RegisterOptionControls(self.ADDON_NAME .. "_LAM", buildOptions())
+    _G[panelId] = panel
+    lam:RegisterOptionControls(panelId, options)
 end

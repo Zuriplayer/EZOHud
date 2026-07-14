@@ -6,14 +6,14 @@ local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 local languageCallbackRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.48"
+EZO_HUD.ADDON_VERSION = "0.1.49"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
 
 EZO_HUD.defaults = {
     general = {
-        language = LANGUAGE_INHERIT,
+        language = LANGUAGE_AUTO,
         debugEnabled = false,
         debugToChat = false,
     },
@@ -87,7 +87,7 @@ local function GetClientLanguage()
 end
 
 function EZO_HUD.GetDefaultLanguage()
-    return LANGUAGE_INHERIT
+    return LANGUAGE_AUTO
 end
 
 function EZO_HUD.GetClientLanguage()
@@ -96,16 +96,16 @@ end
 
 function EZO_HUD.GetEffectiveLanguage(language)
     language = tostring(language or EZO_HUD.GetDefaultLanguage())
-    if language == LANGUAGE_INHERIT then
-        if EZOCore and type(EZOCore.GetLanguage) == "function" then
-            local ok, inherited = pcall(function()
-                return EZOCore:GetLanguage()
-            end)
-            if ok and (inherited == "es" or inherited == "en") then
-                return inherited
-            end
+    if EZO_HUD.IsLanguageManagedByEZOCore and EZO_HUD.IsLanguageManagedByEZOCore() then
+        local ok, inherited = pcall(function()
+            return EZOCore:GetLanguage()
+        end)
+        if ok and (inherited == "es" or inherited == "en") then
+            return inherited
         end
-        return GetClientLanguage()
+    end
+    if language == LANGUAGE_INHERIT then
+        language = LANGUAGE_AUTO
     end
     if language == "es" or language == "en" then
         return language
@@ -115,7 +115,20 @@ end
 
 function EZO_HUD.IsForcedLanguage(language)
     language = tostring(language or EZO_HUD.GetDefaultLanguage())
+    if EZO_HUD.IsLanguageManagedByEZOCore and EZO_HUD.IsLanguageManagedByEZOCore() then
+        return false
+    end
     return language == "es" or language == "en"
+end
+
+function EZO_HUD.IsLanguageManagedByEZOCore()
+    if not (EZOCore and type(EZOCore.IsLanguageGloballyManaged) == "function") then
+        return false
+    end
+    local ok, managed = pcall(function()
+        return EZOCore:IsLanguageGloballyManaged()
+    end)
+    return ok and managed == true
 end
 
 function EZO_HUD:ApplyLanguagePreference(language)
@@ -134,8 +147,8 @@ function EZO_HUD:RegisterEZOCoreLanguageCallback()
     local eventName = EZOCore.EVENT_LANGUAGE_CHANGED or "EZO_CORE_LANGUAGE_CHANGED"
     local ok, result = pcall(function()
         return EZOCore:RegisterCallback(eventName, function()
-            if self.sv and self.sv.general and self.sv.general.language == LANGUAGE_INHERIT then
-                self:ApplyLanguagePreference(LANGUAGE_INHERIT)
+            if self.sv and self.sv.general then
+                self:ApplyLanguagePreference(self.sv.general.language or self.GetDefaultLanguage())
                 if self.RefreshOverlayText then
                     self:RefreshOverlayText()
                 end
@@ -181,7 +194,7 @@ function EZO_HUD:SetMoveModeEnabled(sectionName, enabled)
 end
 
 function EZO_HUD:Initialize()
-    self.defaultLanguage = LANGUAGE_INHERIT
+    self.defaultLanguage = LANGUAGE_AUTO
 
     if self.InitializeSavedVariables ~= nil then
         self:InitializeSavedVariables()
