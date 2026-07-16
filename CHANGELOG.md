@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.1.53 - Move Initialization Hotfix
+
+- Removes unsupported mouse-button initialization calls that crashed overlay startup on some ESO clients.
+- Keeps left-button drag handling through the existing mouse handlers and move mode state.
+
+## 0.1.52 - Shared diagnostics control
+
+- Registers general debug logging and the transient Crux diagnostic mode with EZOCore.
+- The family-wide disable action clears debug-to-chat and unregisters Crux diagnostic events and updates.
+- Enforces left-button dragging for every movable HUD surface.
+
+## 0.1.51 - HUD Position Persistence
+
+- Saves HUD element positions defensively when dragging stops or when movement mode is disabled.
+- Clarifies that movement edit modes reset on `/reloadui` or logout, while saved positions remain persisted.
+
 ## 0.1.50 - Shared Layout Integration
 
 - Registers Attribute, Ultimate, Execute and Crux HUD surfaces independently with EZOCore `family.layout`.

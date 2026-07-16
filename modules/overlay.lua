@@ -408,7 +408,11 @@ function EZO_HUD:RefreshMovementState()
     end
 
     local movable = self:IsMoveModeEnabled("overlay")
-    self.overlay.root:SetMovable(movable)
+    if self.overlayDragActive and not movable then
+        self.overlay.root:StopMovingOrResizing()
+        self.overlayDragActive = false
+    end
+    self.overlay.root:SetMovable(false)
     self.overlay.root:SetMouseEnabled(movable)
 end
 
@@ -588,15 +592,22 @@ function EZO_HUD:InitializeOverlay()
 
     root:SetHandler("OnMouseDown", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
+            self.overlayDragActive = true
+            control:SetMovable(true)
             control:StartMoving()
         end
     end)
     root:SetHandler("OnMouseUp", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
             control:StopMovingOrResizing()
+            self.overlayDragActive = false
+            control:SetMovable(false)
+            self:SaveHudPosition()
         end
     end)
     root:SetHandler("OnMoveStop", function()
+        self.overlayDragActive = false
+        root:SetMovable(false)
         self:SaveHudPosition()
     end)
     if self.RegisterHudSceneControl then

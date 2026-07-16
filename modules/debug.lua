@@ -17,6 +17,24 @@ local function DebugEnabled()
         and EZO_HUD.sv.general.debugEnabled == true
 end
 
+function EZO_HUD:IsDebugModeEnabled()
+    return DebugEnabled()
+end
+
+function EZO_HUD:SetDebugModeEnabled(enabled)
+    if not (EZO_HUD.sv and EZO_HUD.sv.general) then
+        return false
+    end
+
+    EZO_HUD.sv.general.debugEnabled = enabled == true
+    if not EZO_HUD.sv.general.debugEnabled then
+        EZO_HUD.sv.general.debugToChat = false
+    else
+        EZO_HUD:InitializeDebug()
+    end
+    return DebugEnabled() == (enabled == true)
+end
+
 local function DebugToChatEnabled()
     return EZO_HUD.sv
         and EZO_HUD.sv.general

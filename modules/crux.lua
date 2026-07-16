@@ -145,7 +145,11 @@ function EZO_HUD:RefreshCruxMovementState()
 
     local settings = GetCruxSettings()
     local movable = self:IsMoveModeEnabled("crux")
-    self.crux.root:SetMovable(movable)
+    if self.cruxDragActive and not movable then
+        self.crux.root:StopMovingOrResizing()
+        self.cruxDragActive = false
+    end
+    self.crux.root:SetMovable(false)
     self.crux.root:SetMouseEnabled(movable)
 end
 
@@ -305,15 +309,22 @@ function EZO_HUD:InitializeCrux()
 
     self.crux.root:SetHandler("OnMouseDown", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
+            self.cruxDragActive = true
+            control:SetMovable(true)
             control:StartMoving()
         end
     end)
     self.crux.root:SetHandler("OnMouseUp", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
             control:StopMovingOrResizing()
+            self.cruxDragActive = false
+            control:SetMovable(false)
+            self:SaveCruxPosition()
         end
     end)
     self.crux.root:SetHandler("OnMoveStop", function()
+        self.cruxDragActive = false
+        self.crux.root:SetMovable(false)
         self:SaveCruxPosition()
     end)
     if self.RegisterHudSceneControl then

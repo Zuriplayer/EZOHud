@@ -127,7 +127,7 @@ local function EnableCruxDebug()
     ScanCrux()
 end
 
-local function DisableCruxDebug()
+local function DisableCruxDebug(silent)
     if cruxDebugEnabled then
         EVENT_MANAGER:UnregisterForEvent(EVENT_NAMESPACE, EVENT_EFFECT_CHANGED)
         EVENT_MANAGER:UnregisterForUpdate(UPDATE_NAMESPACE)
@@ -135,7 +135,22 @@ local function DisableCruxDebug()
 
     cruxDebugEnabled = false
     lastReportedSecond = nil
-    Log(GetString(EZO_HUD_CRUX_DEBUG_DISABLED))
+    if silent ~= true then
+        Log(GetString(EZO_HUD_CRUX_DEBUG_DISABLED))
+    end
+end
+
+function EZO_HUD:IsCruxDebugEnabled()
+    return cruxDebugEnabled == true
+end
+
+function EZO_HUD:SetCruxDebugEnabled(enabled, silent)
+    if enabled == true then
+        EnableCruxDebug()
+    else
+        DisableCruxDebug(silent == true)
+    end
+    return cruxDebugEnabled == (enabled == true)
 end
 
 local function PrintUsage()
@@ -148,7 +163,7 @@ function EZO_HUD:InitializeCruxDebug()
         if args == "on" or args == "1" or args == "enable" then
             EnableCruxDebug()
         elseif args == "off" or args == "0" or args == "disable" then
-            DisableCruxDebug()
+            DisableCruxDebug(false)
         elseif args == "scan" or args == "status" then
             ScanCrux()
         else

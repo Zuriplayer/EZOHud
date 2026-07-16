@@ -6,9 +6,10 @@ local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
+local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.50"
+EZO_HUD.ADDON_VERSION = "0.1.53"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -178,10 +179,11 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = 10050,
+            addOnVersion = 10053,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",
+                "family.debug.controller",
                 "family.layout.consumer",
                 "family.settings.consumer",
                 "hud.attributes",
@@ -192,6 +194,42 @@ function EZO_HUD:RegisterWithEZOCore()
 
     ezocoreRegistered = ok and result == true
     return ezocoreRegistered
+end
+
+function EZO_HUD:RegisterDebugWithEZOCore()
+    if debugControllerRegistered
+        or not (EZOCore and type(EZOCore.GetService) == "function") then
+        return false
+    end
+
+    local service = EZOCore:GetService("family.debug", 1)
+    if not service or type(service.RegisterController) ~= "function" then
+        return false
+    end
+
+    local ok, result = pcall(function()
+        return service:RegisterController({
+            id = "ezohud.debug",
+            addonId = "ezohud",
+            addonName = "EZOhud",
+            name = function() return GetString(EZO_HUD_OPTION_DEBUG_ENABLE) end,
+            isEnabled = function()
+                return (self.IsDebugModeEnabled and self:IsDebugModeEnabled())
+                    or (self.IsCruxDebugEnabled and self:IsCruxDebugEnabled())
+            end,
+            setEnabled = function(enabled)
+                if enabled == true then
+                    return false
+                end
+                local generalDisabled = not self.SetDebugModeEnabled or self:SetDebugModeEnabled(false)
+                local cruxDisabled = not self.SetCruxDebugEnabled or self:SetCruxDebugEnabled(false, true)
+                return generalDisabled and cruxDisabled
+            end,
+        })
+    end)
+
+    debugControllerRegistered = ok and result == true
+    return debugControllerRegistered
 end
 
 function EZO_HUD:RefreshMoveModeSection(sectionName)
@@ -282,9 +320,27 @@ function EZO_HUD:IsMoveModeEnabled(sectionName)
         and self.runtime.moveMode[sectionName] == true
 end
 
+function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
+    if sectionName == "overlay" and self.SaveHudPosition then
+        self:SaveHudPosition()
+    elseif sectionName == "ultimate" and self.ultimate and self.SaveUltimatePosition then
+        self:SaveUltimatePosition("main")
+        self:SaveUltimatePosition("backup")
+    elseif sectionName == "execute" and self.SaveExecutePosition then
+        self:SaveExecutePosition()
+    elseif sectionName == "crux" and self.SaveCruxPosition then
+        self:SaveCruxPosition()
+    end
+end
+
 function EZO_HUD:SetMoveModeEnabled(sectionName, enabled)
     self.runtime = self.runtime or {}
     self.runtime.moveMode = self.runtime.moveMode or {}
+
+    if self.runtime.moveMode[sectionName] == true and enabled ~= true then
+        self:SaveMoveModeSectionPosition(sectionName)
+    end
+
     self.runtime.moveMode[sectionName] = enabled == true
 
     if self.sv and self.sv[sectionName] then
@@ -312,6 +368,7 @@ function EZO_HUD:Initialize()
     if self.InitializeCruxDebug ~= nil then
         self:InitializeCruxDebug()
     end
+    self:RegisterDebugWithEZOCore()
 
     if self.InitializeUI ~= nil then
         self:InitializeUI()

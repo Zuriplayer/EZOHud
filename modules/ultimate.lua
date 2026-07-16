@@ -135,7 +135,11 @@ function EZO_HUD:RefreshUltimateMovementState()
     local movable = self:IsMoveModeEnabled("ultimate")
     for _, barName in ipairs(ULTIMATE_ORDER) do
         local root = self.ultimate.bars[barName].root
-        root:SetMovable(movable)
+        if self.ultimateDragActive and self.ultimateDragActive[barName] and not movable then
+            root:StopMovingOrResizing()
+            self.ultimateDragActive[barName] = false
+        end
+        root:SetMovable(false)
         root:SetMouseEnabled(movable)
     end
 end
@@ -291,20 +295,28 @@ end
 
 function EZO_HUD:InitializeUltimate()
     self.ultimate = { bars = {} }
+    self.ultimateDragActive = {}
 
     for _, barName in ipairs(ULTIMATE_ORDER) do
         local entry = BuildUltimateBar(barName)
         entry.root:SetHandler("OnMouseDown", function(control, button)
             if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
+                self.ultimateDragActive[barName] = true
+                control:SetMovable(true)
                 control:StartMoving()
             end
         end)
         entry.root:SetHandler("OnMouseUp", function(control, button)
             if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
                 control:StopMovingOrResizing()
+                self.ultimateDragActive[barName] = false
+                control:SetMovable(false)
+                self:SaveUltimatePosition(barName)
             end
         end)
         entry.root:SetHandler("OnMoveStop", function()
+            self.ultimateDragActive[barName] = false
+            entry.root:SetMovable(false)
             self:SaveUltimatePosition(barName)
         end)
         if self.RegisterHudSceneControl then

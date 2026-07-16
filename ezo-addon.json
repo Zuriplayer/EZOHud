@@ -3,7 +3,7 @@
     "addon":  {
                   "id":  "ezohud",
                   "name":  "EZOhud",
-                  "version":  "0.1.50",
+                  "version":  "0.1.53",
                   "stage":  "beta",
                   "status":  "beta",
                   "phase":  "public-beta",
@@ -11,7 +11,7 @@
                   "manifest":  "EZOhud.txt",
                   "package":  {
                                   "rootFolderName":  "EZOhud",
-                                  "zipName":  "EZOhud_v0.1.50.zip",
+                                  "zipName":  "EZOhud_v0.1.53.zip",
                                   "outputPath":  "dist",
                                   "include":  [
                                                   "*.txt",

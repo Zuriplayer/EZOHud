@@ -307,7 +307,11 @@ function EZO_HUD:RefreshExecuteMovementState()
     end
 
     local movable = self:IsMoveModeEnabled("execute")
-    self.execute.root:SetMovable(movable)
+    if self.executeDragActive and not movable then
+        self.execute.root:StopMovingOrResizing()
+        self.executeDragActive = false
+    end
+    self.execute.root:SetMovable(false)
     self.execute.root:SetMouseEnabled(movable)
 end
 
@@ -395,15 +399,22 @@ function EZO_HUD:InitializeExecute()
 
     self.execute.root:SetHandler("OnMouseDown", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
+            self.executeDragActive = true
+            control:SetMovable(true)
             control:StartMoving()
         end
     end)
     self.execute.root:SetHandler("OnMouseUp", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
             control:StopMovingOrResizing()
+            self.executeDragActive = false
+            control:SetMovable(false)
+            self:SaveExecutePosition()
         end
     end)
     self.execute.root:SetHandler("OnMoveStop", function()
+        self.executeDragActive = false
+        self.execute.root:SetMovable(false)
         self:SaveExecutePosition()
     end)
     if self.RegisterHudSceneControl then

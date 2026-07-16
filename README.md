@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.50`
-- AddOnVersion: `10050`
+- Addon version: `0.1.53`
+- AddOnVersion: `10053`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -77,7 +77,7 @@ When EZOCore is active, the complete panel is rendered inside `Settings > EZO` a
 - EZOhud is visual only.
 - It does not cast abilities, press keys, automate rotations, block, dodge, interrupt, target enemies, or make gameplay decisions.
 - Execute, ultimate, resource, and Crux indicators are informational only.
-- Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout.
+- Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
 - EZOhud does not add keybinds or input handling and is intended to remain compatible with keyboard and gamepad play.
 - Debug tools are diagnostics only and should remain disabled during normal play unless troubleshooting.
 
