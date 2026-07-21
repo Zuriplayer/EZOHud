@@ -22,6 +22,24 @@ local function DeepCopyTable(source)
     return copy
 end
 
+local function GetOrCreatePreviewBackdrop(control)
+    if not control or not WINDOW_MANAGER then return nil end
+    local backdropName = control:GetName() .. "_EZOhudPreview"
+    local backdrop = _G[backdropName]
+    if not backdrop then
+        backdrop = WINDOW_MANAGER:CreateControl(backdropName, control, CT_BACKDROP)
+        backdrop:SetAnchorFill(control)
+        backdrop:SetCenterColor(0, 1, 0, 0.3)
+        backdrop:SetEdgeColor(0, 1, 0, 0.8)
+        backdrop:SetEdgeTexture("", 1, 1, 2, 0)
+        backdrop:SetDrawLayer(DL_OVERLAY)
+        backdrop:SetDrawTier(DT_HIGH)
+        backdrop:SetDrawLevel(100)
+    end
+    return backdrop
+end
+
+
 local WIDGETS = {
     {
         id = "nativeQuestTracker",
@@ -34,9 +52,18 @@ local WIDGETS = {
                 local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
                 if scene then scene:AddFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
             end
-            if control then control:SetHidden(false) control:SetAlpha(1) end
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(false) end
+            end
         end,
         onPreviewClose = function(control)
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(true) end
+            end
             if FOCUSED_QUEST_TRACKER_FRAGMENT and SCENE_MANAGER then
                 local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
                 if scene then scene:RemoveFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
@@ -65,12 +92,20 @@ local WIDGETS = {
         maxScale = 1.5,
         onPreviewOpen = function(control)
             if CENTER_SCREEN_ANNOUNCE and EVENT_MANAGER then
-                CENTER_SCREEN_ANNOUNCE:AddMessage(EVENT_MANAGER, CSA_EVENT_SMALL_TEXT, nil, GetString(EZO_HUD_PREVIEW_CSA))
+                CENTER_SCREEN_ANNOUNCE:AddMessage(EVENT_MANAGER, CSA_CATEGORY_SMALL_TEXT, nil, GetString(_G["EZO_HUD_PREVIEW_CSA"] or EZO_HUD_PREVIEW_CSA))
             end
-            if control then control:SetHidden(false) control:SetAlpha(1) end
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(false) end
+            end
         end,
         onPreviewClose = function(control)
-            -- Messages fade automatically, no specific close logic needed
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(true) end
+            end
         end,
         stringIds = {
             header = "EZO_HUD_OPTION_NATIVE_CSA",
@@ -94,10 +129,19 @@ local WIDGETS = {
         minScale = 0.5,
         maxScale = 1.5,
         onPreviewOpen = function(control)
-            if control then control:SetHidden(false) control:SetAlpha(1) end
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(false) end
+            end
         end,
         onPreviewClose = function(control)
-            if control then control:SetHidden(true) end
+            if control then 
+                control:SetHidden(true) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(true) end
+            end
         end,
         stringIds = {
             header = "EZO_HUD_OPTION_NATIVE_SYNERGY",
@@ -121,10 +165,19 @@ local WIDGETS = {
         minScale = 0.5,
         maxScale = 1.5,
         onPreviewOpen = function(control)
-            if control then control:SetHidden(false) control:SetAlpha(1) end
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(false) end
+            end
         end,
         onPreviewClose = function(control)
-            if control then control:SetHidden(true) end
+            if control then 
+                control:SetHidden(true) 
+                local backdrop = GetOrCreatePreviewBackdrop(control)
+                if backdrop then backdrop:SetHidden(true) end
+            end
         end,
         stringIds = {
             header = "EZO_HUD_OPTION_NATIVE_LOOT",
