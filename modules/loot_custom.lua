@@ -199,18 +199,41 @@ function EZO_HUD:InitializeCustomLoot()
 
     local settings = GetCustomLootSettings()
 
+    -- Ensure native panels are invisible if our custom one is enabled
+    if settings.enabled then
+        if ZO_LootHistoryControl_Keyboard then
+            ZO_LootHistoryControl_Keyboard:SetAlpha(0)
+            ZO_LootHistoryControl_Keyboard:SetHidden(true)
+        end
+        if ZO_LootHistoryControl_Gamepad then
+            ZO_LootHistoryControl_Gamepad:SetAlpha(0)
+            ZO_LootHistoryControl_Gamepad:SetHidden(true)
+        end
+    end
+
     -- Intercept Loot to our custom buffer
     if LOOT_HISTORY_KEYBOARD then
         local origAddLoot = LOOT_HISTORY_KEYBOARD.AddLoot
         LOOT_HISTORY_KEYBOARD.AddLoot = function(historySelf, lootType, itemLink, quantity, itemSound, isPickpocketLoot, questItemIcon, itemId, isStolen, ...)
             if EZO_HUD.sv.customLoot and EZO_HUD.sv.customLoot.enabled then
-                local icon, name, _, _, _ = GetItemLinkInfo(itemLink)
-                if not name or name == "" then
-                    origAddLoot(historySelf, lootType, itemLink, quantity, itemSound, isPickpocketLoot, questItemIcon, itemId, isStolen, ...)
-                    return
+                local name = ""
+                local icon = ""
+                local color = ZO_ColorDef:New(1, 1, 1, 1)
+
+                if itemLink and itemLink ~= "" then
+                    icon, name = GetItemLinkInfo(itemLink)
+                    color = GetItemLinkColor(itemLink)
+                elseif lootType == LOOT_TYPE_CURRENCY then
+                    name = GetCurrencyName(itemId, false, false)
+                    local platformIcon = GetCurrencyKeyboardIcon(itemId)
+                    icon = platformIcon or "EsoUI/Art/currency/currency_gold.dds"
+                    color = ZO_ColorDef:New(0.9, 0.8, 0.2, 1)
                 end
 
-                local color = GetItemLinkColor(itemLink)
+                if not name or name == "" then
+                    return -- Unknown loot type without a link or name, safely ignore rather than showing native
+                end
+
                 local coloredName = color:Colorize(zo_strformat("<<1>>", name))
                 local formattedIcon = zo_iconFormat(icon, 32, 32)
                 
