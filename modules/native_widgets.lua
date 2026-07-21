@@ -162,11 +162,12 @@ local WIDGETS = {
     },
     {
         id = "nativeSynergy",
-        controlName = "ZO_SynergyTopLevel",
+        controlName = "ZO_SynergyTopLevelContainer",
         fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -250 },
         minScale = 0.5,
         maxScale = 1.5,
         onPreviewOpen = function(self, control)
+            if ZO_SynergyTopLevel then ZO_SynergyTopLevel:SetHidden(false) end
             if control then 
                 control:SetHidden(false) 
                 control:SetAlpha(1) 
@@ -180,6 +181,7 @@ local WIDGETS = {
                 local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(true) end
             end
+            if ZO_SynergyTopLevel then ZO_SynergyTopLevel:SetHidden(true) end
         end,
         stringIds = {
             header = "EZO_HUD_OPTION_NATIVE_SYNERGY",
