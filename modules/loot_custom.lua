@@ -39,9 +39,13 @@ local function BuildCustomLootIndicator()
     buffer:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
 
     -- Scrollbar
-    local scrollbar = WINDOW_MANAGER:CreateControlFromVirtual(CUSTOM_LOOT_NAME .. "_Scrollbar", root, "ZO_Scrollbar")
+    local scrollbar = WINDOW_MANAGER:CreateControl(CUSTOM_LOOT_NAME .. "_Scrollbar", root, CT_SLIDER)
+    scrollbar:SetDimensions(16, 0)
     scrollbar:SetAnchor(TOPRIGHT, root, TOPRIGHT, 0, 0)
     scrollbar:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 0)
+    scrollbar:SetThumbTexture("EsoUI/Art/ChatWindow/chat_scrollbar_thumb.dds", "EsoUI/Art/ChatWindow/chat_scrollbar_thumb.dds", "EsoUI/Art/ChatWindow/chat_scrollbar_thumb.dds", 16, 50, 0, 0, 1, 1)
+    scrollbar:SetBackgroundMiddleTexture("EsoUI/Art/ChatWindow/chat_scrollbar_track.dds")
+    scrollbar:SetValueStep(1)
     scrollbar:SetHidden(true)
     
     buffer:SetAnchor(TOPLEFT, root, TOPLEFT, 0, 0)
