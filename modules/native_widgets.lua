@@ -221,16 +221,11 @@ local WIDGETS = {
         end,
         onApplyLayout = function(self, settings, defaultSettings)
             if LOOT_HISTORY_KEYBOARD and LOOT_HISTORY_KEYBOARD.lootStream then
-                local anchor = ZO_Anchor:New(
-                    self.fallbackAnchor[1], 
-                    self.fallbackAnchor[2], 
-                    self.fallbackAnchor[3], 
-                    tonumber(settings.offsetX) or defaultSettings.offsetX, 
-                    tonumber(settings.offsetY) or defaultSettings.offsetY
-                )
-                LOOT_HISTORY_KEYBOARD.lootStream.anchor = anchor
+                -- Internally anchor the entries to the moving control instead of GuiRoot to prevent screen pinning
+                local internalAnchor = ZO_Anchor:New(BOTTOMRIGHT, ZO_LootHistoryControl_Keyboard, BOTTOMRIGHT, 0, 0)
+                LOOT_HISTORY_KEYBOARD.lootStream.anchor = internalAnchor
                 if LOOT_HISTORY_KEYBOARD.lootStreamPersistent then
-                    LOOT_HISTORY_KEYBOARD.lootStreamPersistent.anchor = anchor
+                    LOOT_HISTORY_KEYBOARD.lootStreamPersistent.anchor = internalAnchor
                 end
             end
         end,
@@ -281,16 +276,11 @@ local WIDGETS = {
         end,
         onApplyLayout = function(self, settings, defaultSettings)
             if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
-                local anchor = ZO_Anchor:New(
-                    self.fallbackAnchor[1], 
-                    self.fallbackAnchor[2], 
-                    self.fallbackAnchor[3], 
-                    tonumber(settings.offsetX) or defaultSettings.offsetX, 
-                    tonumber(settings.offsetY) or defaultSettings.offsetY
-                )
-                LOOT_HISTORY_GAMEPAD.lootStream.anchor = anchor
+                -- Internally anchor the entries to the moving control instead of GuiRoot to prevent screen pinning
+                local internalAnchor = ZO_Anchor:New(BOTTOMLEFT, ZO_LootHistoryControl_Gamepad, BOTTOMLEFT, 0, 0)
+                LOOT_HISTORY_GAMEPAD.lootStream.anchor = internalAnchor
                 if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
-                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = anchor
+                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = internalAnchor
                 end
             end
         end,
