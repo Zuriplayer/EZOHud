@@ -512,17 +512,18 @@ function EZO_HUD:InitializeNativeWidgets()
         EZO_HUD.synergyStyleHooked = true
     end
 
-    if not EZO_HUD.synergyAbilityHooked and ZO_Synergy and ZO_Synergy.OnSynergyAbilityChanged then
-        local originalOnSynergy = ZO_Synergy.OnSynergyAbilityChanged
-        ZO_Synergy.OnSynergyAbilityChanged = function(self, ...)
-            if EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
-                if SHARED_INFORMATION_AREA then
-                    SHARED_INFORMATION_AREA:SetHidden(self, true)
-                end
-                self.lastSynergyName = nil
+    if not EZO_HUD.synergyAbilityHooked and SHARED_INFORMATION_AREA and SHARED_INFORMATION_AREA.SetHidden then
+        local originalSetHidden = SHARED_INFORMATION_AREA.SetHidden
+        SHARED_INFORMATION_AREA.SetHidden = function(self, element, hidden)
+            if element == ZO_Synergy and EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
+                originalSetHidden(self, element, true)
                 return
             end
-            originalOnSynergy(self, ...)
+            originalSetHidden(self, element, hidden)
+        end
+        -- Ensure it's hidden immediately on load
+        if EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
+            SHARED_INFORMATION_AREA:SetHidden(ZO_Synergy, true)
         end
         EZO_HUD.synergyAbilityHooked = true
     end
