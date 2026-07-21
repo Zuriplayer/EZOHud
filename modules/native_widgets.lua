@@ -259,6 +259,14 @@ local function GetWidgetControls(widget)
     return controls
 end
 
+local function RunOnWidgetControls(widget, func)
+    if not func then return end
+    local controls = GetWidgetControls(widget)
+    for _, wc in ipairs(controls) do
+        func(widget, wc.control)
+    end
+end
+
 local function CaptureOriginalState(widget)
     if originalStates[widget.id] then return end
     
