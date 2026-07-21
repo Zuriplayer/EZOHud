@@ -83,7 +83,7 @@ local function BuildCustomLootIndicator()
         bg:SetCenterColor(0, 0, 0, 0.4)
         bg:SetEdgeColor(0.2, 0.2, 0.2, 0.8)
         UpdateScrollbar()
-        buffer:SetTimeBeforeFade(999999) -- Stop fading while hovering
+        buffer:SetLineFade(999999, 1) -- Stop fading while hovering
     end)
 
     root:SetHandler("OnMouseExit", function()
@@ -91,7 +91,7 @@ local function BuildCustomLootIndicator()
         bg:SetCenterColor(0, 0, 0, 0)
         bg:SetEdgeColor(0, 0, 0, 0)
         UpdateScrollbar()
-        buffer:SetTimeBeforeFade(GetCustomLootSettings().fadeTime or 5)
+        buffer:SetLineFade(GetCustomLootSettings().fadeTime or 5, 1)
     end)
 
     root:SetHandler("OnMouseWheel", function(self, delta)
@@ -141,8 +141,7 @@ function EZO_HUD:ApplyCustomLootLayout()
 
     local font = settings.font or "ZoFontWinH3"
     self.customLoot.buffer:SetFont(font)
-    self.customLoot.buffer:SetTimeBeforeFade(settings.fadeTime or 5)
-    self.customLoot.buffer:SetFadeDuration(1)
+    self.customLoot.buffer:SetLineFade(settings.fadeTime or 5, 1)
 
     self:RefreshCustomLootMovementState()
 end
