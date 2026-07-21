@@ -22,8 +22,8 @@ local function DeepCopyTable(source)
     return copy
 end
 
-local function GetOrCreatePreviewBackdrop(control)
-    if not control or not WINDOW_MANAGER then return nil end
+local function GetOrCreatePreviewBackdrop(control, widget)
+    if not control or not WINDOW_MANAGER or not widget then return nil end
     local backdropName = control:GetName() .. "_EZOhudPreview"
     local backdrop = _G[backdropName]
     if not backdrop then
@@ -36,6 +36,43 @@ local function GetOrCreatePreviewBackdrop(control)
         backdrop:SetDrawLayer(DL_OVERLAY)
         backdrop:SetDrawTier(DT_HIGH)
         backdrop:SetDrawLevel(100)
+
+        backdrop:SetMouseEnabled(true)
+        backdrop:SetMovable(true)
+
+        local label = WINDOW_MANAGER:CreateControl(backdropName .. "_Label", backdrop, CT_LABEL)
+        label:SetAnchorFill()
+        label:SetFont("ZoFontWinH3")
+        label:SetColor(1, 1, 1, 1)
+        label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+        label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+        label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n(Mover)")
+
+        backdrop:SetHandler("OnMoveStop", function(self)
+            local newCx, newCy = self:GetCenter()
+            local oldCx, oldCy = control:GetCenter()
+            
+            local diffX = newCx - oldCx
+            local diffY = newCy - oldCy
+            
+            local settings = EZO_HUD.sv[widget.id]
+            if settings then
+                settings.offsetX = (settings.offsetX or 0) + diffX
+                settings.offsetY = (settings.offsetY or 0) + diffY
+                if EZO_HUD.ApplyNativeWidgetLayout then
+                    EZO_HUD:ApplyNativeWidgetLayout(widget.id)
+                end
+            end
+            
+            self:ClearAnchors()
+            self:SetAnchor(CENTER, control, CENTER, 0, 0)
+            
+            local refX = _G["EZOhud_" .. widget.id .. "_LAM_OffsetX"]
+            if refX and refX.UpdateValue then refX:UpdateValue() end
+            
+            local refY = _G["EZOhud_" .. widget.id .. "_LAM_OffsetY"]
+            if refY and refY.UpdateValue then refY:UpdateValue() end
+        end)
     end
     return backdrop
 end
@@ -48,7 +85,7 @@ local WIDGETS = {
         fallbackAnchor = { TOPRIGHT, GuiRoot, TOPRIGHT, -40, 120 },
         minScale = 0.5,
         maxScale = 1.5,
-        onPreviewOpen = function(control)
+        onPreviewOpen = function(self, control)
             if FOCUSED_QUEST_TRACKER_FRAGMENT and SCENE_MANAGER then
                 local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
                 if scene then scene:AddFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
@@ -56,13 +93,13 @@ local WIDGETS = {
             if control then 
                 control:SetHidden(false) 
                 control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
         end,
-        onPreviewClose = function(control)
+        onPreviewClose = function(self, control)
             if control then
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(true) end
             end
             if FOCUSED_QUEST_TRACKER_FRAGMENT and SCENE_MANAGER then
@@ -91,20 +128,20 @@ local WIDGETS = {
         fallbackAnchor = { TOP, GuiRoot, TOP, 0, 150 },
         minScale = 0.5,
         maxScale = 1.5,
-        onPreviewOpen = function(control)
+        onPreviewOpen = function(self, control)
             if CENTER_SCREEN_ANNOUNCE then
                 CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_SMALL_TEXT, nil, GetString(_G["EZO_HUD_PREVIEW_CSA"] or EZO_HUD_PREVIEW_CSA))
             end
             if control then 
                 control:SetHidden(false) 
                 control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
         end,
-        onPreviewClose = function(control)
+        onPreviewClose = function(self, control)
             if control then
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(true) end
             end
         end,
@@ -129,18 +166,18 @@ local WIDGETS = {
         fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -250 },
         minScale = 0.5,
         maxScale = 1.5,
-        onPreviewOpen = function(control)
+        onPreviewOpen = function(self, control)
             if control then 
                 control:SetHidden(false) 
                 control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
         end,
-        onPreviewClose = function(control)
+        onPreviewClose = function(self, control)
             if control then 
                 control:SetHidden(true) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(true) end
             end
         end,
@@ -165,18 +202,18 @@ local WIDGETS = {
         fallbackAnchor = { BOTTOMRIGHT, GuiRoot, BOTTOMRIGHT, -20, -100 },
         minScale = 0.5,
         maxScale = 1.5,
-        onPreviewOpen = function(control)
+        onPreviewOpen = function(self, control)
             if control then 
                 control:SetHidden(false) 
                 control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
         end,
-        onPreviewClose = function(control)
+        onPreviewClose = function(self, control)
             if control then 
                 control:SetHidden(true) 
-                local backdrop = GetOrCreatePreviewBackdrop(control)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(true) end
             end
         end,
@@ -337,7 +374,7 @@ function EZO_HUD:InitializeNativeWidgets()
                 for _, widget in ipairs(WIDGETS) do
                     local enableRef = _G["EZOhud_" .. widget.id .. "_LAM_Enable"]
                     if enableRef and not enableRef:IsHidden() and GetWidgetSettings(widget.id).enabled then
-                        widget.onPreviewOpen(_G[widget.controlName])
+                        widget:onPreviewOpen(_G[widget.controlName])
                     end
                 end
             end
@@ -347,7 +384,7 @@ function EZO_HUD:InitializeNativeWidgets()
             if isPanelVisible then
                 isPanelVisible = false
                 for _, widget in ipairs(WIDGETS) do
-                    widget.onPreviewClose(_G[widget.controlName])
+                    widget:onPreviewClose(_G[widget.controlName])
                 end
             end
         end)
@@ -390,9 +427,9 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).enabled = value == true
                         self:ApplyNativeWidgetLayout(widget.id)
                         if value == true then
-                            widget.onPreviewOpen(_G[widget.controlName])
+                            widget:onPreviewOpen(_G[widget.controlName])
                         else
-                            widget.onPreviewClose(_G[widget.controlName])
+                            widget:onPreviewClose(_G[widget.controlName])
                         end
                     end,
                     default = self.defaults[widget.id].enabled,
@@ -413,7 +450,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetX = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget.onPreviewOpen(_G[widget.controlName])
+                            widget:onPreviewOpen(_G[widget.controlName])
                         end
                     end,
                     default = self.defaults[widget.id].offsetX,
@@ -434,7 +471,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetY = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget.onPreviewOpen(_G[widget.controlName])
+                            widget:onPreviewOpen(_G[widget.controlName])
                         end
                     end,
                     default = self.defaults[widget.id].offsetY,
@@ -455,7 +492,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).scale = value / 100
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget.onPreviewOpen(_G[widget.controlName])
+                            widget:onPreviewOpen(_G[widget.controlName])
                         end
                     end,
                     default = math.floor(self.defaults[widget.id].scale * 100),
