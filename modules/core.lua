@@ -2,14 +2,14 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.67"
+EZO_HUD.ADDON_VERSION = "0.1.68"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -101,6 +101,13 @@ EZO_HUD.defaults = {
         offsetX = 0,
         offsetY = -120,
         scale = 1.0,
+    },
+    customSynergy = {
+        enabled = false,
+        movable = false,
+        offsetX = 0,
+        offsetY = 150,
+        size = 50,
     },
 }
 
@@ -275,6 +282,9 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "crux" then
         self:RefreshCruxMovementState()
         self:RefreshCruxDisplay()
+    elseif sectionName == "customSynergy" then
+        self:RefreshCustomSynergyMovementState()
+        self:RefreshCustomSynergy()
     end
 end
 
@@ -300,6 +310,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.ultimate", section = "ultimate", order = 20, name = EZO_HUD_OPTION_ULTIMATE_MOVE, tooltip = EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP },
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
+        { id = "ezohud.customSynergy", section = "customSynergy", order = 50, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
     }
 
     for _, definition in ipairs(definitions) do
@@ -360,6 +371,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveExecutePosition()
     elseif sectionName == "crux" and self.SaveCruxPosition then
         self:SaveCruxPosition()
+    elseif sectionName == "customSynergy" and self.SaveCustomSynergyPosition then
+        self:SaveCustomSynergyPosition()
     end
 end
 
@@ -426,6 +439,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCrux ~= nil then
         self:InitializeCrux()
+    end
+
+    if self.InitializeCustomSynergy ~= nil then
+        self:InitializeCustomSynergy()
     end
 
     self:RegisterLayoutWithEZOCore()

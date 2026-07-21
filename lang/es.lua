@@ -155,4 +155,15 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_PREVIEW_HEALTH = "SALUD",
     EZO_HUD_PREVIEW_STAMINA = "AGUANTE",
     EZO_HUD_PREVIEW_MAGICKA = "MAGIA",
+    
+    EZO_HUD_OPTION_CUSTOM_SYNERGY = "Sinergia (Personalizada)",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_HEADER_TOOLTIP = "Reemplaza el aviso de sinergia nativo por un diseño de texto e icono simple y personalizado.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE = "Activar Sinergia personalizada",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE_TOOLTIP = "Oculta el aviso de sinergia de ESO y usa una interfaz propia limpia.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE = "Habilitar movimiento",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP = "Permite arrastrar el aviso personalizado a una nueva posición. Se desactiva al recargar la interfaz.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Escala",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Escala el tamaño del aviso personalizado.",
+    
+    EZO_HUD_SYNERGY_PROMPT = "Sinergia: <<1>>",
 }

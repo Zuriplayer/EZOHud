@@ -161,4 +161,15 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_PREVIEW_HEALTH = "HEALTH",
     EZO_HUD_PREVIEW_STAMINA = "STAMINA",
     EZO_HUD_PREVIEW_MAGICKA = "MAGICKA",
+    
+    EZO_HUD_OPTION_CUSTOM_SYNERGY = "Custom Synergy UI",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_HEADER_TOOLTIP = "Replaces the native synergy prompt with a fully custom, simplified text-based design.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE = "Enable custom synergy UI",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE_TOOLTIP = "Hides the native ESO synergy prompt and uses a clean icon and text overlay.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE = "Enable move mode",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP = "Lets you drag the custom synergy UI to a new position. Disables automatically on reload.",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Scale",
+    EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
+    
+    EZO_HUD_SYNERGY_PROMPT = "Synergy: <<1>>",
 }

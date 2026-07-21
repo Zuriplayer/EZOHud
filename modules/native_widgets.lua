@@ -501,11 +501,30 @@ function EZO_HUD:InitializeNativeWidgets()
         local originalSynergyApplyTextStyle = ZO_Synergy.ApplyTextStyle
         ZO_Synergy.ApplyTextStyle = function(self, constants)
             originalSynergyApplyTextStyle(self, constants)
+            if EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
+                -- Do not apply native UI tweaks if custom synergy is enabled
+                return
+            end
             if EZO_HUD.ApplyNativeWidgetLayout then
                 EZO_HUD:ApplyNativeWidgetLayout("nativeSynergy")
             end
         end
         EZO_HUD.synergyStyleHooked = true
+    end
+
+    if not EZO_HUD.synergyAbilityHooked and ZO_Synergy and ZO_Synergy.OnSynergyAbilityChanged then
+        local originalOnSynergy = ZO_Synergy.OnSynergyAbilityChanged
+        ZO_Synergy.OnSynergyAbilityChanged = function(self, ...)
+            if EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
+                if SHARED_INFORMATION_AREA then
+                    SHARED_INFORMATION_AREA:SetHidden(self, true)
+                end
+                self.lastSynergyName = nil
+                return
+            end
+            originalOnSynergy(self, ...)
+        end
+        EZO_HUD.synergyAbilityHooked = true
     end
 
     if EVENT_GAMEPAD_PREFERRED_MODE_CHANGED then
