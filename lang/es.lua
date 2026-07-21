@@ -143,5 +143,9 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Escala",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Escala el tamaño del aviso personalizado.",
     
+    EZO_HUD_OPTION_CUSTOM_LOOT = "Historial de Botín (Personalizado)",
+    EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Mover Historial de Botín",
+    EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Permite arrastrar el panel de botín personalizado.",
+
     EZO_HUD_SYNERGY_PROMPT = "Sinergia: <<1>>",
 }

@@ -2,14 +2,14 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy", "customLoot" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.74"
+EZO_HUD.ADDON_VERSION = "0.1.75"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -279,6 +279,11 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "customSynergy" then
         self:RefreshCustomSynergyMovementState()
         self:RefreshCustomSynergy()
+    elseif sectionName == "customLoot" then
+        self:RefreshCustomLootMovementState()
+        if self.ApplyCustomLootLayout then
+            self:ApplyCustomLootLayout()
+        end
     end
 end
 
@@ -305,6 +310,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
         { id = "ezohud.customSynergy", section = "customSynergy", order = 50, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
+        { id = "ezohud.customLoot", section = "customLoot", order = 60, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
     }
 
     for _, definition in ipairs(definitions) do
@@ -367,6 +373,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveCruxPosition()
     elseif sectionName == "customSynergy" and self.SaveCustomSynergyPosition then
         self:SaveCustomSynergyPosition()
+    elseif sectionName == "customLoot" and self.SaveCustomLootPosition then
+        self:SaveCustomLootPosition()
     end
 end
 
@@ -437,6 +445,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCustomSynergy ~= nil then
         self:InitializeCustomSynergy()
+    end
+
+    if self.InitializeCustomLoot ~= nil then
+        self:InitializeCustomLoot()
     end
 
     self:RegisterLayoutWithEZOCore()

@@ -147,5 +147,9 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Scale",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
     
+    EZO_HUD_OPTION_CUSTOM_LOOT = "Custom Loot History",
+    EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Move Loot History",
+    EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Lets you drag the custom loot history.",
+
     EZO_HUD_SYNERGY_PROMPT = "Synergy: <<1>>",
 }
