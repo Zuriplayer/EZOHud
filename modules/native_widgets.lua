@@ -403,8 +403,8 @@ function EZO_HUD:InitializeNativeWidgets()
                     name = GetString(_G[widget.stringIds.offsetX] or 0),
                     tooltip = GetString(_G[widget.stringIds.offsetXTooltip] or 0),
                     reference = BuildRef("OffsetX"),
-                    min = -2500,
-                    max = 2500,
+                    min = -4000,
+                    max = 4000,
                     step = 5,
                     getFunc = function()
                         return GetWidgetSettings(widget.id).offsetX
@@ -424,8 +424,8 @@ function EZO_HUD:InitializeNativeWidgets()
                     name = GetString(_G[widget.stringIds.offsetY] or 0),
                     tooltip = GetString(_G[widget.stringIds.offsetYTooltip] or 0),
                     reference = BuildRef("OffsetY"),
-                    min = -1500,
-                    max = 1500,
+                    min = -4000,
+                    max = 4000,
                     step = 5,
                     getFunc = function()
                         return GetWidgetSettings(widget.id).offsetY
