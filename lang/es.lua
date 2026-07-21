@@ -148,4 +148,17 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Permite arrastrar el panel de botín personalizado.",
 
     EZO_HUD_SYNERGY_PROMPT = "Sinergia: <<1>>",
+
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS = "Consejos de Combate Activos",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP = "Controla la posición de los avisos de combate como Break Free, Interrumpir y Esquivar.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE = "Habilitar posicionamiento personalizado",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE_TOOLTIP = "Mueve y escala el control de consejos de combate activos.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X = "Desplazamiento X",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X_TOOLTIP = "Desplazamiento horizontal.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y = "Desplazamiento Y",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y_TOOLTIP = "Desplazamiento vertical.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE = "Escala",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP = "Escala el control de consejos de combate.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Restablecer",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restaura el anclaje original.",
 }

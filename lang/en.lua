@@ -152,4 +152,17 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Lets you drag the custom loot history.",
 
     EZO_HUD_SYNERGY_PROMPT = "Synergy: <<1>>",
+
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS = "Active Combat Tips",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP = "Controls the position of combat prompts like Break Free, Interrupt, and Dodge.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE = "Enable custom positioning",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE_TOOLTIP = "Moves and scales the active combat tips control.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X = "X offset",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X_TOOLTIP = "Horizontal offset.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y = "Y offset",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y_TOOLTIP = "Vertical offset.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE = "Scale",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP = "Scales the combat tips control.",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Reset",
+    EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restores original anchor.",
 }

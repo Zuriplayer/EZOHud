@@ -159,6 +159,41 @@ local WIDGETS = {
             reset = "EZO_HUD_OPTION_NATIVE_CSA_RESET",
             resetTooltip = "EZO_HUD_OPTION_NATIVE_CSA_RESET_TOOLTIP",
         }
+    },
+    {
+        id = "nativeCombatTips",
+        controlName = { "ZO_ActiveCombatTip", "ZO_ActiveCombatTipTopLevel" },
+        fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -150 },
+        minScale = 0.5,
+        maxScale = 2.0,
+        onPreviewOpen = function(self, control)
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(false) end
+            end
+        end,
+        onPreviewClose = function(self, control)
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(true) end
+            end
+        end,
+        stringIds = {
+            header = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP",
+        }
     }
 }
 

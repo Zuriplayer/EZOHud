@@ -52,7 +52,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
-- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales y aviso de sinergia, con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
+- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, aviso de sinergia y consejos de combate activos con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
 - Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español.
@@ -72,7 +72,7 @@ Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZ
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
-- Ajustes de Interfaz Nativa: activar el reposicionamiento de elementos nativos de ESO (tracker de misiones, anuncios centrales y sinergia). Ajustar desplazamientos X/Y, cambiar la escala y restablecer los valores.
+- Ajustes de Interfaz Nativa: activar el reposicionamiento de elementos nativos de ESO (tracker de misiones, anuncios centrales, sinergia y consejos de combate activos). Ajustar desplazamientos X/Y, cambiar la escala y restablecer los valores.
 - Historial de Botín Personalizado: activar el panel de botín, habilitar movimiento y configurar el tiempo que los objetos permanecen visibles antes de desvanecerse.
 - Debug: activar registro de debug y, opcionalmente, reflejar la salida de debug en el chat.
 
