@@ -199,9 +199,9 @@ local WIDGETS = {
         }
     },
     {
-        id = "nativeLootHistory",
-        controlName = {"ZO_LootHistoryControl_Keyboard", "ZO_LootHistoryControl_Gamepad"},
-        fallbackAnchor = { BOTTOMRIGHT, GuiRoot, BOTTOMRIGHT, -20, -100 },
+        id = "nativeLootHistoryKeyboard",
+        controlName = "ZO_LootHistoryControl_Keyboard",
+        fallbackAnchor = { BOTTOMRIGHT, GuiRoot, BOTTOMRIGHT, 0, -84 },
         minScale = 0.5,
         maxScale = 1.5,
         onPreviewOpen = function(self, control)
@@ -219,19 +219,103 @@ local WIDGETS = {
                 if backdrop then backdrop:SetHidden(true) end
             end
         end,
+        onApplyLayout = function(self, settings, defaultSettings)
+            if LOOT_HISTORY_KEYBOARD and LOOT_HISTORY_KEYBOARD.lootStream then
+                local anchor = ZO_Anchor:New(
+                    self.fallbackAnchor[1], 
+                    self.fallbackAnchor[2], 
+                    self.fallbackAnchor[3], 
+                    tonumber(settings.offsetX) or defaultSettings.offsetX, 
+                    tonumber(settings.offsetY) or defaultSettings.offsetY
+                )
+                LOOT_HISTORY_KEYBOARD.lootStream.anchor = anchor
+                if LOOT_HISTORY_KEYBOARD.lootStreamPersistent then
+                    LOOT_HISTORY_KEYBOARD.lootStreamPersistent.anchor = anchor
+                end
+            end
+        end,
+        onRestoreLayout = function(self)
+            if LOOT_HISTORY_KEYBOARD and LOOT_HISTORY_KEYBOARD.lootStream then
+                local anchor = ZO_Anchor:New(unpack(self.fallbackAnchor))
+                LOOT_HISTORY_KEYBOARD.lootStream.anchor = anchor
+                if LOOT_HISTORY_KEYBOARD.lootStreamPersistent then
+                    LOOT_HISTORY_KEYBOARD.lootStreamPersistent.anchor = anchor
+                end
+            end
+        end,
         stringIds = {
-            header = "EZO_HUD_OPTION_NATIVE_LOOT",
-            headerTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_HEADER_TOOLTIP",
-            enable = "EZO_HUD_OPTION_NATIVE_LOOT_ENABLE",
-            enableTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_ENABLE_TOOLTIP",
-            offsetX = "EZO_HUD_OPTION_NATIVE_LOOT_OFFSET_X",
-            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_OFFSET_X_TOOLTIP",
-            offsetY = "EZO_HUD_OPTION_NATIVE_LOOT_OFFSET_Y",
-            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_OFFSET_Y_TOOLTIP",
-            scale = "EZO_HUD_OPTION_NATIVE_LOOT_SCALE",
-            scaleTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_SCALE_TOOLTIP",
-            reset = "EZO_HUD_OPTION_NATIVE_LOOT_RESET",
-            resetTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_RESET_TOOLTIP",
+            header = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_RESET_TOOLTIP",
+        }
+    },
+    {
+        id = "nativeLootHistoryGamepad",
+        controlName = "ZO_LootHistoryControl_Gamepad",
+        fallbackAnchor = { BOTTOMLEFT, GuiRoot, BOTTOMLEFT, 0, -120 },
+        minScale = 0.5,
+        maxScale = 1.5,
+        onPreviewOpen = function(self, control)
+            if control then 
+                control:SetHidden(false) 
+                control:SetAlpha(1) 
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(false) end
+            end
+        end,
+        onPreviewClose = function(self, control)
+            if control then 
+                control:SetHidden(true) 
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(true) end
+            end
+        end,
+        onApplyLayout = function(self, settings, defaultSettings)
+            if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
+                local anchor = ZO_Anchor:New(
+                    self.fallbackAnchor[1], 
+                    self.fallbackAnchor[2], 
+                    self.fallbackAnchor[3], 
+                    tonumber(settings.offsetX) or defaultSettings.offsetX, 
+                    tonumber(settings.offsetY) or defaultSettings.offsetY
+                )
+                LOOT_HISTORY_GAMEPAD.lootStream.anchor = anchor
+                if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
+                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = anchor
+                end
+            end
+        end,
+        onRestoreLayout = function(self)
+            if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
+                local anchor = ZO_Anchor:New(unpack(self.fallbackAnchor))
+                LOOT_HISTORY_GAMEPAD.lootStream.anchor = anchor
+                if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
+                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = anchor
+                end
+            end
+        end,
+        stringIds = {
+            header = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_RESET_TOOLTIP",
         }
     }
 }
@@ -324,6 +408,10 @@ local function RestoreOriginalState(widget)
             control:SetScale(controlState.scale or 1)
         end
     end
+
+    if widget.onRestoreLayout then
+        widget:onRestoreLayout()
+    end
 end
 
 function EZO_HUD:ApplyNativeWidgetLayout(widgetId)
@@ -361,6 +449,10 @@ function EZO_HUD:ApplyNativeWidgetLayout(widgetId)
             tonumber(settings.offsetY) or self.defaults[widget.id].offsetY
         )
         control:SetScale(scale)
+    end
+
+    if widget.onApplyLayout then
+        widget:onApplyLayout(settings, self.defaults[widget.id])
     end
 
     return true

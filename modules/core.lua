@@ -9,7 +9,7 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.63"
+EZO_HUD.ADDON_VERSION = "0.1.64"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -90,10 +90,16 @@ EZO_HUD.defaults = {
         offsetY = -250,
         scale = 1.0,
     },
-    nativeLootHistory = {
+    nativeLootHistoryKeyboard = {
         enabled = false,
-        offsetX = -20,
-        offsetY = -100,
+        offsetX = 0,
+        offsetY = -84,
+        scale = 1.0,
+    },
+    nativeLootHistoryGamepad = {
+        enabled = false,
+        offsetX = 0,
+        offsetY = -120,
         scale = 1.0,
     },
 }
