@@ -221,8 +221,23 @@ function EZO_HUD:InitializeCustomLoot()
 
         -- If itemName contains an item link, we can extract its info
         if type(itemName) == "string" and string.sub(itemName, 1, 2) == "|H" then
-            icon, name = GetItemLinkInfo(itemName)
-            color = GetItemLinkColor(itemName)
+            icon = GetItemLinkInfo(itemName)
+            name = GetItemLinkName(itemName)
+            if not name or name == "" then
+                name = itemName -- Fallback if GetItemLinkName fails
+            end
+            
+            local quality = nil
+            if type(GetItemLinkDisplayQuality) == "function" then
+                quality = GetItemLinkDisplayQuality(itemName)
+            elseif type(GetItemLinkQuality) == "function" then
+                quality = GetItemLinkQuality(itemName)
+            end
+            
+            if quality then
+                local r, g, b = GetInterfaceColor(INTERFACE_COLOR_TYPE_ITEM_QUALITY_COLORS, quality)
+                color = ZO_ColorDef:New(r, g, b, 1)
+            end
         elseif lootType == LOOT_TYPE_CURRENCY then
             name = GetCurrencyName(itemId, false, false)
             local platformIcon = GetCurrencyKeyboardIcon(itemId)
