@@ -1,7 +1,7 @@
 # EZOhud
 
 Prefer Spanish? Read the [Spanish README](README.es.md).
-EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, execute opportunities, and Arcanist Crux tracking while keeping the implementation small and testable.
+EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, execute opportunities, Arcanist Crux tracking, and limited native widget positioning tweaks (like the quest tracker, center screen announcements, synergy prompt, and loot history) while keeping the implementation small and testable.
 
 Support, bug reports, and suggestions: <https://discord.gg/ekw8zUAcRm>
 
@@ -52,6 +52,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Arcanist Crux HUD with stack count, remaining duration bar, timer text, size setting, and bar spacing setting.
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
+- Experimental native widget positioning for the focused quest tracker, center screen announcements, synergy prompt, and loot history with enable, X/Y offset, scale, and reset controls.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
 - English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection.
 - Debug options in a dedicated settings section, with optional LibDebugLogger output and optional chat output.
@@ -63,13 +64,14 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
 
-When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute and Crux surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel.
+When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute and Crux surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel. The native quest tracker test is settings-driven only and is not a shared layout-mode surface.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, hide vanilla bars, enable HUD movement, out-of-combat alpha, and per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
+- Native UI Tweaks: enable repositioning of ESO's native focused quest tracker, center screen announcements, synergy prompt, and loot history. Tune X/Y offsets, adjust scale, and reset the values.
 - Debug: enable debug logging and optionally mirror debug output to chat.
 
 ## Safety Limits
@@ -77,6 +79,7 @@ When EZOCore is active, the complete panel is rendered inside `Settings > EZO` a
 - EZOhud is visual only.
 - It does not cast abilities, press keys, automate rotations, block, dodge, interrupt, target enemies, or make gameplay decisions.
 - Execute, ultimate, resource, and Crux indicators are informational only.
+- Native UI tweaks only reanchor and scale ESO's native elements; they do not replace the elements or alter their core behavior.
 - Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
 - EZOhud does not add keybinds or input handling and is intended to remain compatible with keyboard and gamepad play.
 - Debug tools are diagnostics only and should remain disabled during normal play unless troubleshooting.
@@ -95,6 +98,7 @@ Recommended beta checks:
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it.
 - Test different resolutions and UI scale values.
 - Test `/reloadui` after moving HUD elements.
+- Test native widget positioning with keyboard and gamepad UI for all customized elements.
 
 When reporting layout or behavior issues, include the addon version, ESO API version, character class, language mode, active settings, and a screenshot.
 

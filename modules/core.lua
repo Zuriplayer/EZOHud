@@ -9,7 +9,7 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.53"
+EZO_HUD.ADDON_VERSION = "0.1.56"
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -71,6 +71,30 @@ EZO_HUD.defaults = {
         barGap = 1,
         offsetX = 0,
         offsetY = 95,
+    },
+    nativeQuestTracker = {
+        enabled = false,
+        offsetX = -40,
+        offsetY = 120,
+        scale = 1.0,
+    },
+    nativeCenterScreen = {
+        enabled = false,
+        offsetX = 0,
+        offsetY = 150,
+        scale = 1.0,
+    },
+    nativeSynergy = {
+        enabled = false,
+        offsetX = 0,
+        offsetY = -250,
+        scale = 1.0,
+    },
+    nativeLootHistory = {
+        enabled = false,
+        offsetX = -20,
+        offsetY = -100,
+        scale = 1.0,
     },
 }
 
@@ -376,6 +400,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeHudVisibility ~= nil then
         self:InitializeHudVisibility()
+    end
+
+    if self.InitializeNativeWidgets ~= nil then
+        self:InitializeNativeWidgets()
     end
 
     if self.InitializeOverlay ~= nil then

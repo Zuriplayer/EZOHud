@@ -1,7 +1,7 @@
 # EZOhud
 
 ¿Prefieres inglés? Lee el [README en inglés](README.md).
-EZOhud es un addon beta de HUD para The Elder Scrolls Online dentro de la familia de addons EZO. Su propósito actual es ofrecer indicadores visuales configurables para recursos del jugador, disponibilidad de ultimate, oportunidades de execute y seguimiento de Crux del arcanista, manteniendo una implementación pequeña y fácil de probar.
+EZOhud es un addon beta de HUD para The Elder Scrolls Online dentro de la familia de addons EZO. Su propósito actual es ofrecer indicadores visuales configurables para recursos del jugador, disponibilidad de ultimate, oportunidades de execute, seguimiento de Crux del arcanista y pequeños ajustes de posicionamiento para elementos nativos (como el tracker de misiones, anuncios centrales, aviso de sinergia e historial de botín), manteniendo una implementación pequeña y fácil de probar.
 
 Soporte, errores y sugerencias: <https://discord.gg/ekw8zUAcRm>
 
@@ -52,6 +52,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
+- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, aviso de sinergia e historial de botín, con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
 - Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español.
 - Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
@@ -63,13 +64,14 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
 
-Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute y Crux se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu.
+Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute y Crux se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. La prueba del tracker nativo de misiones solo se controla desde ajustes y no es una superficie del modo compartido de disposición.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
+- Ajustes de Interfaz Nativa: activar el reposicionamiento de elementos nativos de ESO (tracker de misiones, anuncios centrales, sinergia e historial de botín). Ajustar desplazamientos X/Y, cambiar la escala y restablecer los valores.
 - Debug: activar registro de debug y, opcionalmente, reflejar la salida de debug en el chat.
 
 ## Límites de Seguridad
@@ -77,6 +79,7 @@ Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZ
 - EZOhud es únicamente visual.
 - No lanza habilidades, no pulsa teclas, no automatiza rotaciones, no bloquea, no esquiva, no interrumpe, no selecciona objetivos ni toma decisiones de juego.
 - Los indicadores de execute, ultimate, recursos y Crux son solo informativos.
+- Los ajustes de interfaz nativa solo reanclan y escalan los elementos nativos de ESO; no los reemplazan ni alteran su comportamiento principal.
 - Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir; las posiciones guardadas del HUD permanecen.
 - EZOhud no añade atajos de teclado ni gestión de input y está pensado para mantener compatibilidad con juego en teclado y gamepad.
 - Las herramientas de debug son solo diagnósticas y deberían permanecer desactivadas durante el juego normal salvo que se esté investigando un problema.
@@ -95,6 +98,7 @@ Comprobaciones recomendadas para la beta:
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.
 - Probar distintas resoluciones y valores de escala de UI.
 - Probar `/reloadui` después de mover elementos del HUD.
+- Probar el posicionamiento de los elementos nativos con UI de teclado y gamepad para todos los elementos personalizados.
 
 Al informar de problemas de diseño o comportamiento, incluye la versión del addon, versión de API de ESO, clase del personaje, modo de idioma, ajustes activos y una captura de pantalla.
 
