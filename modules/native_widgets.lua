@@ -496,6 +496,17 @@ function EZO_HUD:InitializeNativeWidgets()
             end
         end
     )
+    
+    if not EZO_HUD.synergyStyleHooked and ZO_Synergy and ZO_Synergy.ApplyTextStyle then
+        local originalSynergyApplyTextStyle = ZO_Synergy.ApplyTextStyle
+        ZO_Synergy.ApplyTextStyle = function(self, constants)
+            originalSynergyApplyTextStyle(self, constants)
+            if EZO_HUD.ApplyNativeWidgetLayout then
+                EZO_HUD:ApplyNativeWidgetLayout("nativeSynergy")
+            end
+        end
+        EZO_HUD.synergyStyleHooked = true
+    end
 
     if EVENT_GAMEPAD_PREFERRED_MODE_CHANGED then
         EVENT_MANAGER:RegisterForEvent(
