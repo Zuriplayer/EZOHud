@@ -162,7 +162,7 @@ local WIDGETS = {
     },
     {
         id = "nativeCombatTips",
-        controlName = { "ZO_ActiveCombatTip", "ZO_ActiveCombatTipTopLevel" },
+        controlName = { "ZO_ActiveCombatTip", "ZO_ActiveCombatTips", "ZO_ActiveCombatTipTopLevel", "ZO_ActiveCombatTipsTopLevel", "ACTIVE_COMBAT_TIP_SYSTEM" },
         fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -150 },
         minScale = 0.5,
         maxScale = 2.0,
@@ -206,16 +206,22 @@ end
 
 local function GetWidgetControls(widget)
     local controls = {}
+    local function AddControl(name)
+        local obj = _G[name]
+        if not obj then return end
+        if type(obj) == "userdata" and type(obj.GetScale) == "function" then
+            table.insert(controls, {name = name, control = obj})
+        elseif type(obj) == "table" and type(obj.control) == "userdata" and type(obj.control.GetScale) == "function" then
+            table.insert(controls, {name = name, control = obj.control})
+        end
+    end
+
     if type(widget.controlName) == "table" then
         for _, name in ipairs(widget.controlName) do
-            if _G[name] then
-                table.insert(controls, {name = name, control = _G[name]})
-            end
+            AddControl(name)
         end
     else
-        if _G[widget.controlName] then
-            table.insert(controls, {name = widget.controlName, control = _G[widget.controlName]})
-        end
+        AddControl(widget.controlName)
     end
     return controls
 end
