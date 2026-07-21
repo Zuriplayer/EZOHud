@@ -200,14 +200,14 @@ function EZO_HUD:InitializeCustomLoot()
     local settings = GetCustomLootSettings()
 
     -- Ensure native panels are invisible if our custom one is enabled
-    -- by completely preventing them from processing any loot.
-    -- This prevents Gamepad's built-in fade animations from unhiding them.
+    -- by hiding their scene fragments natively. This prevents any animations
+    -- or scene changes from unhiding them.
     if settings.enabled then
-        if LOOT_HISTORY_KEYBOARD then
-            LOOT_HISTORY_KEYBOARD.AddLoot = function() return end
+        if KEYBOARD_LOOT_HISTORY_FRAGMENT then
+            KEYBOARD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", true)
         end
-        if LOOT_HISTORY_GAMEPAD then
-            LOOT_HISTORY_GAMEPAD.AddLoot = function() return end
+        if GAMEPAD_LOOT_HISTORY_FRAGMENT then
+            GAMEPAD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", true)
         end
     end
 
