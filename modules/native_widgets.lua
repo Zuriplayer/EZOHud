@@ -200,7 +200,7 @@ local WIDGETS = {
     },
     {
         id = "nativeLootHistory",
-        controlName = "ZO_LootHistoryControl_Keyboard",
+        controlName = {"ZO_LootHistoryControl_Keyboard", "ZO_LootHistoryControl_Gamepad"},
         fallbackAnchor = { BOTTOMRIGHT, GuiRoot, BOTTOMRIGHT, -20, -100 },
         minScale = 0.5,
         maxScale = 1.5,
@@ -243,28 +243,50 @@ local function GetWidgetSettings(widgetId)
     return (EZO_HUD.sv and EZO_HUD.sv[widgetId]) or EZO_HUD.defaults[widgetId]
 end
 
+local function GetWidgetControls(widget)
+    local controls = {}
+    if type(widget.controlName) == "table" then
+        for _, name in ipairs(widget.controlName) do
+            if _G[name] then
+                table.insert(controls, {name = name, control = _G[name]})
+            end
+        end
+    else
+        if _G[widget.controlName] then
+            table.insert(controls, {name = widget.controlName, control = _G[widget.controlName]})
+        end
+    end
+    return controls
+end
+
 local function CaptureOriginalState(widget)
     if originalStates[widget.id] then return end
-    local control = _G[widget.controlName]
-    if not control then return end
+    
+    local widgetControls = GetWidgetControls(widget)
+    if #widgetControls == 0 then return end
 
-    local state = {
-        scale = control.GetScale and control:GetScale() or 1,
-        anchors = {},
-    }
+    local state = {}
+    
+    for _, wc in ipairs(widgetControls) do
+        local control = wc.control
+        state[wc.name] = {
+            scale = control.GetScale and control:GetScale() or 1,
+            anchors = {},
+        }
 
-    if control.GetNumAnchors and control.GetAnchor then
-        local numAnchors = control:GetNumAnchors()
-        for index = 0, numAnchors - 1 do
-            local isValid, point, relativeTo, relativePoint, offsetX, offsetY = control:GetAnchor(index)
-            if isValid and point ~= nil then
-                state.anchors[#state.anchors + 1] = {
-                    point = point,
-                    relativeTo = relativeTo,
-                    relativePoint = relativePoint,
-                    offsetX = offsetX,
-                    offsetY = offsetY,
-                }
+        if control.GetNumAnchors and control.GetAnchor then
+            local numAnchors = control:GetNumAnchors()
+            for index = 0, numAnchors - 1 do
+                local isValid, point, relativeTo, relativePoint, offsetX, offsetY = control:GetAnchor(index)
+                if isValid and point ~= nil then
+                    table.insert(state[wc.name].anchors, {
+                        point = point,
+                        relativeTo = relativeTo,
+                        relativePoint = relativePoint,
+                        offsetX = offsetX,
+                        offsetY = offsetY,
+                    })
+                end
             end
         end
     end
@@ -274,18 +296,26 @@ end
 
 local function RestoreOriginalState(widget)
     local state = originalStates[widget.id]
-    local control = _G[widget.controlName]
-    if not (control and state) then return end
-
-    control:ClearAnchors()
-    if #state.anchors > 0 then
-        for _, anchor in ipairs(state.anchors) do
-            control:SetAnchor(anchor.point, anchor.relativeTo, anchor.relativePoint, anchor.offsetX, anchor.offsetY)
+    if not state then return end
+    
+    local widgetControls = GetWidgetControls(widget)
+    
+    for _, wc in ipairs(widgetControls) do
+        local control = wc.control
+        local controlState = state[wc.name]
+        
+        if controlState then
+            control:ClearAnchors()
+            if #controlState.anchors > 0 then
+                for _, anchor in ipairs(controlState.anchors) do
+                    control:SetAnchor(anchor.point, anchor.relativeTo, anchor.relativePoint, anchor.offsetX, anchor.offsetY)
+                end
+            else
+                control:SetAnchor(unpack(widget.fallbackAnchor))
+            end
+            control:SetScale(controlState.scale or 1)
         end
-    else
-        control:SetAnchor(unpack(widget.fallbackAnchor))
     end
-    control:SetScale(state.scale or 1)
 end
 
 function EZO_HUD:ApplyNativeWidgetLayout(widgetId)
@@ -298,8 +328,8 @@ function EZO_HUD:ApplyNativeWidgetLayout(widgetId)
     end
     if not widget then return false end
 
-    local control = _G[widget.controlName]
-    if not control then return false end
+    local widgetControls = GetWidgetControls(widget)
+    if #widgetControls == 0 then return false end
 
     CaptureOriginalState(widget)
 
@@ -312,15 +342,18 @@ function EZO_HUD:ApplyNativeWidgetLayout(widgetId)
     local scale = Clamp(settings.scale or self.defaults[widget.id].scale, widget.minScale, widget.maxScale)
     settings.scale = scale
 
-    control:ClearAnchors()
-    control:SetAnchor(
-        widget.fallbackAnchor[1], -- point
-        widget.fallbackAnchor[2], -- relativeTo
-        widget.fallbackAnchor[3], -- relativePoint
-        tonumber(settings.offsetX) or self.defaults[widget.id].offsetX,
-        tonumber(settings.offsetY) or self.defaults[widget.id].offsetY
-    )
-    control:SetScale(scale)
+    for _, wc in ipairs(widgetControls) do
+        local control = wc.control
+        control:ClearAnchors()
+        control:SetAnchor(
+            widget.fallbackAnchor[1], -- point
+            widget.fallbackAnchor[2], -- relativeTo
+            widget.fallbackAnchor[3], -- relativePoint
+            tonumber(settings.offsetX) or self.defaults[widget.id].offsetX,
+            tonumber(settings.offsetY) or self.defaults[widget.id].offsetY
+        )
+        control:SetScale(scale)
+    end
 
     return true
 end
@@ -376,7 +409,7 @@ function EZO_HUD:InitializeNativeWidgets()
                 for _, widget in ipairs(WIDGETS) do
                     local enableRef = _G["EZOhud_" .. widget.id .. "_LAM_Enable"]
                     if enableRef and not enableRef:IsHidden() and GetWidgetSettings(widget.id).enabled then
-                        widget:onPreviewOpen(_G[widget.controlName])
+                        RunOnWidgetControls(widget, widget.onPreviewOpen)
                     end
                 end
             end
@@ -386,7 +419,7 @@ function EZO_HUD:InitializeNativeWidgets()
             if isPanelVisible then
                 isPanelVisible = false
                 for _, widget in ipairs(WIDGETS) do
-                    widget:onPreviewClose(_G[widget.controlName])
+                    RunOnWidgetControls(widget, widget.onPreviewClose)
                 end
             end
         end)
@@ -429,9 +462,9 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).enabled = value == true
                         self:ApplyNativeWidgetLayout(widget.id)
                         if value == true then
-                            widget:onPreviewOpen(_G[widget.controlName])
+                            RunOnWidgetControls(widget, widget.onPreviewOpen)
                         else
-                            widget:onPreviewClose(_G[widget.controlName])
+                            RunOnWidgetControls(widget, widget.onPreviewClose)
                         end
                     end,
                     default = self.defaults[widget.id].enabled,
@@ -452,7 +485,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetX = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget:onPreviewOpen(_G[widget.controlName])
+                            RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,
                     default = self.defaults[widget.id].offsetX,
@@ -473,7 +506,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetY = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget:onPreviewOpen(_G[widget.controlName])
+                            RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,
                     default = self.defaults[widget.id].offsetY,
@@ -494,7 +527,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).scale = value / 100
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            widget:onPreviewOpen(_G[widget.controlName])
+                            RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,
                     default = math.floor(self.defaults[widget.id].scale * 100),
@@ -513,7 +546,7 @@ function EZO_HUD:InitializeNativeWidgets()
                                 control:UpdateValue()
                             end
                         end
-                        widget.onPreviewClose(_G[widget.controlName])
+                        RunOnWidgetControls(widget, widget.onPreviewClose)
                     end,
                     width = "half",
                 })
