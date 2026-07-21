@@ -37,7 +37,6 @@ local function BuildCustomLootIndicator()
     buffer:SetAnchorFill()
     buffer:SetMaxHistoryLines(30)
     buffer:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    buffer:SetLineSpacing(5)
 
     -- Scrollbar
     local scrollbar = WINDOW_MANAGER:CreateControlFromVirtual(CUSTOM_LOOT_NAME .. "_Scrollbar", root, "ZO_Scrollbar")
