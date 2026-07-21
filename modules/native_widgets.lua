@@ -224,8 +224,17 @@ local WIDGETS = {
                 -- Internally anchor the entries to the moving control instead of GuiRoot to prevent screen pinning
                 local internalAnchor = ZO_Anchor:New(BOTTOMRIGHT, ZO_LootHistoryControl_Keyboard, BOTTOMRIGHT, 0, 0)
                 LOOT_HISTORY_KEYBOARD.lootStream.anchor = internalAnchor
+                if LOOT_HISTORY_KEYBOARD.lootStream.ReleaseAllControls then
+                    LOOT_HISTORY_KEYBOARD.lootStream:ReleaseAllControls()
+                    LOOT_HISTORY_KEYBOARD.lootStream:RefreshBatchAfterRelease()
+                end
+                
                 if LOOT_HISTORY_KEYBOARD.lootStreamPersistent then
                     LOOT_HISTORY_KEYBOARD.lootStreamPersistent.anchor = internalAnchor
+                    if LOOT_HISTORY_KEYBOARD.lootStreamPersistent.ReleaseAllControls then
+                        LOOT_HISTORY_KEYBOARD.lootStreamPersistent:ReleaseAllControls()
+                        LOOT_HISTORY_KEYBOARD.lootStreamPersistent:RefreshBatchAfterRelease()
+                    end
                 end
             end
         end,
@@ -279,8 +288,17 @@ local WIDGETS = {
                 -- Internally anchor the entries to the moving control instead of GuiRoot to prevent screen pinning
                 local internalAnchor = ZO_Anchor:New(BOTTOMLEFT, ZO_LootHistoryControl_Gamepad, BOTTOMLEFT, 0, 0)
                 LOOT_HISTORY_GAMEPAD.lootStream.anchor = internalAnchor
+                if LOOT_HISTORY_GAMEPAD.lootStream.ReleaseAllControls then
+                    LOOT_HISTORY_GAMEPAD.lootStream:ReleaseAllControls()
+                    LOOT_HISTORY_GAMEPAD.lootStream:RefreshBatchAfterRelease()
+                end
+                
                 if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
                     LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = internalAnchor
+                    if LOOT_HISTORY_GAMEPAD.lootStreamPersistent.ReleaseAllControls then
+                        LOOT_HISTORY_GAMEPAD.lootStreamPersistent:ReleaseAllControls()
+                        LOOT_HISTORY_GAMEPAD.lootStreamPersistent:RefreshBatchAfterRelease()
+                    end
                 end
             end
         end,
