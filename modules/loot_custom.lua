@@ -211,48 +211,51 @@ function EZO_HUD:InitializeCustomLoot()
         end
     end
 
-    -- Intercept Loot to our custom buffer
-    if LOOT_HISTORY_KEYBOARD then
-        local origAddLoot = LOOT_HISTORY_KEYBOARD.AddLoot
-        LOOT_HISTORY_KEYBOARD.AddLoot = function(historySelf, lootType, itemLink, quantity, itemSound, isPickpocketLoot, questItemIcon, itemId, isStolen, ...)
-            if EZO_HUD.sv.customLoot and EZO_HUD.sv.customLoot.enabled then
-                local name = ""
-                local icon = ""
-                local color = ZO_ColorDef:New(1, 1, 1, 1)
+    EVENT_MANAGER:RegisterForEvent("EZOhud_CustomLoot", EVENT_LOOT_RECEIVED, function(eventCode, receivedBy, itemName, quantity, itemSound, lootType, lootedBySelf, isPickpocketLoot, questItemIcon, itemId, isStolen)
+        if not GetCustomLootSettings().enabled then return end
+        if not lootedBySelf then return end -- Only show local player's loot
 
-                if itemLink and itemLink ~= "" then
-                    icon, name = GetItemLinkInfo(itemLink)
-                    color = GetItemLinkColor(itemLink)
-                elseif lootType == LOOT_TYPE_CURRENCY then
-                    name = GetCurrencyName(itemId, false, false)
-                    local platformIcon = GetCurrencyKeyboardIcon(itemId)
-                    icon = platformIcon or "EsoUI/Art/currency/currency_gold.dds"
-                    color = ZO_ColorDef:New(0.9, 0.8, 0.2, 1)
-                end
+        local name = ""
+        local icon = ""
+        local color = ZO_ColorDef:New(1, 1, 1, 1)
 
-                if not name or name == "" then
-                    return -- Unknown loot type without a link or name, safely ignore rather than showing native
-                end
-
-                local coloredName = color:Colorize(zo_strformat("<<1>>", name))
-                local formattedIcon = zo_iconFormat(icon, 32, 32)
-                
-                local message = ""
-                if quantity > 1 then
-                    message = string.format("%s %s x%d", coloredName, formattedIcon, quantity)
-                else
-                    message = string.format("%s %s", coloredName, formattedIcon)
-                end
-                
-                -- Add to our text buffer
-                self.customLoot.buffer:AddMessage(message, 1, 1, 1, 0)
-                
-                return -- Block native UI
-            else
-                return origAddLoot(historySelf, lootType, itemLink, quantity, itemSound, isPickpocketLoot, questItemIcon, itemId, isStolen, ...)
-            end
+        -- If itemName contains an item link, we can extract its info
+        if type(itemName) == "string" and string.sub(itemName, 1, 2) == "|H" then
+            icon, name = GetItemLinkInfo(itemName)
+            color = GetItemLinkColor(itemName)
+        elseif lootType == LOOT_TYPE_CURRENCY then
+            name = GetCurrencyName(itemId, false, false)
+            local platformIcon = GetCurrencyKeyboardIcon(itemId)
+            icon = platformIcon or "EsoUI/Art/currency/currency_gold.dds"
+            color = ZO_ColorDef:New(0.9, 0.8, 0.2, 1)
+        else
+            -- Plain text or generic fallback
+            name = itemName
+            icon = questItemIcon or ""
         end
-    end
+
+        if not name or name == "" then
+            return -- Abort safely
+        end
+
+        local coloredName = color:Colorize(zo_strformat("<<1>>", name))
+        local formattedIcon = ""
+        if icon and icon ~= "" then
+            formattedIcon = zo_iconFormat(icon, 32, 32)
+        end
+        
+        local message = ""
+        if quantity > 1 then
+            message = string.format("%s %s x%d", coloredName, formattedIcon, quantity)
+        else
+            message = string.format("%s %s", coloredName, formattedIcon)
+        end
+        
+        -- Add to our text buffer
+        if EZO_HUD.customLoot and EZO_HUD.customLoot.buffer then
+            EZO_HUD.customLoot.buffer:AddMessage(message, 1, 1, 1, 0)
+        end
+    end)
 
     -- LAM Menu
     EZOhud_LAM.RegisterSection("customLoot", 70, function()
