@@ -223,70 +223,6 @@ local WIDGETS = {
             reset = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_RESET",
             resetTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_RESET_TOOLTIP",
         }
-    },
-    {
-        id = "nativeLootHistoryGamepad",
-        controlName = "ZO_LootHistoryControl_Gamepad",
-        fallbackAnchor = { BOTTOMLEFT, GuiRoot, BOTTOMLEFT, 0, -120 },
-        minScale = 0.5,
-        maxScale = 1.5,
-        onPreviewOpen = function(self, control)
-            if control then 
-                control:SetHidden(false) 
-                control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(false) end
-            end
-        end,
-        onPreviewClose = function(self, control)
-            if control then 
-                control:SetHidden(true) 
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(true) end
-            end
-        end,
-        onApplyLayout = function(self, settings, defaultSettings)
-            if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
-                -- Internally anchor the entries to the moving control's container instead of GuiRoot
-                local internalAnchor = ZO_Anchor:New(BOTTOMLEFT, ZO_LootHistoryControl_GamepadContainer or ZO_LootHistoryControl_Gamepad, BOTTOMLEFT, 0, 0)
-                LOOT_HISTORY_GAMEPAD.lootStream.anchor = internalAnchor
-                if LOOT_HISTORY_GAMEPAD.lootStream.ReleaseAllControls then
-                    LOOT_HISTORY_GAMEPAD.lootStream:ReleaseAllControls()
-                    LOOT_HISTORY_GAMEPAD.lootStream:RefreshBatchAfterRelease()
-                end
-                
-                if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
-                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = internalAnchor
-                    if LOOT_HISTORY_GAMEPAD.lootStreamPersistent.ReleaseAllControls then
-                        LOOT_HISTORY_GAMEPAD.lootStreamPersistent:ReleaseAllControls()
-                        LOOT_HISTORY_GAMEPAD.lootStreamPersistent:RefreshBatchAfterRelease()
-                    end
-                end
-            end
-        end,
-        onRestoreLayout = function(self)
-            if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
-                local anchor = ZO_Anchor:New(unpack(self.fallbackAnchor))
-                LOOT_HISTORY_GAMEPAD.lootStream.anchor = anchor
-                if LOOT_HISTORY_GAMEPAD.lootStreamPersistent then
-                    LOOT_HISTORY_GAMEPAD.lootStreamPersistent.anchor = anchor
-                end
-            end
-        end,
-        stringIds = {
-            header = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD",
-            headerTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_HEADER_TOOLTIP",
-            enable = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_ENABLE",
-            enableTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_ENABLE_TOOLTIP",
-            offsetX = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_X",
-            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_X_TOOLTIP",
-            offsetY = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_Y",
-            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_OFFSET_Y_TOOLTIP",
-            scale = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_SCALE",
-            scaleTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_SCALE_TOOLTIP",
-            reset = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_RESET",
-            resetTooltip = "EZO_HUD_OPTION_NATIVE_LOOT_GAMEPAD_RESET_TOOLTIP",
-        }
     }
 }
 
@@ -481,6 +417,17 @@ function EZO_HUD:InitializeNativeWidgets()
                 self:ApplyAllNativeWidgetLayouts()
             end
         )
+    end
+
+    -- Force Keyboard Loot History to be used universally
+    if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_KEYBOARD then
+        local origGamepadAddLoot = LOOT_HISTORY_GAMEPAD.AddLoot
+        LOOT_HISTORY_GAMEPAD.AddLoot = function(self, ...)
+            return LOOT_HISTORY_KEYBOARD:AddLoot(...)
+        end
+        if ZO_LootHistoryControl_Gamepad then
+            ZO_LootHistoryControl_Gamepad:SetHidden(true)
+        end
     end
 
     if CALLBACK_MANAGER then
