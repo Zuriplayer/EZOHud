@@ -119,18 +119,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_CSA_RESET = "Reset",
     EZO_HUD_OPTION_NATIVE_CSA_RESET_TOOLTIP = "Restores original anchor.",
     
-    EZO_HUD_OPTION_NATIVE_SYNERGY = "Synergy Prompt",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_HEADER_TOOLTIP = "Controls the position of the synergy prompt.",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_ENABLE = "Enable custom positioning",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_ENABLE_TOOLTIP = "Moves and scales the synergy prompt.",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_X = "X offset",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_X_TOOLTIP = "Horizontal offset.",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_Y = "Y offset",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_Y_TOOLTIP = "Vertical offset.",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_SCALE = "Scale",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_SCALE_TOOLTIP = "Scales the synergy prompt.",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_RESET = "Reset",
-    EZO_HUD_OPTION_NATIVE_SYNERGY_RESET_TOOLTIP = "Restores original anchor.",
+
     
     EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD = "Loot History (Keyboard)",
     EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_HEADER_TOOLTIP = "Controls the position of the loot history box in Keyboard UI.",

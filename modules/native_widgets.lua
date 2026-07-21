@@ -161,44 +161,6 @@ local WIDGETS = {
         }
     },
     {
-        id = "nativeSynergy",
-        controlName = "ZO_SynergyTopLevelContainer",
-        fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -250 },
-        minScale = 0.5,
-        maxScale = 1.5,
-        onPreviewOpen = function(self, control)
-            if ZO_SynergyTopLevel then ZO_SynergyTopLevel:SetHidden(false) end
-            if control then 
-                control:SetHidden(false) 
-                control:SetAlpha(1) 
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(false) end
-            end
-        end,
-        onPreviewClose = function(self, control)
-            if control then 
-                control:SetHidden(true) 
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(true) end
-            end
-            if ZO_SynergyTopLevel then ZO_SynergyTopLevel:SetHidden(true) end
-        end,
-        stringIds = {
-            header = "EZO_HUD_OPTION_NATIVE_SYNERGY",
-            headerTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_HEADER_TOOLTIP",
-            enable = "EZO_HUD_OPTION_NATIVE_SYNERGY_ENABLE",
-            enableTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_ENABLE_TOOLTIP",
-            offsetX = "EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_X",
-            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_X_TOOLTIP",
-            offsetY = "EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_Y",
-            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_OFFSET_Y_TOOLTIP",
-            scale = "EZO_HUD_OPTION_NATIVE_SYNERGY_SCALE",
-            scaleTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_SCALE_TOOLTIP",
-            reset = "EZO_HUD_OPTION_NATIVE_SYNERGY_RESET",
-            resetTooltip = "EZO_HUD_OPTION_NATIVE_SYNERGY_RESET_TOOLTIP",
-        }
-    },
-    {
         id = "nativeLootHistoryKeyboard",
         controlName = "ZO_LootHistoryControl_Keyboard",
         fallbackAnchor = { BOTTOMRIGHT, GuiRoot, BOTTOMRIGHT, 0, -84 },
@@ -285,8 +247,8 @@ local WIDGETS = {
         end,
         onApplyLayout = function(self, settings, defaultSettings)
             if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_GAMEPAD.lootStream then
-                -- Internally anchor the entries to the moving control instead of GuiRoot to prevent screen pinning
-                local internalAnchor = ZO_Anchor:New(BOTTOMLEFT, ZO_LootHistoryControl_Gamepad, BOTTOMLEFT, 0, 0)
+                -- Internally anchor the entries to the moving control's container instead of GuiRoot
+                local internalAnchor = ZO_Anchor:New(BOTTOMLEFT, ZO_LootHistoryControl_GamepadContainer or ZO_LootHistoryControl_Gamepad, BOTTOMLEFT, 0, 0)
                 LOOT_HISTORY_GAMEPAD.lootStream.anchor = internalAnchor
                 if LOOT_HISTORY_GAMEPAD.lootStream.ReleaseAllControls then
                     LOOT_HISTORY_GAMEPAD.lootStream:ReleaseAllControls()
@@ -497,21 +459,6 @@ function EZO_HUD:InitializeNativeWidgets()
         end
     )
     
-    if not EZO_HUD.synergyStyleHooked and ZO_Synergy and ZO_Synergy.ApplyTextStyle then
-        local originalSynergyApplyTextStyle = ZO_Synergy.ApplyTextStyle
-        ZO_Synergy.ApplyTextStyle = function(self, constants)
-            originalSynergyApplyTextStyle(self, constants)
-            if EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
-                -- Do not apply native UI tweaks if custom synergy is enabled
-                return
-            end
-            if EZO_HUD.ApplyNativeWidgetLayout then
-                EZO_HUD:ApplyNativeWidgetLayout("nativeSynergy")
-            end
-        end
-        EZO_HUD.synergyStyleHooked = true
-    end
-
     if not EZO_HUD.synergyAbilityHooked and SHARED_INFORMATION_AREA and SHARED_INFORMATION_AREA.SetHidden then
         local originalSetHidden = SHARED_INFORMATION_AREA.SetHidden
         SHARED_INFORMATION_AREA.SetHidden = function(self, element, hidden)

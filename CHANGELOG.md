@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.72 - Native Synergy Removal
+
+- Removed native keyboard and gamepad synergy positioning/management logic to enforce the use of the custom synergy module.
+
+
 ## 0.1.53 - Move Initialization Hotfix
 
 - Removes unsupported mouse-button initialization calls that crashed overlay startup on some ESO clients.
