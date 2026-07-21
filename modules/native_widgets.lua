@@ -28,9 +28,10 @@ local function GetOrCreatePreviewBackdrop(control)
     local backdrop = _G[backdropName]
     if not backdrop then
         backdrop = WINDOW_MANAGER:CreateControl(backdropName, control, CT_BACKDROP)
-        backdrop:SetAnchorFill(control)
-        backdrop:SetCenterColor(0, 1, 0, 0.3)
-        backdrop:SetEdgeColor(0, 1, 0, 0.8)
+        backdrop:SetAnchor(CENTER, control, CENTER, 0, 0)
+        backdrop:SetDimensions(300, 100)
+        backdrop:SetCenterColor(0, 1, 0, 0.5)
+        backdrop:SetEdgeColor(0, 1, 0, 1)
         backdrop:SetEdgeTexture("", 1, 1, 2, 0)
         backdrop:SetDrawLayer(DL_OVERLAY)
         backdrop:SetDrawTier(DT_HIGH)
@@ -91,8 +92,8 @@ local WIDGETS = {
         minScale = 0.5,
         maxScale = 1.5,
         onPreviewOpen = function(control)
-            if CENTER_SCREEN_ANNOUNCE and EVENT_MANAGER then
-                CENTER_SCREEN_ANNOUNCE:AddMessage(EVENT_MANAGER, CSA_CATEGORY_SMALL_TEXT, nil, GetString(_G["EZO_HUD_PREVIEW_CSA"] or EZO_HUD_PREVIEW_CSA))
+            if CENTER_SCREEN_ANNOUNCE then
+                CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_SMALL_TEXT, nil, GetString(_G["EZO_HUD_PREVIEW_CSA"] or EZO_HUD_PREVIEW_CSA))
             end
             if control then 
                 control:SetHidden(false) 
