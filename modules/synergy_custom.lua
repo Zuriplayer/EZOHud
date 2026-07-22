@@ -136,8 +136,15 @@ function EZO_HUD:RefreshCustomSynergy()
     if not self.customSynergy then return end
 
     local settings = GetCustomSynergySettings()
+    local isHudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
+
+    if not isHudVisible then
+        self.customSynergy.root:SetHidden(true)
+        return
+    end
 
     if self:IsMoveModeEnabled("customSynergy") then
+        self.customSynergy.root:SetHidden(false)
         return
     end
 
@@ -169,6 +176,9 @@ function EZO_HUD:InitializeCustomSynergy()
 
     self.customSynergy = BuildCustomSynergyIndicator()
     self:ApplyCustomSynergyLayout()
+    if self.RegisterHudSceneControl then
+        self:RegisterHudSceneControl(self.customSynergy.root)
+    end
 
     local function OnSynergyAbilityChanged()
         self:RefreshCustomSynergy()

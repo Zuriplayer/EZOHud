@@ -33,10 +33,10 @@ local function BuildCustomLootIndicator()
     local root = WINDOW_MANAGER:CreateTopLevelWindow(CUSTOM_LOOT_NAME)
     root:SetClampedToScreen(true)
     root:SetMovable(false)
-    root:SetMouseEnabled(true)
+    root:SetMouseEnabled(false)
     root:SetDrawLayer(DL_OVERLAY)
     root:SetDrawTier(DT_MEDIUM)
-    root:SetHidden(false) -- Keep root visible, buffer fades internally
+    root:SetHidden(true)
 
     local bg = WINDOW_MANAGER:CreateControl(CUSTOM_LOOT_NAME .. "_Bg", root, CT_BACKDROP)
     bg:SetCenterColor(0, 0, 0, 0)
@@ -123,6 +123,18 @@ local function BuildCustomLootIndicator()
     }
 end
 
+function EZO_HUD:RefreshCustomLootVisibility()
+    if not self.customLoot then return end
+
+    local settings = GetCustomLootSettings()
+    local isMovable = self:IsMoveModeEnabled("customLoot")
+    local isHudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
+    local shouldShow = isHudVisible and (settings.enabled == true or isMovable)
+
+    self.customLoot.root:SetHidden(not shouldShow)
+    self.customLoot.root:SetMouseEnabled(isHudVisible and isMovable)
+end
+
 function EZO_HUD:ApplyCustomLootLayout()
     if not self.customLoot then return end
 
@@ -154,6 +166,7 @@ function EZO_HUD:ApplyCustomLootLayout()
     self.customLoot.buffer:SetLineFade(settings.fadeTime or 5, 1)
 
     self:RefreshCustomLootMovementState()
+    self:RefreshCustomLootVisibility()
 end
 
 function EZO_HUD:SaveCustomLootPosition()
@@ -175,6 +188,7 @@ function EZO_HUD:RefreshCustomLootMovementState()
 
     local isMovable = self:IsMoveModeEnabled("customLoot")
     self.customLoot.root:SetMovable(isMovable)
+    self.customLoot.root:SetMouseEnabled(isMovable)
 
     if isMovable then
         self.customLoot.bg:SetCenterColor(0.05, 0.05, 0.02, 0.6)
@@ -184,6 +198,8 @@ function EZO_HUD:RefreshCustomLootMovementState()
         self.customLoot.bg:SetCenterColor(0, 0, 0, 0)
         self.customLoot.bg:SetEdgeColor(0, 0, 0, 0)
     end
+
+    self:RefreshCustomLootVisibility()
 end
 
 function EZO_HUD:InitializeCustomLoot()
@@ -193,6 +209,9 @@ function EZO_HUD:InitializeCustomLoot()
 
     self.customLoot = BuildCustomLootIndicator()
     self:ApplyCustomLootLayout()
+    if self.RegisterHudSceneControl then
+        self:RegisterHudSceneControl(self.customLoot.root)
+    end
 
     local settings = GetCustomLootSettings()
 
@@ -266,6 +285,7 @@ function EZO_HUD:InitializeCustomLoot()
         -- Add to our text buffer
         if EZO_HUD.customLoot and EZO_HUD.customLoot.buffer then
             EZO_HUD.customLoot.buffer:AddMessage(message, 1, 1, 1, 0)
+            EZO_HUD:RefreshCustomLootVisibility()
         end
     end)
 

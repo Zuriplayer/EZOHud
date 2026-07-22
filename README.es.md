@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.85`
-- AddOnVersion: `10085`
+- Versión del addon: `0.1.86`
+- AddOnVersion: `10086`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -55,6 +55,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, aviso de sinergia y consejos de combate activos con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
+- Las ventanas de Historial de Botín personalizado y Sinergia personalizada quedan restringidas a escenas HUD para que los paneles nativos de menú sigan siendo accesibles.
 - Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español.
 - Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
 - Comando local `/ezohudcrux` para diagnóstico puntual de Crux.
@@ -82,6 +83,7 @@ Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZ
 - No lanza habilidades, no pulsa teclas, no automatiza rotaciones, no bloquea, no esquiva, no interrumpe, no selecciona objetivos ni toma decisiones de juego.
 - Los indicadores de execute, ultimate, recursos y Crux son solo informativos.
 - Los ajustes de interfaz nativa solo reanclan y escalan los elementos nativos de ESO; no los reemplazan ni alteran su comportamiento principal.
+- Las superficies de Historial de Botín personalizado y Sinergia personalizada se ocultan fuera de las escenas HUD normales, y el Historial de Botín personalizado solo captura el mouse mientras su modo de movimiento está activo.
 - Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir; las posiciones guardadas del HUD permanecen.
 - EZOhud no añade atajos de teclado ni gestión de input y está pensado para mantener compatibilidad con juego en teclado y gamepad.
 - Las herramientas de debug son solo diagnósticas y deberían permanecer desactivadas durante el juego normal salvo que se esté investigando un problema.
@@ -92,6 +94,7 @@ Comprobaciones recomendadas para la beta:
 
 - Probar en personajes arcanistas y no arcanistas para confirmar que la visibilidad del HUD de Crux es correcta.
 - Probar HUD normal, HUD UI, menús, puntos de campeón, Tales of Tribute y otras escenas que no sean HUD.
+- Probar paneles nativos de configuración como Habilidades y Ajustes con el Historial de Botín personalizado activado para confirmar que los paneles del HUD no los bloquean.
 - Probar el comportamiento en combate y el alpha fuera de combate.
 - Probar la ocultación de las barras de atributos de EZOhud independientemente de la ocultación de las barras vanilla de ESO.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.

@@ -64,6 +64,12 @@ function EZO_HUD:RefreshHudContextVisibility()
     if self.RefreshCruxDisplay then
         self:RefreshCruxDisplay()
     end
+    if self.RefreshCustomSynergy then
+        self:RefreshCustomSynergy()
+    end
+    if self.RefreshCustomLootVisibility then
+        self:RefreshCustomLootVisibility()
+    end
 end
 
 function EZO_HUD:InitializeHudVisibility()

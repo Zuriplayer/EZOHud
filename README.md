@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.85`
-- AddOnVersion: `10085`
+- Addon version: `0.1.86`
+- AddOnVersion: `10086`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -55,6 +55,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Experimental native widget positioning for the focused quest tracker, center screen announcements, synergy prompt, and active combat tips with enable, X/Y offset, scale, and reset controls.
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory and adjustable fade.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
+- Custom Loot History and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
 - English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection.
 - Debug options in a dedicated settings section, with optional LibDebugLogger output and optional chat output.
 - Local `/ezohudcrux` debug command for focused Crux diagnostics.
@@ -82,6 +83,7 @@ When EZOCore is active, the complete panel is rendered inside `Settings > EZO` a
 - It does not cast abilities, press keys, automate rotations, block, dodge, interrupt, target enemies, or make gameplay decisions.
 - Execute, ultimate, resource, and Crux indicators are informational only.
 - Native UI tweaks only reanchor and scale ESO's native elements; they do not replace the elements or alter their core behavior.
+- Custom Loot History and custom Synergy surfaces are hidden outside normal HUD scenes, and Custom Loot only captures the mouse while its move mode is active.
 - Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
 - EZOhud does not add keybinds or input handling and is intended to remain compatible with keyboard and gamepad play.
 - Debug tools are diagnostics only and should remain disabled during normal play unless troubleshooting.
@@ -92,6 +94,7 @@ Recommended beta checks:
 
 - Test on Arcanist and non-Arcanist characters to confirm Crux HUD visibility is correct.
 - Test normal HUD, HUD UI, menus, champion points, Tales of Tribute, and other non-HUD scenes.
+- Test native configuration panels such as Skills and Settings while Custom Loot History is enabled to confirm HUD-only panels do not block them.
 - Test combat and out-of-combat alpha behavior.
 - Test hiding EZOhud attribute bars independently from hiding vanilla ESO bars.
 - Test each ultimate display mode and active/inactive bar state.

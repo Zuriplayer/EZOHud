@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.86 - HUD Scene Blocking Hotfix
+
+- Restricted Custom Loot History and custom Synergy windows to HUD/HUD UI scenes so they do not cover native menu panels.
+- Disabled Custom Loot mouse capture except while its move mode is active.
+- Synchronized addon version metadata and public documentation.
+
 ## 0.1.85 - Native Widgets and Custom UI Stabilization
 
 - Added native UI positioning controls for the focused quest tracker, center screen announcements, synergy prompt, and active combat tips.
