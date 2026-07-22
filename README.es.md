@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.87`
-- AddOnVersion: `10087`
+- Versión del addon: `0.1.88`
+- AddOnVersion: `10088`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -37,7 +37,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de atributos para Salud, Magia y Estamina.
 - Ocultación opcional de las barras de atributos del jugador por defecto de ESO.
 - Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
-- Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical alineada a la derecha para Salud, Magia y Estamina.
+- Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical alineada a la izquierda para Salud, Magia y Estamina.
 - Ajustes de anchura de barra para Salud, Magia y Estamina.
 - Selectores de color de recurso limitados a la familia de color de cada recurso.
 - Umbrales de aviso por recurso que cambian solo los números del recurso a un color de alarma.

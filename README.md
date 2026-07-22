@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.87`
-- AddOnVersion: `10087`
+- Addon version: `0.1.88`
+- AddOnVersion: `10088`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -37,7 +37,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Attribute HUD for Health, Magicka, and Stamina.
 - Optional hiding of the default ESO player attribute bars.
 - Attribute HUD movement mode that lets the three resource bars move as a group.
-- Attribute HUD layout selector with the classic split model and a right-aligned vertical stack for Health, Magicka, and Stamina.
+- Attribute HUD layout selector with the classic split model and a left-aligned vertical stack for Health, Magicka, and Stamina.
 - Resource bar width settings for Health, Magicka, and Stamina.
 - Resource color pickers constrained to each resource color family.
 - Per-resource warning thresholds that change only the resource numbers to an alarm color.

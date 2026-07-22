@@ -16,7 +16,8 @@ local SIDE_GAP = 6
 local ROW_GAP = 10
 local LEGACY_RESOURCE_LAYER_SUFFIXES = { "_Shadow", "_Frame", "_Background", "_Alert" }
 local OVERLAY_LAYOUT_CLASSIC = "classic"
-local OVERLAY_LAYOUT_RIGHT_STACK = "rightStack"
+local OVERLAY_LAYOUT_LEFT_STACK = "leftStack"
+local OVERLAY_LAYOUT_LEGACY_RIGHT_STACK = "rightStack"
 
 local RESOURCE_ORDER = { "health", "magicka", "stamina" }
 local RESOURCE_META = {
@@ -155,8 +156,8 @@ end
 
 local function GetOverlayLayoutMode(settings)
     local mode = settings and settings.layoutMode
-    if mode == OVERLAY_LAYOUT_RIGHT_STACK then
-        return OVERLAY_LAYOUT_RIGHT_STACK
+    if mode == OVERLAY_LAYOUT_LEFT_STACK or mode == OVERLAY_LAYOUT_LEGACY_RIGHT_STACK then
+        return OVERLAY_LAYOUT_LEFT_STACK
     end
     return OVERLAY_LAYOUT_CLASSIC
 end
@@ -536,7 +537,7 @@ function EZO_HUD:ApplyOverlayLayout()
     local groupWidth
     local groupHeight
 
-    if layoutMode == OVERLAY_LAYOUT_RIGHT_STACK then
+    if layoutMode == OVERLAY_LAYOUT_LEFT_STACK then
         groupWidth = 0
         groupHeight = 0
         for index, resourceName in ipairs(RESOURCE_ORDER) do
@@ -561,12 +562,12 @@ function EZO_HUD:ApplyOverlayLayout()
     self.overlay.root:ClearAnchors()
     self.overlay.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
 
-    if layoutMode == OVERLAY_LAYOUT_RIGHT_STACK then
+    if layoutMode == OVERLAY_LAYOUT_LEFT_STACK then
         local currentTop = 0
         for _, resourceName in ipairs(RESOURCE_ORDER) do
             local entry = layout[resourceName]
             entry.resource.root:ClearAnchors()
-            entry.resource.root:SetAnchor(TOPRIGHT, self.overlay.root, TOPRIGHT, 0, currentTop)
+            entry.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, 0, currentTop)
             currentTop = currentTop + entry.height + ROW_GAP
         end
     else
@@ -821,7 +822,7 @@ function EZO_HUD:InitializeSettings()
     EZOhud_LAM.RegisterSection("overlay", 20, function()
         local layoutChoices = {
             GetString(EZO_HUD_OVERLAY_LAYOUT_CLASSIC),
-            GetString(EZO_HUD_OVERLAY_LAYOUT_RIGHT_STACK),
+            GetString(EZO_HUD_OVERLAY_LAYOUT_LEFT_STACK),
         }
 
         local options = {
@@ -852,7 +853,7 @@ function EZO_HUD:InitializeSettings()
                 name = GetString(EZO_HUD_OPTION_OVERLAY_LAYOUT),
                 tooltip = GetString(EZO_HUD_OPTION_OVERLAY_LAYOUT_TOOLTIP),
                 choices = layoutChoices,
-                choicesValues = { OVERLAY_LAYOUT_CLASSIC, OVERLAY_LAYOUT_RIGHT_STACK },
+                choicesValues = { OVERLAY_LAYOUT_CLASSIC, OVERLAY_LAYOUT_LEFT_STACK },
                 getFunc = function()
                     return GetOverlayLayoutMode(self.sv.overlay)
                 end,

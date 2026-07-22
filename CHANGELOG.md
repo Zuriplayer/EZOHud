@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.88 - Left Attribute Stack Hotfix
+
+- Corrected the stacked Attribute HUD model to align Health, Magicka, and Stamina on the left edge.
+
 ## 0.1.87 - Attribute Layout Selector
 
 - Added an Attribute HUD layout selector with a classic split layout and a right-aligned Health, Magicka, and Stamina stack.
