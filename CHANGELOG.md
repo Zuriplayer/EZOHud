@@ -1,9 +1,15 @@
 # Changelog
 
+## 0.1.97 - Native-Style Group Search Hotfix
+
+- Changed the Custom Group Search display to a compact native-style two-line label.
+- Fixed movement by using explicit mouse down/up drag handlers and saving position when dragging stops.
+- Expanded the scale range for the custom label.
+
 ## 0.1.96 - Custom Group Search Panel
 
 - Added a movable Custom Group Search panel that can replace ESO's native on-screen Activity Finder status tracker.
-- Shows available group-search details including status, selected role, activity, queue time, estimate, and ready-check counts.
+- Shows available group-search status in a compact native-style label.
 - Keeps the feature visual only: it does not queue, accept, decline, leave, or automate Activity Finder actions.
 - Registered the panel as an independent EZOCore layout surface and synchronized English/Spanish documentation.
 
