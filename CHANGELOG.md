@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.102 - Custom Quest Tracker Text Fit
+
+- Widened the Custom Quest Tracker panel and removed the visible hints header.
+- Kept focused quest objective and hint text constrained to two ellipsis-truncated lines.
+
 ## 0.1.101 - Custom Quest Tracker Move Hotfix
 
 - Fixed Custom Quest Tracker move mode so its preview can be shown from settings scenes and the panel becomes temporarily movable while dragging.

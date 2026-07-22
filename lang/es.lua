@@ -151,7 +151,6 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SCALE_TOOLTIP = "Controla el tamaño del panel personalizado de misiones.",
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SHOW_HINTS = "Mostrar pistas",
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SHOW_HINTS_TOOLTIP = "Muestra líneas opcionales de pistas de la misión enfocada cuando ESO las expone.",
-    EZO_HUD_CUSTOM_QUEST_TRACKER_HINTS = "Pistas:",
     EZO_HUD_CUSTOM_QUEST_TRACKER_COMPLETE = "Misión completada",
     EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_TITLE = "Duelos de Historias",
     EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_OBJECTIVE = "Derrota a un jugador en una partida de Historias",

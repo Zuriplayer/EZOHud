@@ -155,7 +155,6 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SCALE_TOOLTIP = "Controls the size of the custom quest tracker panel.",
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SHOW_HINTS = "Show hints",
     EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_SHOW_HINTS_TOOLTIP = "Shows optional hint lines from the focused quest when ESO exposes them.",
-    EZO_HUD_CUSTOM_QUEST_TRACKER_HINTS = "Hints:",
     EZO_HUD_CUSTOM_QUEST_TRACKER_COMPLETE = "Quest complete",
     EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_TITLE = "Dueling Tributes",
     EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_OBJECTIVE = "Defeat a Player in a Tribute Match",

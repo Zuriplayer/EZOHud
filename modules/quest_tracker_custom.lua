@@ -3,8 +3,8 @@ local EZO_HUD = EZOhud
 
 local CUSTOM_QUEST_TRACKER_NAME = "EZOhud_CustomQuestTracker"
 local NATIVE_HIDDEN_REASON = "EZOhud_CustomQuestTracker"
-local PANEL_WIDTH = 360
-local PANEL_HEIGHT = 140
+local PANEL_WIDTH = 440
+local PANEL_HEIGHT = 150
 local OBJECTIVE_LINES = 2
 local HINT_LINES = 2
 
@@ -98,13 +98,6 @@ local function GetFocusedQuestIndex()
         end
         return data.arg1
     end
-end
-
-local function GetHintHeaderText()
-    if SI_QUEST_HINT_STEP_HEADER then
-        return GetString(SI_QUEST_HINT_STEP_HEADER)
-    end
-    return GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_HINTS)
 end
 
 local function FormatHintText(text)
@@ -229,21 +222,13 @@ local function BuildCustomQuestTracker()
     objective:SetMouseEnabled(false)
     SetLabelMaxLines(objective, OBJECTIVE_LINES)
 
-    local hintsHeader = WINDOW_MANAGER:CreateControl(CUSTOM_QUEST_TRACKER_NAME .. "_HintsHeader", root, CT_LABEL)
-    hintsHeader:SetFont("ZoFontGameBold")
-    hintsHeader:SetColor(0.92, 0.86, 0.58, 0.86)
-    hintsHeader:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    hintsHeader:SetVerticalAlignment(TEXT_ALIGN_CENTER)
-    hintsHeader:SetMouseEnabled(false)
-    SetLabelMaxOneLine(hintsHeader)
-
     local hintOne = WINDOW_MANAGER:CreateControl(CUSTOM_QUEST_TRACKER_NAME .. "_HintOne", root, CT_LABEL)
     hintOne:SetFont("ZoFontGameLarge")
     hintOne:SetColor(0.72, 0.72, 0.64, 0.92)
     hintOne:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    hintOne:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    hintOne:SetVerticalAlignment(TEXT_ALIGN_TOP)
     hintOne:SetMouseEnabled(false)
-    SetLabelMaxOneLine(hintOne)
+    SetLabelMaxLines(hintOne, HINT_LINES)
 
     local hintTwo = WINDOW_MANAGER:CreateControl(CUSTOM_QUEST_TRACKER_NAME .. "_HintTwo", root, CT_LABEL)
     hintTwo:SetFont("ZoFontGameLarge")
@@ -284,7 +269,6 @@ local function BuildCustomQuestTracker()
         keybind = keybind,
         title = title,
         objective = objective,
-        hintsHeader = hintsHeader,
         hints = { hintOne, hintTwo },
     }
 end
@@ -315,13 +299,9 @@ function EZO_HUD:ApplyCustomQuestTrackerLayout()
     self.customQuestTracker.objective:ClearAnchors()
     self.customQuestTracker.objective:SetAnchor(TOPLEFT, self.customQuestTracker.root, TOPLEFT, 0, 48)
 
-    self.customQuestTracker.hintsHeader:SetDimensions(PANEL_WIDTH, 20)
-    self.customQuestTracker.hintsHeader:ClearAnchors()
-    self.customQuestTracker.hintsHeader:SetAnchor(TOPRIGHT, self.customQuestTracker.objective, BOTTOMRIGHT, 0, 0)
-
-    self.customQuestTracker.hints[1]:SetDimensions(PANEL_WIDTH, 24)
+    self.customQuestTracker.hints[1]:SetDimensions(PANEL_WIDTH, 48)
     self.customQuestTracker.hints[1]:ClearAnchors()
-    self.customQuestTracker.hints[1]:SetAnchor(TOPRIGHT, self.customQuestTracker.hintsHeader, BOTTOMRIGHT, 0, 0)
+    self.customQuestTracker.hints[1]:SetAnchor(TOPRIGHT, self.customQuestTracker.objective, BOTTOMRIGHT, 0, 4)
 
     self.customQuestTracker.hints[2]:SetDimensions(PANEL_WIDTH, 24)
     self.customQuestTracker.hints[2]:ClearAnchors()
@@ -383,8 +363,6 @@ function EZO_HUD:RefreshCustomQuestTracker()
     if isMovable then
         self.customQuestTracker.title:SetText(GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_TITLE))
         self.customQuestTracker.objective:SetText(GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_OBJECTIVE))
-        self.customQuestTracker.hintsHeader:SetText(GetHintHeaderText())
-        self.customQuestTracker.hintsHeader:SetHidden(settings.showHints ~= true)
         SetHintLabel(self.customQuestTracker.hints[1], settings.showHints and GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_HINT) or nil)
         SetHintLabel(self.customQuestTracker.hints[2], nil)
         self.customQuestTracker.root:SetHidden(false)
@@ -402,10 +380,8 @@ function EZO_HUD:RefreshCustomQuestTracker()
     self.customQuestTracker.objective:SetText(questData.objective)
 
     local showHints = settings.showHints == true and #questData.hints > 0
-    self.customQuestTracker.hintsHeader:SetText(GetHintHeaderText())
-    self.customQuestTracker.hintsHeader:SetHidden(not showHints)
-    SetHintLabel(self.customQuestTracker.hints[1], showHints and questData.hints[1] or nil)
-    SetHintLabel(self.customQuestTracker.hints[2], showHints and questData.hints[2] or nil)
+    SetHintLabel(self.customQuestTracker.hints[1], showHints and table.concat(questData.hints, "\n") or nil)
+    SetHintLabel(self.customQuestTracker.hints[2], nil)
 
     self.customQuestTracker.root:SetHidden(false)
 end
