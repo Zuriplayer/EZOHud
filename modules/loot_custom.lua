@@ -3,10 +3,6 @@ local EZO_HUD = EZOhud
 
 local CUSTOM_LOOT_NAME = "EZOhud_CustomLoot"
 
-local function GetCustomLootSettings()
-    return EZO_HUD.sv and EZO_HUD.sv.customLoot or EZO_HUD.defaults.customLoot
-end
-
 local function DeepCopyTable(source)
     local copy = {}
     for key, value in pairs(source) do
@@ -17,6 +13,20 @@ local function DeepCopyTable(source)
         end
     end
     return copy
+end
+
+local function GetCustomLootSettings()
+    if EZO_HUD.sv then
+        EZO_HUD.sv.customLoot = EZO_HUD.sv.customLoot or DeepCopyTable(EZO_HUD.defaults.customLoot)
+        for key, value in pairs(EZO_HUD.defaults.customLoot) do
+            if EZO_HUD.sv.customLoot[key] == nil then
+                EZO_HUD.sv.customLoot[key] = value
+            end
+        end
+        return EZO_HUD.sv.customLoot
+    end
+
+    return EZO_HUD.defaults.customLoot
 end
 
 local function BuildCustomLootIndicator()
@@ -47,7 +57,7 @@ local function BuildCustomLootIndicator()
     scrollbar:SetBackgroundMiddleTexture("EsoUI/Art/ChatWindow/chat_scrollbar_track.dds")
     scrollbar:SetValueStep(1)
     scrollbar:SetHidden(true)
-    
+
     buffer:SetAnchor(TOPLEFT, root, TOPLEFT, 0, 0)
     buffer:SetAnchor(BOTTOMRIGHT, scrollbar, BOTTOMLEFT, -5, 0)
 
@@ -55,7 +65,7 @@ local function BuildCustomLootIndicator()
     local function UpdateScrollbar()
         local numHistoryLines = buffer:GetNumHistoryLines()
         local numVisibleLines = buffer:GetNumVisibleLines()
-        
+
         if numHistoryLines > numVisibleLines then
             scrollbar:SetMinMax(0, numHistoryLines - numVisibleLines)
             scrollbar:SetValue(buffer:GetScrollPosition())
@@ -71,8 +81,8 @@ local function BuildCustomLootIndicator()
 
     buffer:SetHandler("OnScrollPositionChanged", UpdateScrollbar)
     buffer:SetHandler("OnTextChanged", UpdateScrollbar)
-    
-    scrollbar:SetHandler("OnValueChanged", function(self, value, eventReason)
+
+    scrollbar:SetHandler("OnValueChanged", function(_, value, eventReason)
         if eventReason == EVENT_REASON_HARDWARE then
             buffer:SetScrollPosition(value)
         end
@@ -94,12 +104,12 @@ local function BuildCustomLootIndicator()
         buffer:SetLineFade(GetCustomLootSettings().fadeTime or 5, 1)
     end)
 
-    root:SetHandler("OnMouseWheel", function(self, delta)
+    root:SetHandler("OnMouseWheel", function(_, delta)
         local newPos = buffer:GetScrollPosition() - delta
         buffer:SetScrollPosition(newPos)
     end)
 
-    root:SetHandler("OnMoveStop", function(self)
+    root:SetHandler("OnMoveStop", function()
         if EZO_HUD.SaveCustomLootPosition then
             EZO_HUD:SaveCustomLootPosition()
         end
@@ -117,7 +127,7 @@ function EZO_HUD:ApplyCustomLootLayout()
     if not self.customLoot then return end
 
     local settings = GetCustomLootSettings()
-    
+
     local width = settings.width or 350
     local height = settings.height or 400
     local scale = settings.scale or 1.0
@@ -169,7 +179,7 @@ function EZO_HUD:RefreshCustomLootMovementState()
     if isMovable then
         self.customLoot.bg:SetCenterColor(0.05, 0.05, 0.02, 0.6)
         self.customLoot.bg:SetEdgeColor(0.8, 0.8, 0.2, 1)
-        self.customLoot.buffer:AddMessage("Posición de prueba...", 1, 1, 1, 0)
+        self.customLoot.buffer:AddMessage(GetString(EZO_HUD_CUSTOM_LOOT_MOVE_PREVIEW), 1, 1, 1, 0)
     else
         self.customLoot.bg:SetCenterColor(0, 0, 0, 0)
         self.customLoot.bg:SetEdgeColor(0, 0, 0, 0)
@@ -179,20 +189,7 @@ end
 function EZO_HUD:InitializeCustomLoot()
     if self.customLoot then return end
 
-    -- Register defaults
-    if not self.defaults.customLoot then
-        self.defaults.customLoot = {
-            enabled = true,
-            width = 350,
-            height = 400,
-            scale = 1.0,
-            fadeTime = 5,
-            font = "ZoFontWinH3"
-        }
-    end
-    if not self.sv.customLoot then
-        self.sv.customLoot = DeepCopyTable(self.defaults.customLoot)
-    end
+    GetCustomLootSettings()
 
     self.customLoot = BuildCustomLootIndicator()
     self:ApplyCustomLootLayout()
@@ -211,12 +208,12 @@ function EZO_HUD:InitializeCustomLoot()
         end
     end
 
-    EVENT_MANAGER:RegisterForEvent("EZOhud_CustomLoot", EVENT_LOOT_RECEIVED, function(eventCode, receivedBy, itemName, quantity, itemSound, lootType, lootedBySelf, isPickpocketLoot, questItemIcon, itemId, isStolen)
+    EVENT_MANAGER:RegisterForEvent("EZOhud_CustomLoot", EVENT_LOOT_RECEIVED, function(_eventCode, _receivedBy, itemName, quantity, _itemSound, lootType, lootedBySelf, _isPickpocketLoot, questItemIcon, itemId, _isStolen)
         if not GetCustomLootSettings().enabled then return end
         if not lootedBySelf then return end -- Only show local player's loot
 
-        local name = ""
-        local icon = ""
+        local name
+        local icon
         local color = ZO_ColorDef:New(1, 1, 1, 1)
 
         -- If itemName contains an item link, we can extract its info
@@ -226,14 +223,14 @@ function EZO_HUD:InitializeCustomLoot()
             if not name or name == "" then
                 name = itemName -- Fallback if GetItemLinkName fails
             end
-            
+
             local quality = nil
             if type(GetItemLinkDisplayQuality) == "function" then
                 quality = GetItemLinkDisplayQuality(itemName)
             elseif type(GetItemLinkQuality) == "function" then
                 quality = GetItemLinkQuality(itemName)
             end
-            
+
             if quality then
                 local r, g, b = GetInterfaceColor(INTERFACE_COLOR_TYPE_ITEM_QUALITY_COLORS, quality)
                 color = ZO_ColorDef:New(r, g, b, 1)
@@ -258,14 +255,14 @@ function EZO_HUD:InitializeCustomLoot()
         if icon and icon ~= "" then
             formattedIcon = zo_iconFormat(icon, 32, 32)
         end
-        
-        local message = ""
+
+        local message
         if quantity > 1 then
             message = string.format("%s %s x%d", coloredName, formattedIcon, quantity)
         else
             message = string.format("%s %s", coloredName, formattedIcon)
         end
-        
+
         -- Add to our text buffer
         if EZO_HUD.customLoot and EZO_HUD.customLoot.buffer then
             EZO_HUD.customLoot.buffer:AddMessage(message, 1, 1, 1, 0)
@@ -276,19 +273,22 @@ function EZO_HUD:InitializeCustomLoot()
     EZOhud_LAM.RegisterSection("customLoot", 70, function()
         local s = GetCustomLootSettings()
         return {
-            EZOhud_LAM.CreateInfoHeader(GetString(EZO_HUD_OPTION_CUSTOM_LOOT) or "Historial de Botín", "Reemplaza el historial de botín nativo por un panel moderno y personalizable con memoria y desplazamiento."),
+            EZOhud_LAM.CreateInfoHeader(
+                GetString(EZO_HUD_OPTION_CUSTOM_LOOT),
+                GetString(EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP)
+            ),
             {
                 type = "checkbox",
-                name = "Activar historial personalizado",
-                tooltip = "Oculta el botín del juego y usa este panel mejorado.",
+                name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE),
+                tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP),
                 getFunc = function() return s.enabled end,
                 setFunc = function(v) s.enabled = v end,
-                default = true,
+                default = EZO_HUD.defaults.customLoot.enabled,
             },
             {
                 type = "checkbox",
-                name = "Habilitar movimiento",
-                tooltip = "Permite arrastrar el cuadro de botín.",
+                name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_MOVE),
+                tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP),
                 getFunc = function() return EZO_HUD:IsMoveModeEnabled("customLoot") end,
                 setFunc = function(v)
                     EZO_HUD:SetMoveModeEnabled("customLoot", v)
@@ -299,8 +299,8 @@ function EZO_HUD:InitializeCustomLoot()
             },
             {
                 type = "slider",
-                name = "Tiempo de desvanecimiento",
-                tooltip = "Segundos antes de que el texto desaparezca.",
+                name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME),
+                tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME_TOOLTIP),
                 min = 2, max = 20, step = 1,
                 getFunc = function() return s.fadeTime end,
                 setFunc = function(v)
@@ -308,12 +308,12 @@ function EZO_HUD:InitializeCustomLoot()
                     EZO_HUD:ApplyCustomLootLayout()
                 end,
                 disabled = function() return not s.enabled end,
-                default = 5,
+                default = EZO_HUD.defaults.customLoot.fadeTime,
             },
             {
                 type = "slider",
-                name = "Escala",
-                tooltip = "Tamaño general del texto e iconos.",
+                name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_SCALE),
+                tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_SCALE_TOOLTIP),
                 min = 50, max = 150, step = 5,
                 getFunc = function() return math.floor(s.scale * 100) end,
                 setFunc = function(v)
@@ -321,7 +321,7 @@ function EZO_HUD:InitializeCustomLoot()
                     EZO_HUD:ApplyCustomLootLayout()
                 end,
                 disabled = function() return not s.enabled end,
-                default = 100,
+                default = math.floor(EZO_HUD.defaults.customLoot.scale * 100),
             },
         }
     end)

@@ -15,8 +15,7 @@
       "outputPath": "dist",
       "include": [
         "*.txt",
-        "*.lua",
-        "*.xml",
+        "EZOhud.lua",
         "modules/**",
         "lang/**",
         "libs/**",

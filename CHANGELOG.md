@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.85 - Native Widgets and Custom UI Stabilization
+
+- Added native UI positioning controls for the focused quest tracker, center screen announcements, synergy prompt, and active combat tips.
+- Added custom Synergy and custom Loot History modules with independent movement surfaces.
+- Hardened native loot suppression and custom loot event handling.
+- Kept package contents runtime-focused and prevented extracted ESO UI reference files from being included accidentally.
+- Synchronized addon version metadata and public documentation.
+
 ## 0.1.72 - Native Synergy Removal
 
 - Removed native keyboard and gamepad synergy positioning/management logic to enforce the use of the custom synergy module.

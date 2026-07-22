@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.53`
-- AddOnVersion: `10053`
+- Versión del addon: `0.1.85`
+- AddOnVersion: `10085`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -65,7 +65,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
 
-Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute y Crux se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. La prueba del tracker nativo de misiones solo se controla desde ajustes y no es una superficie del modo compartido de disposición.
+Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute, Crux, Sinergia personalizada e Historial de Botín personalizado se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. Los Ajustes de Interfaz Nativa solo se controlan desde ajustes y no son superficies del modo compartido de disposición.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.

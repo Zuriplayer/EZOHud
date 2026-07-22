@@ -9,7 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.84"
+EZO_HUD.ADDON_VERSION = "0.1.85"
+EZO_HUD.ADDON_VERSION_NUM = 10085
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -96,6 +97,15 @@ EZO_HUD.defaults = {
         offsetX = 0,
         offsetY = 150,
         size = 50,
+    },
+    customLoot = {
+        enabled = true,
+        movable = false,
+        width = 350,
+        height = 400,
+        scale = 1.0,
+        fadeTime = 5,
+        font = "ZoFontWinH3",
     },
 }
 
@@ -204,7 +214,7 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = 10053,
+            addOnVersion = self.ADDON_VERSION_NUM or 10085,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",

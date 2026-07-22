@@ -18,10 +18,12 @@ local function DebugEnabled()
 end
 
 function EZO_HUD:IsDebugModeEnabled()
+    local _ = self
     return DebugEnabled()
 end
 
 function EZO_HUD:SetDebugModeEnabled(enabled)
+    local _ = self
     if not (EZO_HUD.sv and EZO_HUD.sv.general) then
         return false
     end
@@ -170,6 +172,7 @@ EZO_HUD.DebugBatchAdd = DebugBatchAdd
 EZO_HUD.DebugBatchFlush = DebugBatchFlush
 
 function EZO_HUD:InitializeDebug()
+    local _ = self
     EZO_HUD.runtime = EZO_HUD.runtime or {}
     if DebugEnabled() then
         EnsureDebugLogger()

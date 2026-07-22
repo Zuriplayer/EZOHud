@@ -53,3 +53,13 @@ release/
 releases/
 packages/
 *.zip
+
+# Local extracted ESO UI reference files
+esoui_tree.json
+centerscreenannounce.xml
+craftingresults_keyboard.lua
+loot.xml
+loothistory_*.lua
+loothistory_*.xml
+synergy.xml
+zo_fadingstationarycontrolbuffer.lua

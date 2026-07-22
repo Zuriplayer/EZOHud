@@ -133,7 +133,7 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_PREVIEW_HEALTH = "SALUD",
     EZO_HUD_PREVIEW_STAMINA = "AGUANTE",
     EZO_HUD_PREVIEW_MAGICKA = "MAGIA",
-    
+
     EZO_HUD_OPTION_CUSTOM_SYNERGY = "Sinergia (Personalizada)",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_HEADER_TOOLTIP = "Reemplaza el aviso de sinergia nativo por un diseño de texto e icono simple y personalizado.",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE = "Activar Sinergia personalizada",
@@ -142,12 +142,21 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP = "Permite arrastrar el aviso personalizado a una nueva posición. Se desactiva al recargar la interfaz.",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Escala",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Escala el tamaño del aviso personalizado.",
-    
+
     EZO_HUD_OPTION_CUSTOM_LOOT = "Historial de Botín (Personalizado)",
+    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Reemplaza el historial de botín nativo de ESO por un panel personalizado configurable con memoria, desplazamiento y tiempo de desvanecimiento.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE = "Activar historial personalizado",
+    EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP = "Oculta el botín nativo de ESO y usa el panel de botín personalizado de EZOhud.",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Mover Historial de Botín",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Permite arrastrar el panel de botín personalizado.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME = "Tiempo de desvanecimiento",
+    EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME_TOOLTIP = "Segundos antes de que el texto de botín desaparezca después de mostrarse.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_SCALE = "Escala",
+    EZO_HUD_OPTION_CUSTOM_LOOT_SCALE_TOOLTIP = "Controla el tamaño general del texto y los iconos del botín personalizado.",
+    EZO_HUD_CUSTOM_LOOT_MOVE_PREVIEW = "Vista previa de movimiento...",
 
     EZO_HUD_SYNERGY_PROMPT = "Sinergia: <<1>>",
+    EZO_HUD_SYNERGY_PREVIEW = "Sinergia de prueba",
 
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS = "Consejos de Combate Activos",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP = "Controla la posición de los avisos de combate como Break Free, Interrumpir y Esquivar.",

@@ -143,7 +143,6 @@ function EZO_HUD:RefreshCruxMovementState()
         return
     end
 
-    local settings = GetCruxSettings()
     local movable = self:IsMoveModeEnabled("crux")
     if self.cruxDragActive and not movable then
         self.crux.root:StopMovingOrResizing()

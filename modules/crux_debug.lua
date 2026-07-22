@@ -141,10 +141,12 @@ local function DisableCruxDebug(silent)
 end
 
 function EZO_HUD:IsCruxDebugEnabled()
+    local _ = self
     return cruxDebugEnabled == true
 end
 
 function EZO_HUD:SetCruxDebugEnabled(enabled, silent)
+    local _ = self
     if enabled == true then
         EnableCruxDebug()
     else
@@ -158,6 +160,7 @@ local function PrintUsage()
 end
 
 function EZO_HUD:InitializeCruxDebug()
+    local _ = self
     SLASH_COMMANDS[SLASH_COMMAND] = function(args)
         args = zo_strlower(tostring(args or ""))
         if args == "on" or args == "1" or args == "enable" then

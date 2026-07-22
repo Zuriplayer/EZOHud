@@ -51,10 +51,10 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         backdrop:SetHandler("OnMoveStop", function(self)
             local newCx, newCy = self:GetCenter()
             local oldCx, oldCy = control:GetCenter()
-            
+
             local diffX = newCx - oldCx
             local diffY = newCy - oldCy
-            
+
             local settings = EZO_HUD.sv[widget.id]
             if settings then
                 settings.offsetX = (settings.offsetX or 0) + diffX
@@ -63,13 +63,13 @@ local function GetOrCreatePreviewBackdrop(control, widget)
                     EZO_HUD:ApplyNativeWidgetLayout(widget.id)
                 end
             end
-            
+
             self:ClearAnchors()
             self:SetAnchor(CENTER, control, CENTER, 0, 0)
-            
+
             local refX = _G["EZOhud_" .. widget.id .. "_LAM_OffsetX"]
             if refX and refX.UpdateValue then refX:UpdateValue() end
-            
+
             local refY = _G["EZOhud_" .. widget.id .. "_LAM_OffsetY"]
             if refY and refY.UpdateValue then refY:UpdateValue() end
         end)
@@ -90,9 +90,9 @@ local WIDGETS = {
                 local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
                 if scene then scene:AddFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
             end
-            if control then 
-                control:SetHidden(false) 
-                control:SetAlpha(1) 
+            if control then
+                control:SetHidden(false)
+                control:SetAlpha(1)
                 local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
@@ -132,9 +132,9 @@ local WIDGETS = {
             if CENTER_SCREEN_ANNOUNCE then
                 CENTER_SCREEN_ANNOUNCE:AddMessage(0, CSA_CATEGORY_SMALL_TEXT, nil, GetString(_G["EZO_HUD_PREVIEW_CSA"] or EZO_HUD_PREVIEW_CSA))
             end
-            if control then 
-                control:SetHidden(false) 
-                control:SetAlpha(1) 
+            if control then
+                control:SetHidden(false)
+                control:SetAlpha(1)
                 local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
@@ -167,9 +167,9 @@ local WIDGETS = {
         minScale = 0.5,
         maxScale = 2.0,
         onPreviewOpen = function(self, control)
-            if control then 
-                control:SetHidden(false) 
-                control:SetAlpha(1) 
+            if control then
+                control:SetHidden(false)
+                control:SetAlpha(1)
                 local backdrop = GetOrCreatePreviewBackdrop(control, self)
                 if backdrop then backdrop:SetHidden(false) end
             end
@@ -236,12 +236,12 @@ end
 
 local function CaptureOriginalState(widget)
     if originalStates[widget.id] then return end
-    
+
     local widgetControls = GetWidgetControls(widget)
     if #widgetControls == 0 then return end
 
     local state = {}
-    
+
     for _, wc in ipairs(widgetControls) do
         local control = wc.control
         state[wc.name] = {
@@ -265,20 +265,20 @@ local function CaptureOriginalState(widget)
             end
         end
     end
-    
+
     originalStates[widget.id] = state
 end
 
 local function RestoreOriginalState(widget)
     local state = originalStates[widget.id]
     if not state then return end
-    
+
     local widgetControls = GetWidgetControls(widget)
-    
+
     for _, wc in ipairs(widgetControls) do
         local control = wc.control
         local controlState = state[wc.name]
-        
+
         if controlState then
             control:ClearAnchors()
             if #controlState.anchors > 0 then
@@ -371,17 +371,18 @@ function EZO_HUD:InitializeNativeWidgets()
             end
         end
     )
-    
-    if not EZO_HUD.synergyAbilityHooked and SHARED_INFORMATION_AREA and SHARED_INFORMATION_AREA.SetHidden then
-        local originalSetHidden = SHARED_INFORMATION_AREA.SetHidden
-        SHARED_INFORMATION_AREA.SetHidden = function(self, element, hidden)
+
+    local sharedInformationArea = SHARED_INFORMATION_AREA
+    if not EZO_HUD.synergyAbilityHooked and sharedInformationArea and sharedInformationArea.SetHidden then
+        local originalSetHidden = sharedInformationArea.SetHidden
+        sharedInformationArea.SetHidden = function(manager, element, hidden)
             if element == ZO_Synergy and EZO_HUD.sv and EZO_HUD.sv.customSynergy and EZO_HUD.sv.customSynergy.enabled then
                 if ZO_SynergyTopLevel then
                     ZO_SynergyTopLevel:SetHidden(true)
                 end
                 return
             end
-            originalSetHidden(self, element, hidden)
+            originalSetHidden(manager, element, hidden)
         end
         EZO_HUD.synergyAbilityHooked = true
     end
@@ -397,10 +398,11 @@ function EZO_HUD:InitializeNativeWidgets()
     end
 
     -- Force Keyboard Loot History to be used universally
-    if LOOT_HISTORY_GAMEPAD and LOOT_HISTORY_KEYBOARD then
-        local origGamepadAddLoot = LOOT_HISTORY_GAMEPAD.AddLoot
-        LOOT_HISTORY_GAMEPAD.AddLoot = function(self, ...)
-            return LOOT_HISTORY_KEYBOARD:AddLoot(...)
+    local gamepadLootHistory = LOOT_HISTORY_GAMEPAD
+    local keyboardLootHistory = LOOT_HISTORY_KEYBOARD
+    if gamepadLootHistory and keyboardLootHistory then
+        gamepadLootHistory.AddLoot = function(_, ...)
+            return keyboardLootHistory:AddLoot(...)
         end
         if ZO_LootHistoryControl_Gamepad then
             ZO_LootHistoryControl_Gamepad:SetHidden(true)
@@ -409,8 +411,8 @@ function EZO_HUD:InitializeNativeWidgets()
 
     if CALLBACK_MANAGER then
         local isPanelVisible = false
-        
-        CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function(panel)
+
+        CALLBACK_MANAGER:RegisterCallback("LAM-PanelOpened", function()
             local panelRef = EZOhud_NativeWidgets_LAM_Panel
             if panelRef and not panelRef:IsHidden() then
                 isPanelVisible = true
@@ -422,8 +424,8 @@ function EZO_HUD:InitializeNativeWidgets()
                 end
             end
         end)
-        
-        CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", function(panel)
+
+        CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", function()
             if isPanelVisible then
                 isPanelVisible = false
                 for _, widget in ipairs(WIDGETS) do
@@ -441,7 +443,7 @@ function EZO_HUD:InitializeNativeWidgets()
                     GetString(EZO_HUD_OPTION_NATIVE_TWEAKS_HEADER_TOOLTIP)
                 )
             }
-            
+
             -- Control invisible para detectar cuándo es visible esta sección específica de LAM
             table.insert(options, {
                 type = "custom",
@@ -452,7 +454,7 @@ function EZO_HUD:InitializeNativeWidgets()
                 local function BuildRef(suffix)
                     return "EZOhud_" .. widget.id .. "_LAM_" .. suffix
                 end
-                
+
                 table.insert(options, {
                     type = "header",
                     name = GetString(_G[widget.stringIds.header] or 0),

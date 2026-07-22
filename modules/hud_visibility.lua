@@ -23,6 +23,7 @@ local function GetCurrentSceneName()
 end
 
 function EZO_HUD:IsHudSceneVisible()
+    local _ = self
     local sceneName = GetCurrentSceneName()
     if sceneName then
         return HUD_SCENE_NAMES[sceneName] == true

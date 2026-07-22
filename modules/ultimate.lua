@@ -216,6 +216,7 @@ function EZO_HUD:ApplyUltimateLayout()
 end
 
 function EZO_HUD:RefreshUltimateText()
+    local _ = self
 end
 
 function EZO_HUD:RefreshUltimateValues()

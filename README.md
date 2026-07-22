@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.53`
-- AddOnVersion: `10053`
+- Addon version: `0.1.85`
+- AddOnVersion: `10085`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -65,7 +65,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
 
-When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute and Crux surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel. The native quest tracker test is settings-driven only and is not a shared layout-mode surface.
+When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute, Crux, custom Synergy, and custom Loot History surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel. Native UI Tweaks are settings-driven only and are not shared layout-mode surfaces.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, hide vanilla bars, enable HUD movement, out-of-combat alpha, and per-resource size, color, and warning threshold.

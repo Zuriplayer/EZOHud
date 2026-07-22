@@ -101,11 +101,11 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_SCALE_TOOLTIP = "Scales ESO's native focused quest tracker as a whole. This test avoids changing internal width or height because the native tracker recalculates its own layout.",
     EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_RESET = "Reset quest tracker test",
     EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_RESET_TOOLTIP = "Restores the test values to defaults and disables EZOhud control of the native quest tracker.",
-    
+
     EZO_HUD_OPTION_NATIVE_TWEAKS = "Native UI Tweaks",
     EZO_HUD_OPTION_NATIVE_TWEAKS_HEADER_TOOLTIP = "Experimental positioning for native ESO controls. Reanchors and scales native elements without replacing them.",
     EZO_HUD_PREVIEW_CSA = "EZOhud Preview Announcement",
-    
+
     EZO_HUD_OPTION_NATIVE_CSA = "Center Screen Announcements",
     EZO_HUD_OPTION_NATIVE_CSA_HEADER_TOOLTIP = "Controls the position of achievement, leveling, and other central text announcements.",
     EZO_HUD_OPTION_NATIVE_CSA_ENABLE = "Enable custom positioning",
@@ -118,9 +118,9 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_CSA_SCALE_TOOLTIP = "Scales the announcements control.",
     EZO_HUD_OPTION_NATIVE_CSA_RESET = "Reset",
     EZO_HUD_OPTION_NATIVE_CSA_RESET_TOOLTIP = "Restores original anchor.",
-    
 
-    
+
+
     EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD = "Loot History (Universal)",
     EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_HEADER_TOOLTIP = "Controls the position of the loot history box. Forces Keyboard mode even when playing on Gamepad.",
     EZO_HUD_OPTION_NATIVE_LOOT_KEYBOARD_ENABLE = "Enable custom positioning",
@@ -137,7 +137,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_PREVIEW_HEALTH = "HEALTH",
     EZO_HUD_PREVIEW_STAMINA = "STAMINA",
     EZO_HUD_PREVIEW_MAGICKA = "MAGICKA",
-    
+
     EZO_HUD_OPTION_CUSTOM_SYNERGY = "Custom Synergy UI",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_HEADER_TOOLTIP = "Replaces the native synergy prompt with a fully custom, simplified text-based design.",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE = "Enable custom synergy UI",
@@ -146,12 +146,21 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP = "Lets you drag the custom synergy UI to a new position. Disables automatically on reload.",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE = "Scale",
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
-    
+
     EZO_HUD_OPTION_CUSTOM_LOOT = "Custom Loot History",
+    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Replaces ESO's native loot history with a configurable custom panel with memory, scrolling, and fade timing.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE = "Enable custom loot history",
+    EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP = "Hides ESO's native loot stream and uses EZOhud's custom loot panel.",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Move Loot History",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP = "Lets you drag the custom loot history.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME = "Fade time",
+    EZO_HUD_OPTION_CUSTOM_LOOT_FADE_TIME_TOOLTIP = "Seconds before loot text fades after it appears.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_SCALE = "Scale",
+    EZO_HUD_OPTION_CUSTOM_LOOT_SCALE_TOOLTIP = "Controls the overall size of custom loot text and icons.",
+    EZO_HUD_CUSTOM_LOOT_MOVE_PREVIEW = "Move preview...",
 
     EZO_HUD_SYNERGY_PROMPT = "Synergy: <<1>>",
+    EZO_HUD_SYNERGY_PREVIEW = "Preview Synergy",
 
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS = "Active Combat Tips",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP = "Controls the position of combat prompts like Break Free, Interrupt, and Dodge.",
