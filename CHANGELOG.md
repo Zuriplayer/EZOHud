@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.103 - Native Quest Tracker Tweak Cleanup
+
+- Removed the Native UI Tweaks controls, defaults, and runtime widget entry for repositioning ESO's native focused quest tracker.
+- Kept Custom Quest Tracker as the supported movable replacement for focused quest display on HUD scenes.
+
 ## 0.1.102 - Custom Quest Tracker Text Fit
 
 - Widened the Custom Quest Tracker panel and removed the visible hints header.

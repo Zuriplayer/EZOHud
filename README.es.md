@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.102`
-- AddOnVersion: `10102`
+- Versión del addon: `0.1.103`
+- AddOnVersion: `10103`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -53,7 +53,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
-- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales y consejos de combate activos con controles para aplicar posición, mostrar un tirador cada vez, ajustar desplazamiento X/Y, escala y restablecer.
+- Posicionamiento experimental de elementos nativos como anuncios centrales y consejos de combate activos con controles para aplicar posición, mostrar un tirador cada vez, ajustar desplazamiento X/Y, escala y restablecer.
 - Tracker de Misiones Personalizado que puede ocultar el tracker nativo de misión enfocada de ESO en el HUD y mostrar un panel movible y escalable con estilo nativo, misión enfocada, objetivo actual, pistas opcionales y el keybind nativo de cambiar misión.
 - Interfaz de Sinergia Personalizada que oculta el aviso de sinergia nativo de ESO y usa una capa movible independiente.
 - Etiqueta de Búsqueda de Grupo Personalizada que oculta el tracker nativo en pantalla del Buscador de actividades de ESO, mantiene categoría/estado compactos con estilo nativo y añade líneas menores alineadas a la izquierda para destino y duración de búsqueda/sigla de rol.
@@ -79,7 +79,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
-- Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para elementos nativos de ESO (tracker de misiones, anuncios centrales y consejos de combate activos). Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
+- Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para anuncios centrales y consejos de combate activos nativos de ESO. Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
 - Tracker de Misiones Personalizado: activar el panel personalizado de misión enfocada, habilitar movimiento, ajustar escala y elegir si se muestran pistas opcionales. El panel refleja la misión enfocada de ESO y deja el cambio de misión por teclado/mando en el binding nativo `ASSIST_NEXT_TRACKED_QUEST`.
 - Sinergia Personalizada: activar el aviso de sinergia personalizado, habilitar movimiento y ajustar la escala.
 - Búsqueda de Grupo Personalizada: activar la etiqueta personalizada de estado del Buscador de actividades, habilitar movimiento y ajustar la escala. La etiqueta reemplaza solo el pequeño tracker de estado del HUD, no la ventana completa del buscador, y muestra una línea alineada a la izquierda con el destino y otra con duración de búsqueda y rol `DD`/`T`/`H` bajo las líneas con estilo nativo.
@@ -116,7 +116,7 @@ Comprobaciones recomendadas para la beta:
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.
 - Probar distintas resoluciones y valores de escala de UI.
 - Probar `/reloadui` después de mover elementos del HUD.
-- Probar el posicionamiento de los elementos nativos con UI de teclado y gamepad para todos los elementos personalizados.
+- Probar el posicionamiento de elementos nativos con UI de teclado y gamepad para anuncios centrales y consejos de combate activos.
 
 Al informar de problemas de diseño o comportamiento, incluye la versión del addon, versión de API de ESO, clase del personaje, modo de idioma, ajustes activos y una captura de pantalla.
 

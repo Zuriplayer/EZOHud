@@ -84,49 +84,6 @@ end
 
 local WIDGETS = {
     {
-        id = "nativeQuestTracker",
-        controlName = "ZO_FocusedQuestTrackerPanel",
-        fallbackAnchor = { TOPRIGHT, GuiRoot, TOPRIGHT, -40, 120 },
-        minScale = 0.5,
-        maxScale = 1.5,
-        onPreviewOpen = function(self, control)
-            if FOCUSED_QUEST_TRACKER_FRAGMENT and SCENE_MANAGER then
-                local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
-                if scene then scene:AddFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
-            end
-            if control then
-                control:SetHidden(false)
-                control:SetAlpha(1)
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(false) end
-            end
-        end,
-        onPreviewClose = function(self, control)
-            if control then
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(true) end
-            end
-            if FOCUSED_QUEST_TRACKER_FRAGMENT and SCENE_MANAGER then
-                local scene = SCENE_MANAGER:GetScene("gameMenuInGame")
-                if scene then scene:RemoveFragment(FOCUSED_QUEST_TRACKER_FRAGMENT) end
-            end
-        end,
-        stringIds = {
-            header = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER",
-            headerTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_HEADER_TOOLTIP",
-            enable = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_ENABLE",
-            enableTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_ENABLE_TOOLTIP",
-            offsetX = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_OFFSET_X",
-            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_OFFSET_X_TOOLTIP",
-            offsetY = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_OFFSET_Y",
-            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_OFFSET_Y_TOOLTIP",
-            scale = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_SCALE",
-            scaleTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_SCALE_TOOLTIP",
-            reset = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_RESET",
-            resetTooltip = "EZO_HUD_OPTION_NATIVE_QUEST_TRACKER_RESET_TOOLTIP",
-        }
-    },
-    {
         id = "nativeCenterScreen",
         controlName = "ZO_CenterScreenAnnounce",
         fallbackAnchor = { TOP, GuiRoot, TOP, 0, 150 },
