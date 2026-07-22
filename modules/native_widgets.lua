@@ -196,20 +196,9 @@ local WIDGETS = {
         }
     },
     {
-        id = "nativeDungeonFinder",
-        controlName = {
-            "ZO_ActivityFinder",
-            "ZO_ActivityFinderTopLevel",
-            "ZO_ActivityFinder_Keyboard",
-            "ZO_ActivityFinder_Keyboard_TopLevel",
-            "ZO_DungeonFinder",
-            "ZO_DungeonFinderTopLevel",
-            "ZO_DungeonFinder_Keyboard",
-            "ZO_DungeonFinder_Keyboard_TopLevel",
-            "ZO_LFG",
-            "ZO_LFGTopLevel",
-        },
-        fallbackAnchor = { CENTER, GuiRoot, CENTER, 0, 0 },
+        id = "nativeGroupSearchIndicator",
+        controlName = "ZO_ActivityTracker",
+        fallbackAnchor = { RIGHT, GuiRoot, RIGHT, 0, 10 },
         minScale = 0.75,
         maxScale = 1.25,
         onPreviewOpen = function(self, control)
@@ -227,18 +216,18 @@ local WIDGETS = {
             end
         end,
         stringIds = {
-            header = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER",
-            headerTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_HEADER_TOOLTIP",
-            enable = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE",
-            enableTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE_TOOLTIP",
-            offsetX = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X",
-            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X_TOOLTIP",
-            offsetY = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y",
-            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y_TOOLTIP",
-            scale = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE",
-            scaleTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE_TOOLTIP",
-            reset = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET",
-            resetTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET_TOOLTIP",
+            header = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_GROUP_SEARCH_INDICATOR_RESET_TOOLTIP",
         }
     }
 }
@@ -441,6 +430,17 @@ function EZO_HUD:InitializeNativeWidgets()
                 self:ApplyAllNativeWidgetLayouts()
             end
         )
+    end
+
+    if ZO_ACTIVITY_FINDER_ROOT_MANAGER and ZO_ACTIVITY_FINDER_ROOT_MANAGER.RegisterCallback then
+        ZO_ACTIVITY_FINDER_ROOT_MANAGER:RegisterCallback("OnActivityFinderStatusUpdate", function()
+            self:ApplyNativeWidgetLayout("nativeGroupSearchIndicator")
+            if zo_callLater then
+                zo_callLater(function()
+                    self:ApplyNativeWidgetLayout("nativeGroupSearchIndicator")
+                end, 50)
+            end
+        end)
     end
 
     -- Force Keyboard Loot History to be used universally

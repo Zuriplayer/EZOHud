@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.94 - Native Group Search Indicator
+
+- Corrected the Activity Finder native tweak to target ESO's HUD group-search status indicator instead of the full Dungeon Finder/Activity Finder panel.
+- Reapplies the indicator layout after Activity Finder status updates so native queue refreshes do not immediately restore the default anchor.
+
 ## 0.1.93 - Native Dungeon Finder Positioning
 
 - Added experimental Native UI Tweaks controls for moving and scaling ESO's native Dungeon Finder/Activity Finder panel without automating activity finder actions.
