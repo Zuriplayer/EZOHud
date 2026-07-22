@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.89 - Stamina Stack Order
+
+- Reordered the left-stacked Attribute HUD model to show Stamina above Magicka and tightened the vertical spacing.
+
 ## 0.1.88 - Left Attribute Stack Hotfix
 
 - Corrected the stacked Attribute HUD model to align Health, Magicka, and Stamina on the left edge.

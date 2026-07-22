@@ -14,12 +14,14 @@ local DOMINANCE_MIN_SCALE = 0.82
 local TEXT_INSET = 12
 local SIDE_GAP = 6
 local ROW_GAP = 10
+local STACK_ROW_GAP = 6
 local LEGACY_RESOURCE_LAYER_SUFFIXES = { "_Shadow", "_Frame", "_Background", "_Alert" }
 local OVERLAY_LAYOUT_CLASSIC = "classic"
 local OVERLAY_LAYOUT_LEFT_STACK = "leftStack"
 local OVERLAY_LAYOUT_LEGACY_RIGHT_STACK = "rightStack"
 
 local RESOURCE_ORDER = { "health", "magicka", "stamina" }
+local STACK_RESOURCE_ORDER = { "health", "stamina", "magicka" }
 local RESOURCE_META = {
     health = {
         powerType = POWERTYPE_HEALTH,
@@ -540,12 +542,12 @@ function EZO_HUD:ApplyOverlayLayout()
     if layoutMode == OVERLAY_LAYOUT_LEFT_STACK then
         groupWidth = 0
         groupHeight = 0
-        for index, resourceName in ipairs(RESOURCE_ORDER) do
+        for index, resourceName in ipairs(STACK_RESOURCE_ORDER) do
             local entry = layout[resourceName]
             groupWidth = math.max(groupWidth, entry.width)
             groupHeight = groupHeight + entry.height
-            if index < #RESOURCE_ORDER then
-                groupHeight = groupHeight + ROW_GAP
+            if index < #STACK_RESOURCE_ORDER then
+                groupHeight = groupHeight + STACK_ROW_GAP
             end
         end
     else
@@ -564,11 +566,11 @@ function EZO_HUD:ApplyOverlayLayout()
 
     if layoutMode == OVERLAY_LAYOUT_LEFT_STACK then
         local currentTop = 0
-        for _, resourceName in ipairs(RESOURCE_ORDER) do
+        for _, resourceName in ipairs(STACK_RESOURCE_ORDER) do
             local entry = layout[resourceName]
             entry.resource.root:ClearAnchors()
             entry.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, 0, currentTop)
-            currentTop = currentTop + entry.height + ROW_GAP
+            currentTop = currentTop + entry.height + STACK_ROW_GAP
         end
     else
         layout.health.resource.root:ClearAnchors()
