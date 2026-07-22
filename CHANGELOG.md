@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.101 - Custom Quest Tracker Move Hotfix
+
+- Fixed Custom Quest Tracker move mode so its preview can be shown from settings scenes and the panel becomes temporarily movable while dragging.
+
 ## 0.1.100 - Custom Quest Tracker Prototype
 
 - Added a disabled-by-default Custom Quest Tracker panel that can replace ESO's focused quest tracker on HUD scenes.

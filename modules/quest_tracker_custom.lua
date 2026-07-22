@@ -206,6 +206,7 @@ local function BuildCustomQuestTracker()
     bg:SetCenterColor(0, 0, 0, 0.28)
     bg:SetEdgeColor(0, 1, 0, 0.85)
     bg:SetEdgeTexture("", 1, 1, 2, 0)
+    bg:SetMouseEnabled(false)
     bg:SetHidden(true)
 
     local keybind = WINDOW_MANAGER:CreateControlFromVirtual(CUSTOM_QUEST_TRACKER_NAME .. "_Keybind", root, "ZO_KeybindButton")
@@ -256,6 +257,7 @@ local function BuildCustomQuestTracker()
         if button == MOUSE_BUTTON_INDEX_LEFT
             and EZO_HUD:IsMoveModeEnabled("customQuestTracker")
             and not EZO_HUD.customQuestTrackerDragActive then
+            control:SetMovable(true)
             control:StartMoving()
             EZO_HUD.customQuestTrackerDragActive = true
         end
@@ -264,6 +266,14 @@ local function BuildCustomQuestTracker()
         if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD.customQuestTrackerDragActive then
             control:StopMovingOrResizing()
             EZO_HUD.customQuestTrackerDragActive = false
+            control:SetMovable(false)
+            EZO_HUD:SaveCustomQuestTrackerPosition()
+        end
+    end)
+    root:SetHandler("OnMoveStop", function(control)
+        control:SetMovable(false)
+        EZO_HUD.customQuestTrackerDragActive = false
+        if EZO_HUD.SaveCustomQuestTrackerPosition then
             EZO_HUD:SaveCustomQuestTrackerPosition()
         end
     end)
@@ -365,7 +375,7 @@ function EZO_HUD:RefreshCustomQuestTracker()
 
     SetNativeQuestTrackerHidden(settings.enabled == true)
 
-    if not isHudVisible then
+    if (not isHudVisible and not isMovable) or (not settings.enabled and not isMovable) then
         self.customQuestTracker.root:SetHidden(true)
         return
     end
@@ -378,11 +388,6 @@ function EZO_HUD:RefreshCustomQuestTracker()
         SetHintLabel(self.customQuestTracker.hints[1], settings.showHints and GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_HINT) or nil)
         SetHintLabel(self.customQuestTracker.hints[2], nil)
         self.customQuestTracker.root:SetHidden(false)
-        return
-    end
-
-    if not settings.enabled then
-        self.customQuestTracker.root:SetHidden(true)
         return
     end
 
