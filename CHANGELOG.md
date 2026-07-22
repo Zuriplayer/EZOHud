@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.100 - Custom Quest Tracker Prototype
+
+- Added a disabled-by-default Custom Quest Tracker panel that can replace ESO's focused quest tracker on HUD scenes.
+- Shows the focused quest, current objective, optional hint lines, and ESO's native Cycle Focused Quest keybind while leaving keyboard/gamepad quest cycling under native control.
+
 ## 0.1.99 - Group Search Layout Cleanup
 
 - Left-aligned the Custom Group Search label text and split the lower information into separate destination and search-duration/role lines.

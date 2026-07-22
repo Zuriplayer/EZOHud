@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy", "customGroupSearch", "customLoot" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.99"
-EZO_HUD.ADDON_VERSION_NUM = 10099
+EZO_HUD.ADDON_VERSION = "0.1.100"
+EZO_HUD.ADDON_VERSION_NUM = 10100
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -91,6 +91,14 @@ EZO_HUD.defaults = {
         offsetX = 0,
         offsetY = -150,
         scale = 1.0,
+    },
+    customQuestTracker = {
+        enabled = false,
+        movable = false,
+        offsetX = 390,
+        offsetY = -210,
+        scale = 1.0,
+        showHints = true,
     },
     customSynergy = {
         enabled = false,
@@ -222,7 +230,7 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = self.ADDON_VERSION_NUM or 10099,
+            addOnVersion = self.ADDON_VERSION_NUM or 10100,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",
@@ -288,6 +296,9 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "crux" then
         self:RefreshCruxMovementState()
         self:RefreshCruxDisplay()
+    elseif sectionName == "customQuestTracker" then
+        self:RefreshCustomQuestTrackerMovementState()
+        self:RefreshCustomQuestTracker()
     elseif sectionName == "customSynergy" then
         self:RefreshCustomSynergyMovementState()
         self:RefreshCustomSynergy()
@@ -324,9 +335,10 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.ultimate", section = "ultimate", order = 20, name = EZO_HUD_OPTION_ULTIMATE_MOVE, tooltip = EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP },
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
-        { id = "ezohud.customSynergy", section = "customSynergy", order = 50, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
-        { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 60, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
-        { id = "ezohud.customLoot", section = "customLoot", order = 70, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
+        { id = "ezohud.customQuestTracker", section = "customQuestTracker", order = 50, name = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE_TOOLTIP },
+        { id = "ezohud.customSynergy", section = "customSynergy", order = 60, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
+        { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 70, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
+        { id = "ezohud.customLoot", section = "customLoot", order = 80, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
     }
 
     for _, definition in ipairs(definitions) do
@@ -387,6 +399,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveExecutePosition()
     elseif sectionName == "crux" and self.SaveCruxPosition then
         self:SaveCruxPosition()
+    elseif sectionName == "customQuestTracker" and self.SaveCustomQuestTrackerPosition then
+        self:SaveCustomQuestTrackerPosition()
     elseif sectionName == "customSynergy" and self.SaveCustomSynergyPosition then
         self:SaveCustomSynergyPosition()
     elseif sectionName == "customGroupSearch" and self.SaveCustomGroupSearchPosition then
@@ -459,6 +473,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCrux ~= nil then
         self:InitializeCrux()
+    end
+
+    if self.InitializeCustomQuestTracker ~= nil then
+        self:InitializeCustomQuestTracker()
     end
 
     if self.InitializeCustomSynergy ~= nil then
