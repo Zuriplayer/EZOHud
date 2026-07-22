@@ -4,7 +4,7 @@ local EZO_HUD = EZOhud
 local CUSTOM_GROUP_SEARCH_NAME = "EZOhud_CustomGroupSearch"
 local NATIVE_HIDDEN_REASON = "EZOhud_CustomGroupSearch"
 local PANEL_WIDTH = 250
-local PANEL_HEIGHT = 78
+local PANEL_HEIGHT = 96
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -146,10 +146,16 @@ local function GetSearchDurationText(status)
     return FormatMilliseconds(zo_max(0, GetFrameTimeMilliseconds() - searchStartTimeMs))
 end
 
-local function GetExtraInfoText(status, activityId)
+local function GetDestinationText(activityId)
     return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_EXTRA_FORMAT, "Destination: <<1>> - <<2>> - <<3>>"),
-        GetActivityDisplayName(activityId),
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT, "Destination: <<1>>"),
+        GetActivityDisplayName(activityId)
+    )
+end
+
+local function GetMetaText(status)
+    return zo_strformat(
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_META_FORMAT, "Search: <<1>> - <<2>>"),
         GetSearchDurationText(status),
         GetSelectedRoleAcronym()
     )
@@ -206,28 +212,41 @@ local function BuildCustomGroupSearchPanel()
     local title = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Title", root, CT_LABEL)
     title:SetFont("ZoFontGameShadow")
     title:SetColor(0.93, 0.86, 0.62, 1)
-    title:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    title:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
     title:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     title:SetMouseEnabled(false)
 
     local status = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Status", root, CT_LABEL)
     status:SetFont("ZoFontWinH3")
     status:SetColor(1, 1, 1, 1)
-    status:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    status:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
     status:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     status:SetMouseEnabled(false)
 
-    local extra = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Extra", root, CT_LABEL)
-    extra:SetFont("ZoFontGameSmall")
-    extra:SetColor(0.82, 0.82, 0.74, 1)
-    extra:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
-    extra:SetVerticalAlignment(TEXT_ALIGN_CENTER)
-    extra:SetMouseEnabled(false)
-    if type(extra.SetMaxLineCount) == "function" then
-        extra:SetMaxLineCount(1)
+    local destination = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Destination", root, CT_LABEL)
+    destination:SetFont("ZoFontGameSmall")
+    destination:SetColor(0.82, 0.82, 0.74, 1)
+    destination:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+    destination:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    destination:SetMouseEnabled(false)
+    if type(destination.SetMaxLineCount) == "function" then
+        destination:SetMaxLineCount(1)
     end
-    if type(extra.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
-        extra:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+    if type(destination.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
+        destination:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+    end
+
+    local meta = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Meta", root, CT_LABEL)
+    meta:SetFont("ZoFontGameSmall")
+    meta:SetColor(0.82, 0.82, 0.74, 1)
+    meta:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+    meta:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    meta:SetMouseEnabled(false)
+    if type(meta.SetMaxLineCount) == "function" then
+        meta:SetMaxLineCount(1)
+    end
+    if type(meta.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
+        meta:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
     end
 
     root:SetHandler("OnMouseDown", function(control, button)
@@ -262,7 +281,8 @@ local function BuildCustomGroupSearchPanel()
         bg = bg,
         title = title,
         status = status,
-        extra = extra,
+        destination = destination,
+        meta = meta,
     }
 end
 
@@ -282,15 +302,19 @@ function EZO_HUD:ApplyCustomGroupSearchLayout()
 
     self.customGroupSearch.title:SetDimensions(PANEL_WIDTH, 24)
     self.customGroupSearch.title:ClearAnchors()
-    self.customGroupSearch.title:SetAnchor(TOP, self.customGroupSearch.root, TOP, 0, 3)
+    self.customGroupSearch.title:SetAnchor(TOPLEFT, self.customGroupSearch.root, TOPLEFT, 0, 3)
 
     self.customGroupSearch.status:SetDimensions(PANEL_WIDTH, 30)
     self.customGroupSearch.status:ClearAnchors()
-    self.customGroupSearch.status:SetAnchor(TOP, self.customGroupSearch.title, BOTTOM, 0, -2)
+    self.customGroupSearch.status:SetAnchor(TOPLEFT, self.customGroupSearch.title, BOTTOMLEFT, 0, -2)
 
-    self.customGroupSearch.extra:SetDimensions(PANEL_WIDTH, 20)
-    self.customGroupSearch.extra:ClearAnchors()
-    self.customGroupSearch.extra:SetAnchor(TOP, self.customGroupSearch.status, BOTTOM, 0, -2)
+    self.customGroupSearch.destination:SetDimensions(PANEL_WIDTH, 18)
+    self.customGroupSearch.destination:ClearAnchors()
+    self.customGroupSearch.destination:SetAnchor(TOPLEFT, self.customGroupSearch.status, BOTTOMLEFT, 0, -2)
+
+    self.customGroupSearch.meta:SetDimensions(PANEL_WIDTH, 18)
+    self.customGroupSearch.meta:ClearAnchors()
+    self.customGroupSearch.meta:SetAnchor(TOPLEFT, self.customGroupSearch.destination, BOTTOMLEFT, 0, -2)
 
     self:RefreshCustomGroupSearchMovementState()
 end
@@ -346,9 +370,12 @@ function EZO_HUD:RefreshCustomGroupSearch()
     if isMovable then
         self.customGroupSearch.title:SetText(GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder"))
         self.customGroupSearch.status:SetText(GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS, "Queued"))
-        self.customGroupSearch.extra:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_EXTRA_FORMAT, "Destination: <<1>> - <<2>> - <<3>>"),
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity"),
+        self.customGroupSearch.destination:SetText(zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT, "Destination: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+        ))
+        self.customGroupSearch.meta:SetText(zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_META_FORMAT, "Search: <<1>> - <<2>>"),
             "0:00",
             "DD"
         ))
@@ -368,7 +395,8 @@ function EZO_HUD:RefreshCustomGroupSearch()
 
     self.customGroupSearch.title:SetText(title)
     self.customGroupSearch.status:SetText(statusText)
-    self.customGroupSearch.extra:SetText(GetExtraInfoText(status, activityId))
+    self.customGroupSearch.destination:SetText(GetDestinationText(activityId))
+    self.customGroupSearch.meta:SetText(GetMetaText(status))
     self.customGroupSearch.root:SetHidden(false)
 end
 

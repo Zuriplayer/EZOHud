@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.99 - Group Search Layout Cleanup
+
+- Left-aligned the Custom Group Search label text and split the lower information into separate destination and search-duration/role lines.
+- Removed the Native UI Tweaks mover for ESO's native Activity Finder group-search status indicator now that EZOhud has its own movable replacement.
+
 ## 0.1.98 - Group Search Detail Line
 
 - Restored Custom Group Search extra information as a smaller third line below the native-style category and status.
