@@ -3,8 +3,8 @@ local EZO_HUD = EZOhud
 
 local CUSTOM_GROUP_SEARCH_NAME = "EZOhud_CustomGroupSearch"
 local NATIVE_HIDDEN_REASON = "EZOhud_CustomGroupSearch"
-local PANEL_WIDTH = 185
-local PANEL_HEIGHT = 58
+local PANEL_WIDTH = 250
+local PANEL_HEIGHT = 78
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -91,6 +91,70 @@ local function GetActivityCategoryName(activityId)
     return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE, "Group Search")
 end
 
+local function GetActivityDisplayName(activityId)
+    if activityId == nil or activityId == 0 then
+        return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+    end
+
+    local activityName = SafeCall(GetActivityName, activityId)
+    if activityName ~= nil and activityName ~= "" then
+        return zo_strformat("<<C:1>>", activityName)
+    end
+
+    activityName = SafeCall(GetActivityInfo, activityId)
+    if activityName ~= nil and activityName ~= "" then
+        return zo_strformat("<<C:1>>", activityName)
+    end
+
+    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+end
+
+local function GetSelectedRoleAcronym()
+    local role = SafeCall(GetSelectedLFGRole)
+    if role == LFG_ROLE_TANK then
+        return "T"
+    elseif role == LFG_ROLE_HEAL then
+        return "H"
+    elseif role == LFG_ROLE_DPS then
+        return "DD"
+    end
+
+    return "-"
+end
+
+local function FormatMilliseconds(milliseconds)
+    if type(ZO_FormatTimeMilliseconds) == "function" then
+        return ZO_FormatTimeMilliseconds(milliseconds, TIME_FORMAT_STYLE_COLONS, TIME_FORMAT_PRECISION_TWELVE_HOUR)
+    end
+
+    local totalSeconds = zo_floor((tonumber(milliseconds) or 0) / 1000)
+    local minutes = zo_floor(totalSeconds / 60)
+    local seconds = totalSeconds % 60
+    return string.format("%d:%02d", minutes, seconds)
+end
+
+local function GetSearchDurationText(status)
+    if status ~= ACTIVITY_FINDER_STATUS_QUEUED then
+        return "--:--"
+    end
+
+    local searchStartTimeMs = SafeCall(GetLFGSearchTimes)
+    if not searchStartTimeMs or searchStartTimeMs <= 0 then
+        return "--:--"
+    end
+
+    return FormatMilliseconds(zo_max(0, GetFrameTimeMilliseconds() - searchStartTimeMs))
+end
+
+local function GetExtraInfoText(status, activityId)
+    return zo_strformat(
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_EXTRA_FORMAT, "Destination: <<1>> - <<2>> - <<3>>"),
+        GetActivityDisplayName(activityId),
+        GetSearchDurationText(status),
+        GetSelectedRoleAcronym()
+    )
+end
+
 local function HasTrackedActivityState()
     if SafeCall(IsCurrentlySearchingForGroup) then
         return true
@@ -153,6 +217,19 @@ local function BuildCustomGroupSearchPanel()
     status:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     status:SetMouseEnabled(false)
 
+    local extra = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Extra", root, CT_LABEL)
+    extra:SetFont("ZoFontGameSmall")
+    extra:SetColor(0.82, 0.82, 0.74, 1)
+    extra:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    extra:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    extra:SetMouseEnabled(false)
+    if type(extra.SetMaxLineCount) == "function" then
+        extra:SetMaxLineCount(1)
+    end
+    if type(extra.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
+        extra:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+    end
+
     root:SetHandler("OnMouseDown", function(control, button)
         if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD:IsMoveModeEnabled("customGroupSearch") then
             EZO_HUD.customGroupSearchDragActive = true
@@ -185,6 +262,7 @@ local function BuildCustomGroupSearchPanel()
         bg = bg,
         title = title,
         status = status,
+        extra = extra,
     }
 end
 
@@ -209,6 +287,10 @@ function EZO_HUD:ApplyCustomGroupSearchLayout()
     self.customGroupSearch.status:SetDimensions(PANEL_WIDTH, 30)
     self.customGroupSearch.status:ClearAnchors()
     self.customGroupSearch.status:SetAnchor(TOP, self.customGroupSearch.title, BOTTOM, 0, -2)
+
+    self.customGroupSearch.extra:SetDimensions(PANEL_WIDTH, 20)
+    self.customGroupSearch.extra:ClearAnchors()
+    self.customGroupSearch.extra:SetAnchor(TOP, self.customGroupSearch.status, BOTTOM, 0, -2)
 
     self:RefreshCustomGroupSearchMovementState()
 end
@@ -264,6 +346,12 @@ function EZO_HUD:RefreshCustomGroupSearch()
     if isMovable then
         self.customGroupSearch.title:SetText(GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder"))
         self.customGroupSearch.status:SetText(GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS, "Queued"))
+        self.customGroupSearch.extra:SetText(zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_EXTRA_FORMAT, "Destination: <<1>> - <<2>> - <<3>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity"),
+            "0:00",
+            "DD"
+        ))
         self.customGroupSearch.root:SetHidden(false)
         return
     end
@@ -280,6 +368,7 @@ function EZO_HUD:RefreshCustomGroupSearch()
 
     self.customGroupSearch.title:SetText(title)
     self.customGroupSearch.status:SetText(statusText)
+    self.customGroupSearch.extra:SetText(GetExtraInfoText(status, activityId))
     self.customGroupSearch.root:SetHidden(false)
 end
 

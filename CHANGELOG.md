@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.98 - Group Search Detail Line
+
+- Restored Custom Group Search extra information as a smaller third line below the native-style category and status.
+- Shows destination, search duration, and compact role acronym (`DD`, `T`, or `H`) while keeping the custom label movable and scalable.
+
 ## 0.1.97 - Native-Style Group Search Hotfix
 
 - Changed the Custom Group Search display to a compact native-style two-line label.

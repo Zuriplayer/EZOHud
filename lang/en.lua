@@ -155,7 +155,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
 
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH = "Custom Group Search",
-    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Replaces ESO's native on-screen Activity Finder status tracker with a compact movable HUD label that keeps the native-style two-line format and supports scaling. It does not join, leave, accept, decline, or automate queue actions.",
+    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Replaces ESO's native on-screen Activity Finder status tracker with a compact movable HUD label that keeps the native-style header/status and adds a smaller destination, search duration, and role line. It supports scaling and does not join, leave, accept, decline, or automate queue actions.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE = "Enable custom group search label",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE_TOOLTIP = "Hides ESO's native Activity Finder status tracker and shows EZOhud's movable native-style label while queued, in an LFG group, or in ready check.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE = "Move Group Search",
@@ -174,6 +174,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_CUSTOM_GROUP_SEARCH_READY_SELF_PENDING = "Pending",
     EZO_HUD_CUSTOM_GROUP_SEARCH_PENDING_NONE = "none",
     EZO_HUD_CUSTOM_GROUP_SEARCH_DETAIL_FORMAT = "<<1>> - <<2>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_EXTRA_FORMAT = "Destination: <<1>> - <<2>> - <<3>>",
 
     EZO_HUD_OPTION_CUSTOM_LOOT = "Custom Loot History",
     EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Replaces ESO's native loot history with a configurable custom panel with memory, scrolling, fade timing, and a bottom hover zone for reviewing recent loot.",
