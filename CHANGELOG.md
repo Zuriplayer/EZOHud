@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.95 - Native Widget Move Handles
+
+- Stopped opening every enabled native widget drag preview automatically when the Native UI Tweaks section opens.
+- Added a per-widget move-handle button so only the selected native widget shows its green drag handle while testing placement.
+- Clarified native widget labels and documentation so disabling custom positioning is understood as restoring ESO's original runtime anchor.
+
 ## 0.1.94 - Native Group Search Indicator
 
 - Corrected the Activity Finder native tweak to target ESO's HUD group-search status indicator instead of the full Dungeon Finder/Activity Finder panel.

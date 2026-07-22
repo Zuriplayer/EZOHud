@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.94`
-- AddOnVersion: `10094`
+- Versión del addon: `0.1.95`
+- AddOnVersion: `10095`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -53,7 +53,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
-- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, indicador de estado de búsqueda de grupo del Buscador de actividades y consejos de combate activos con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
+- Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, indicador de estado de búsqueda de grupo del Buscador de actividades y consejos de combate activos con controles para aplicar posición, mostrar un tirador cada vez, ajustar desplazamiento X/Y, escala y restablecer.
 - Interfaz de Sinergia Personalizada que oculta el aviso de sinergia nativo de ESO y usa una capa movible independiente.
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, revisión al pasar el ratón por la parte inferior, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
@@ -77,7 +77,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
-- Ajustes de Interfaz Nativa: activar el reposicionamiento de elementos nativos de ESO (tracker de misiones, anuncios centrales, indicador de estado de búsqueda de grupo del Buscador de actividades y consejos de combate activos). Ajustar desplazamientos X/Y, cambiar la escala y restablecer los valores.
+- Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para elementos nativos de ESO (tracker de misiones, anuncios centrales, indicador de estado de búsqueda de grupo del Buscador de actividades y consejos de combate activos). Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
 - Sinergia Personalizada: activar el aviso de sinergia personalizado, habilitar movimiento y ajustar la escala.
 - Historial de Botín Personalizado: activar el panel de botín, habilitar movimiento y ajustar la escala y el tiempo que los objetos permanecen visibles antes de desvanecerse.
 - Debug: activar registro de debug y, opcionalmente, reflejar la salida de debug en el chat.

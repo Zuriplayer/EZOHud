@@ -46,7 +46,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         label:SetColor(1, 1, 1, 1)
         label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
-        label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n(Mover)")
+        label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
 
         backdrop:SetHandler("OnMoveStop", function(self)
             local newCx, newCy = self:GetCenter()
@@ -73,6 +73,10 @@ local function GetOrCreatePreviewBackdrop(control, widget)
             local refY = _G["EZOhud_" .. widget.id .. "_LAM_OffsetY"]
             if refY and refY.UpdateValue then refY:UpdateValue() end
         end)
+    end
+    local label = _G[backdropName .. "_Label"]
+    if label then
+        label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
     end
     return backdrop
 end
@@ -269,6 +273,12 @@ local function RunOnWidgetControls(widget, func)
     end
 end
 
+local function CloseAllNativeWidgetPreviews()
+    for _, widget in ipairs(WIDGETS) do
+        RunOnWidgetControls(widget, widget.onPreviewClose)
+    end
+end
+
 local function CaptureOriginalState(widget)
     if originalStates[widget.id] then return end
 
@@ -462,21 +472,13 @@ function EZO_HUD:InitializeNativeWidgets()
             local panelRef = EZOhud_NativeWidgets_LAM_Panel
             if panelRef and not panelRef:IsHidden() then
                 isPanelVisible = true
-                for _, widget in ipairs(WIDGETS) do
-                    local enableRef = _G["EZOhud_" .. widget.id .. "_LAM_Enable"]
-                    if enableRef and not enableRef:IsHidden() and GetWidgetSettings(widget.id).enabled then
-                        RunOnWidgetControls(widget, widget.onPreviewOpen)
-                    end
-                end
             end
         end)
 
         CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", function()
             if isPanelVisible then
                 isPanelVisible = false
-                for _, widget in ipairs(WIDGETS) do
-                    RunOnWidgetControls(widget, widget.onPreviewClose)
-                end
+                CloseAllNativeWidgetPreviews()
             end
         end)
     end
@@ -518,6 +520,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).enabled = value == true
                         self:ApplyNativeWidgetLayout(widget.id)
                         if value == true then
+                            CloseAllNativeWidgetPreviews()
                             RunOnWidgetControls(widget, widget.onPreviewOpen)
                         else
                             RunOnWidgetControls(widget, widget.onPreviewClose)
@@ -525,6 +528,21 @@ function EZO_HUD:InitializeNativeWidgets()
                     end,
                     default = self.defaults[widget.id].enabled,
                     width = "full",
+                })
+                table.insert(options, {
+                    type = "button",
+                    name = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE"] or 0),
+                    tooltip = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE_TOOLTIP"] or 0),
+                    func = function()
+                        if GetWidgetSettings(widget.id).enabled ~= true then return end
+                        CloseAllNativeWidgetPreviews()
+                        self:ApplyNativeWidgetLayout(widget.id)
+                        RunOnWidgetControls(widget, widget.onPreviewOpen)
+                    end,
+                    disabled = function()
+                        return GetWidgetSettings(widget.id).enabled ~= true
+                    end,
+                    width = "half",
                 })
                 table.insert(options, {
                     type = "slider",
@@ -541,6 +559,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetX = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
+                            CloseAllNativeWidgetPreviews()
                             RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,
@@ -562,6 +581,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetY = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
+                            CloseAllNativeWidgetPreviews()
                             RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,
@@ -583,6 +603,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).scale = value / 100
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
+                            CloseAllNativeWidgetPreviews()
                             RunOnWidgetControls(widget, widget.onPreviewOpen)
                         end
                     end,

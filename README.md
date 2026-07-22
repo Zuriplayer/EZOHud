@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.94`
-- AddOnVersion: `10094`
+- Addon version: `0.1.95`
+- AddOnVersion: `10095`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -53,7 +53,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Arcanist Crux HUD with stack count, remaining duration bar, timer text, size setting, and bar spacing setting.
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
-- Experimental native widget positioning for the focused quest tracker, center screen announcements, Activity Finder group-search status indicator, and active combat tips with enable, X/Y offset, scale, and reset controls.
+- Experimental native widget positioning for the focused quest tracker, center screen announcements, Activity Finder group-search status indicator, and active combat tips with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls.
 - Custom Synergy UI that hides ESO's native synergy prompt and uses an independent movable overlay.
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
@@ -77,7 +77,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
-- Native UI Tweaks: enable repositioning of ESO's native focused quest tracker, center screen announcements, Activity Finder group-search status indicator, and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, and reset the values.
+- Native UI Tweaks: apply custom positioning for ESO's native focused quest tracker, center screen announcements, Activity Finder group-search status indicator, and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
 - Custom Synergy UI: enable the custom synergy prompt, allow movement, and adjust scale.
 - Custom Loot History: enable the custom loot panel, allow movement, and adjust scale and the time loot remains visible before fading.
 - Debug: enable debug logging and optionally mirror debug output to chat.

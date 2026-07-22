@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.94"
-EZO_HUD.ADDON_VERSION_NUM = 10094
+EZO_HUD.ADDON_VERSION = "0.1.95"
+EZO_HUD.ADDON_VERSION_NUM = 10095
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -221,7 +221,7 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = self.ADDON_VERSION_NUM or 10094,
+            addOnVersion = self.ADDON_VERSION_NUM or 10095,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",
