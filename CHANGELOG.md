@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.92 - Custom Loot Hover Review
+
+- Added a bottom hover zone to Custom Loot History so recent loot can be revealed and scrolled without keeping the whole panel mouse-active by default.
+
 ## 0.1.91 - Automatic Vanilla Bar Hiding
 
 - Automatically enables vanilla attribute-bar hiding when the custom Attribute HUD is turned on.

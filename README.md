@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.91`
-- AddOnVersion: `10091`
+- Addon version: `0.1.92`
+- AddOnVersion: `10092`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -54,7 +54,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
 - Experimental native widget positioning for the focused quest tracker, center screen announcements, synergy prompt, and active combat tips with enable, X/Y offset, scale, and reset controls.
-- Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory and adjustable fade.
+- Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
 - Custom Loot History and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
 - English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection.

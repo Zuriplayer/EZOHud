@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.91`
-- AddOnVersion: `10091`
+- Versión del addon: `0.1.92`
+- AddOnVersion: `10092`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -54,7 +54,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
 - Posicionamiento experimental de elementos nativos como el tracker de misiones, anuncios centrales, aviso de sinergia y consejos de combate activos con controles para activar, ajustar desplazamiento X/Y, escala y restablecer.
-- Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, desplazamiento y tiempo de desvanecimiento ajustable.
+- Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, revisión al pasar el ratón por la parte inferior, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
 - Las ventanas de Historial de Botín personalizado y Sinergia personalizada quedan restringidas a escenas HUD para que los paneles nativos de menú sigan siendo accesibles.
 - Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español.

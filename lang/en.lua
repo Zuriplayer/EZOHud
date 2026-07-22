@@ -152,7 +152,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
 
     EZO_HUD_OPTION_CUSTOM_LOOT = "Custom Loot History",
-    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Replaces ESO's native loot history with a configurable custom panel with memory, scrolling, and fade timing.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Replaces ESO's native loot history with a configurable custom panel with memory, scrolling, fade timing, and a bottom hover zone for reviewing recent loot.",
     EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE = "Enable custom loot history",
     EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP = "Hides ESO's native loot stream and uses EZOhud's custom loot panel.",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Move Loot History",

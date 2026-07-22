@@ -2,6 +2,7 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
 local CUSTOM_LOOT_NAME = "EZOhud_CustomLoot"
+local INTERACTION_HOTSPOT_HEIGHT = 72
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -61,6 +62,16 @@ local function BuildCustomLootIndicator()
     buffer:SetAnchor(TOPLEFT, root, TOPLEFT, 0, 0)
     buffer:SetAnchor(BOTTOMRIGHT, scrollbar, BOTTOMLEFT, -5, 0)
 
+    local interactionHotspot = WINDOW_MANAGER:CreateControl(CUSTOM_LOOT_NAME .. "_InteractionHotspot", root, CT_CONTROL)
+    interactionHotspot:SetAnchor(BOTTOMLEFT, root, BOTTOMLEFT, 0, 0)
+    interactionHotspot:SetAnchor(BOTTOMRIGHT, root, BOTTOMRIGHT, 0, 0)
+    interactionHotspot:SetHeight(INTERACTION_HOTSPOT_HEIGHT)
+    interactionHotspot:SetMouseEnabled(true)
+
+    local function ScrollToLatest()
+        buffer:SetScrollPosition(0)
+    end
+
     -- Wiring scrollbar
     local function UpdateScrollbar()
         local numHistoryLines = buffer:GetNumHistoryLines()
@@ -79,6 +90,29 @@ local function BuildCustomLootIndicator()
         end
     end
 
+    local function BeginInteraction()
+        if root.isHovered then return end
+        root.isHovered = true
+        root:SetMouseEnabled(true)
+        bg:SetCenterColor(0, 0, 0, 0.4)
+        bg:SetEdgeColor(0.2, 0.2, 0.2, 0.8)
+        ScrollToLatest()
+        UpdateScrollbar()
+        buffer:SetLineFade(999999, 1)
+    end
+
+    local function EndInteraction()
+        if not root.isHovered then return end
+        root.isHovered = false
+        if not EZO_HUD:IsMoveModeEnabled("customLoot") then
+            root:SetMouseEnabled(false)
+        end
+        bg:SetCenterColor(0, 0, 0, 0)
+        bg:SetEdgeColor(0, 0, 0, 0)
+        UpdateScrollbar()
+        buffer:SetLineFade(GetCustomLootSettings().fadeTime or 5, 1)
+    end
+
     buffer:SetHandler("OnScrollPositionChanged", UpdateScrollbar)
     buffer:SetHandler("OnTextChanged", UpdateScrollbar)
 
@@ -88,21 +122,9 @@ local function BuildCustomLootIndicator()
         end
     end)
 
-    root:SetHandler("OnMouseEnter", function()
-        root.isHovered = true
-        bg:SetCenterColor(0, 0, 0, 0.4)
-        bg:SetEdgeColor(0.2, 0.2, 0.2, 0.8)
-        UpdateScrollbar()
-        buffer:SetLineFade(999999, 1) -- Stop fading while hovering
-    end)
-
-    root:SetHandler("OnMouseExit", function()
-        root.isHovered = false
-        bg:SetCenterColor(0, 0, 0, 0)
-        bg:SetEdgeColor(0, 0, 0, 0)
-        UpdateScrollbar()
-        buffer:SetLineFade(GetCustomLootSettings().fadeTime or 5, 1)
-    end)
+    interactionHotspot:SetHandler("OnMouseEnter", BeginInteraction)
+    root:SetHandler("OnMouseEnter", BeginInteraction)
+    root:SetHandler("OnMouseExit", EndInteraction)
 
     root:SetHandler("OnMouseWheel", function(_, delta)
         local newPos = buffer:GetScrollPosition() - delta
@@ -120,6 +142,7 @@ local function BuildCustomLootIndicator()
         bg = bg,
         buffer = buffer,
         scrollbar = scrollbar,
+        interactionHotspot = interactionHotspot,
     }
 end
 
@@ -131,8 +154,16 @@ function EZO_HUD:RefreshCustomLootVisibility()
     local isHudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
     local shouldShow = isHudVisible and (settings.enabled == true or isMovable)
 
+    if not shouldShow then
+        self.customLoot.root.isHovered = false
+        self.customLoot.bg:SetCenterColor(0, 0, 0, 0)
+        self.customLoot.bg:SetEdgeColor(0, 0, 0, 0)
+        self.customLoot.scrollbar:SetHidden(true)
+    end
+
     self.customLoot.root:SetHidden(not shouldShow)
-    self.customLoot.root:SetMouseEnabled(isHudVisible and isMovable)
+    self.customLoot.root:SetMouseEnabled(shouldShow and (isMovable or self.customLoot.root.isHovered == true))
+    self.customLoot.interactionHotspot:SetMouseEnabled(shouldShow and settings.enabled == true and not isMovable)
 end
 
 function EZO_HUD:ApplyCustomLootLayout()
@@ -189,6 +220,7 @@ function EZO_HUD:RefreshCustomLootMovementState()
     local isMovable = self:IsMoveModeEnabled("customLoot")
     self.customLoot.root:SetMovable(isMovable)
     self.customLoot.root:SetMouseEnabled(isMovable)
+    self.customLoot.interactionHotspot:SetMouseEnabled(not isMovable)
 
     if isMovable then
         self.customLoot.bg:SetCenterColor(0.05, 0.05, 0.02, 0.6)

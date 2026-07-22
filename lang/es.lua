@@ -148,7 +148,7 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Escala el tamaño del aviso personalizado.",
 
     EZO_HUD_OPTION_CUSTOM_LOOT = "Historial de Botín (Personalizado)",
-    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Reemplaza el historial de botín nativo de ESO por un panel personalizado configurable con memoria, desplazamiento y tiempo de desvanecimiento.",
+    EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Reemplaza el historial de botín nativo de ESO por un panel personalizado configurable con memoria, desplazamiento, tiempo de desvanecimiento y una zona inferior para revisar el botín reciente.",
     EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE = "Activar historial personalizado",
     EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP = "Oculta el botín nativo de ESO y usa el panel de botín personalizado de EZOhud.",
     EZO_HUD_OPTION_CUSTOM_LOOT_MOVE = "Mover Historial de Botín",
