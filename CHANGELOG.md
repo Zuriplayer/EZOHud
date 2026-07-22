@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.91 - Automatic Vanilla Bar Hiding
+
+- Automatically enables vanilla attribute-bar hiding when the custom Attribute HUD is turned on.
+
 ## 0.1.90 - Soft Resource Warning Background
 
 - Added a soft alarm tint to the consumed background of resource bars when their warning threshold is active.

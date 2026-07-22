@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.90`
-- AddOnVersion: `10090`
+- Addon version: `0.1.91`
+- AddOnVersion: `10091`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -35,7 +35,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 ## Implemented Features
 
 - Attribute HUD for Health, Magicka, and Stamina.
-- Optional hiding of the default ESO player attribute bars.
+- Automatic hiding of the default ESO player attribute bars when the custom Attribute HUD is enabled, with a manual toggle still available.
 - Attribute HUD movement mode that lets the three resource bars move as a group.
 - Attribute HUD layout selector with the classic split model and a tighter left-aligned vertical stack for Health, Stamina, and Magicka.
 - Resource bar width settings for Health, Magicka, and Stamina.
@@ -72,7 +72,7 @@ When EZOCore is active, the complete panel is rendered inside `Settings > EZO` a
 With EZOCore active, EZOhud follows the EZO family preference storage policy: ordinary HUD settings use the selected account-wide or per-character scope. When the scope is per character, the first load copies existing account-wide EZOhud settings into that character profile. Without EZOCore, EZOhud keeps its historical account-wide storage.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
-- Attribute HUD: enable custom bars, hide vanilla bars, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
+- Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
@@ -99,7 +99,7 @@ Recommended beta checks:
 - Test normal HUD, HUD UI, menus, champion points, Tales of Tribute, and other non-HUD scenes.
 - Test native configuration panels such as Skills and Settings while Custom Loot History is enabled to confirm HUD-only panels do not block them.
 - Test combat and out-of-combat alpha behavior.
-- Test hiding EZOhud attribute bars independently from hiding vanilla ESO bars.
+- Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
 - Test each ultimate display mode and active/inactive bar state.
 - Test execute alert behavior with known execute abilities on the active bar.
 - Test shared EZOCore, English, Spanish, and Automatic language modes.

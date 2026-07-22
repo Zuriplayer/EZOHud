@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.90`
-- AddOnVersion: `10090`
+- Versión del addon: `0.1.91`
+- AddOnVersion: `10091`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -35,7 +35,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 ## Funciones Implementadas
 
 - HUD de atributos para Salud, Magia y Estamina.
-- Ocultación opcional de las barras de atributos del jugador por defecto de ESO.
+- Ocultación automática de las barras de atributos del jugador por defecto de ESO al activar el HUD de atributos personalizado, manteniendo disponible el ajuste manual.
 - Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
 - Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical más compacta alineada a la izquierda para Salud, Estamina y Magia.
 - Ajustes de anchura de barra para Salud, Magia y Estamina.
@@ -72,7 +72,7 @@ Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZ
 Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
-- HUD de atributos: activar barras personalizadas, ocultar barras vanilla, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
+- HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
@@ -99,7 +99,7 @@ Comprobaciones recomendadas para la beta:
 - Probar HUD normal, HUD UI, menús, puntos de campeón, Tales of Tribute y otras escenas que no sean HUD.
 - Probar paneles nativos de configuración como Habilidades y Ajustes con el Historial de Botín personalizado activado para confirmar que los paneles del HUD no los bloquean.
 - Probar el comportamiento en combate y el alpha fuera de combate.
-- Probar la ocultación de las barras de atributos de EZOhud independientemente de la ocultación de las barras vanilla de ESO.
+- Probar que al activar el HUD de atributos de EZOhud se ocultan automáticamente las barras vanilla de ESO, y que el ajuste manual de barras vanilla sigue aplicándose después.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
 - Probar los modos de idioma compartido de EZOCore, Inglés, Español y Automático.

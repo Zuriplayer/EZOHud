@@ -839,7 +839,17 @@ function EZO_HUD:InitializeSettings()
                 name = GetString(EZO_HUD_OPTION_OVERLAY_ENABLE),
                 tooltip = GetString(EZO_HUD_OPTION_OVERLAY_ENABLE_TOOLTIP),
                 getFunc = function() return self.sv.overlay.enabled end,
-                setFunc = function(value) self.sv.overlay.enabled = value; self:RefreshOverlayVisibility() end,
+                setFunc = function(value)
+                    self.sv.overlay.enabled = value
+                    if value == true then
+                        self.sv.overlay.hideVanillaAttributes = true
+                        local hideVanillaControl = _G.EZOhud_Overlay_LAM_HideVanilla
+                        if hideVanillaControl and hideVanillaControl.UpdateValue then
+                            hideVanillaControl:UpdateValue()
+                        end
+                    end
+                    self:RefreshOverlayVisibility()
+                end,
                 default = self.defaults.overlay.enabled,
                 width = "full",
             },
@@ -847,6 +857,7 @@ function EZO_HUD:InitializeSettings()
                 type = "checkbox",
                 name = GetString(EZO_HUD_OPTION_HIDE_VANILLA),
                 tooltip = GetString(EZO_HUD_OPTION_HIDE_VANILLA_TOOLTIP),
+                reference = "EZOhud_Overlay_LAM_HideVanilla",
                 getFunc = function() return self.sv.overlay.hideVanillaAttributes end,
                 setFunc = function(value) self.sv.overlay.hideVanillaAttributes = value; self:ApplyVanillaVisibility() end,
                 default = self.defaults.overlay.hideVanillaAttributes,
