@@ -174,4 +174,17 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP = "Escala el control de consejos de combate.",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Restablecer",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restaura el anclaje original.",
+
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER = "Buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_HEADER_TOOLTIP = "Posicionamiento experimental para el panel nativo de Buscador de actividades/mazmorras de ESO. Solo reancla y escala el control nativo; no pone en cola, acepta ni automatiza acciones del buscador de actividades.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE = "Activar posicionamiento del buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE_TOOLTIP = "Mueve y escala el panel nativo de Buscador de mazmorras/actividades de ESO con los valores de abajo. Desactívalo para restaurar el anclaje original de ese control durante esta sesión.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X = "Desplazamiento X del buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X_TOOLTIP = "Desplazamiento horizontal desde el centro de la pantalla. Los valores negativos mueven el panel a la izquierda; los positivos lo mueven a la derecha.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y = "Desplazamiento Y del buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y_TOOLTIP = "Desplazamiento vertical desde el centro de la pantalla. Los valores positivos mueven el panel hacia abajo; los negativos lo mueven hacia arriba.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE = "Escala del buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE_TOOLTIP = "Escala el panel nativo de Buscador de mazmorras/actividades de ESO completo.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET = "Restablecer posicionamiento del buscador de mazmorras",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET_TOOLTIP = "Restaura los valores de la prueba a sus valores por defecto y desactiva el control de EZOhud sobre el panel nativo de Buscador de mazmorras/actividades.",
 }

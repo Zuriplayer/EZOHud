@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.92"
-EZO_HUD.ADDON_VERSION_NUM = 10092
+EZO_HUD.ADDON_VERSION = "0.1.93"
+EZO_HUD.ADDON_VERSION_NUM = 10093
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -90,6 +90,12 @@ EZO_HUD.defaults = {
         enabled = false,
         offsetX = 0,
         offsetY = -150,
+        scale = 1.0,
+    },
+    nativeDungeonFinder = {
+        enabled = false,
+        offsetX = 0,
+        offsetY = 0,
         scale = 1.0,
     },
     customSynergy = {
@@ -215,7 +221,7 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = self.ADDON_VERSION_NUM or 10092,
+            addOnVersion = self.ADDON_VERSION_NUM or 10093,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",

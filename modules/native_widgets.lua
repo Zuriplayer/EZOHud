@@ -194,6 +194,52 @@ local WIDGETS = {
             reset = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET",
             resetTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP",
         }
+    },
+    {
+        id = "nativeDungeonFinder",
+        controlName = {
+            "ZO_ActivityFinder",
+            "ZO_ActivityFinderTopLevel",
+            "ZO_ActivityFinder_Keyboard",
+            "ZO_ActivityFinder_Keyboard_TopLevel",
+            "ZO_DungeonFinder",
+            "ZO_DungeonFinderTopLevel",
+            "ZO_DungeonFinder_Keyboard",
+            "ZO_DungeonFinder_Keyboard_TopLevel",
+            "ZO_LFG",
+            "ZO_LFGTopLevel",
+        },
+        fallbackAnchor = { CENTER, GuiRoot, CENTER, 0, 0 },
+        minScale = 0.75,
+        maxScale = 1.25,
+        onPreviewOpen = function(self, control)
+            if control then
+                control:SetHidden(false)
+                control:SetAlpha(1)
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(false) end
+            end
+        end,
+        onPreviewClose = function(self, control)
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(true) end
+            end
+        end,
+        stringIds = {
+            header = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET_TOOLTIP",
+        }
     }
 }
 

@@ -178,4 +178,17 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP = "Scales the combat tips control.",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Reset",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restores original anchor.",
+
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER = "Dungeon Finder",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_HEADER_TOOLTIP = "Experimental positioning for ESO's native Activity Finder/Dungeon Finder panel. It reanchors and scales the native control only; it does not queue, accept, or automate activity finder actions.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE = "Enable dungeon finder positioning",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_ENABLE_TOOLTIP = "Moves and scales ESO's native Dungeon Finder/Activity Finder panel with the values below. Disable it to restore the control's original runtime anchor for this session.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X = "Dungeon finder X offset",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_X_TOOLTIP = "Horizontal offset from the center of the screen. Negative values move the panel left; positive values move it right.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y = "Dungeon finder Y offset",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_OFFSET_Y_TOOLTIP = "Vertical offset from the center of the screen. Positive values move the panel down; negative values move it up.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE = "Dungeon finder scale",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_SCALE_TOOLTIP = "Scales ESO's native Dungeon Finder/Activity Finder panel as a whole.",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET = "Reset dungeon finder positioning",
+    EZO_HUD_OPTION_NATIVE_DUNGEON_FINDER_RESET_TOOLTIP = "Restores the test values to defaults and disables EZOhud control of the native Dungeon Finder/Activity Finder panel.",
 }

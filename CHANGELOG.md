@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.93 - Native Dungeon Finder Positioning
+
+- Added experimental Native UI Tweaks controls for moving and scaling ESO's native Dungeon Finder/Activity Finder panel without automating activity finder actions.
+
 ## 0.1.92 - Custom Loot Hover Review
 
 - Added a bottom hover zone to Custom Loot History so recent loot can be revealed and scrolled without keeping the whole panel mouse-active by default.
