@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.96 - Custom Group Search Panel
+
+- Added a movable Custom Group Search panel that can replace ESO's native on-screen Activity Finder status tracker.
+- Shows available group-search details including status, selected role, activity, queue time, estimate, and ready-check counts.
+- Keeps the feature visual only: it does not queue, accept, decline, leave, or automate Activity Finder actions.
+- Registered the panel as an independent EZOCore layout surface and synchronized English/Spanish documentation.
+
 ## 0.1.95 - Native Widget Move Handles
 
 - Stopped opening every enabled native widget drag preview automatically when the Native UI Tweaks section opens.

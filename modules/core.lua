@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy", "customLoot" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "execute", "crux", "customSynergy", "customGroupSearch", "customLoot" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.95"
-EZO_HUD.ADDON_VERSION_NUM = 10095
+EZO_HUD.ADDON_VERSION = "0.1.96"
+EZO_HUD.ADDON_VERSION_NUM = 10096
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -104,6 +104,13 @@ EZO_HUD.defaults = {
         offsetX = 0,
         offsetY = 150,
         size = 50,
+    },
+    customGroupSearch = {
+        enabled = false,
+        movable = false,
+        offsetX = 360,
+        offsetY = -120,
+        scale = 1.0,
     },
     customLoot = {
         enabled = true,
@@ -221,7 +228,7 @@ function EZO_HUD:RegisterWithEZOCore()
             id = "ezohud",
             name = self.ADDON_NAME or "EZOhud",
             version = self.ADDON_VERSION or "0.0.0",
-            addOnVersion = self.ADDON_VERSION_NUM or 10095,
+            addOnVersion = self.ADDON_VERSION_NUM or 10096,
             apiVersion = 1,
             capabilities = {
                 "family.language.consumer",
@@ -290,6 +297,9 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "customSynergy" then
         self:RefreshCustomSynergyMovementState()
         self:RefreshCustomSynergy()
+    elseif sectionName == "customGroupSearch" then
+        self:RefreshCustomGroupSearchMovementState()
+        self:RefreshCustomGroupSearch()
     elseif sectionName == "customLoot" then
         self:RefreshCustomLootMovementState()
         if self.ApplyCustomLootLayout then
@@ -321,7 +331,8 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
         { id = "ezohud.customSynergy", section = "customSynergy", order = 50, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
-        { id = "ezohud.customLoot", section = "customLoot", order = 60, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
+        { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 60, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
+        { id = "ezohud.customLoot", section = "customLoot", order = 70, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
     }
 
     for _, definition in ipairs(definitions) do
@@ -384,6 +395,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveCruxPosition()
     elseif sectionName == "customSynergy" and self.SaveCustomSynergyPosition then
         self:SaveCustomSynergyPosition()
+    elseif sectionName == "customGroupSearch" and self.SaveCustomGroupSearchPosition then
+        self:SaveCustomGroupSearchPosition()
     elseif sectionName == "customLoot" and self.SaveCustomLootPosition then
         self:SaveCustomLootPosition()
     end
@@ -456,6 +469,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCustomSynergy ~= nil then
         self:InitializeCustomSynergy()
+    end
+
+    if self.InitializeCustomGroupSearch ~= nil then
+        self:InitializeCustomGroupSearch()
     end
 
     if self.InitializeCustomLoot ~= nil then
