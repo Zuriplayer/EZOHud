@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.104 - Custom Quest Tracker Tooltip
+
+- Added a hover tooltip to the Custom Quest Tracker with focused quest title, level/repeatable metadata when available, long quest text, and current visible tasks.
+- Kept the tooltip disabled while moving the custom quest tracker so drag behavior remains unchanged.
+
 ## 0.1.103 - Native Quest Tracker Tweak Cleanup
 
 - Removed the Native UI Tweaks controls, defaults, and runtime widget entry for repositioning ESO's native focused quest tracker.

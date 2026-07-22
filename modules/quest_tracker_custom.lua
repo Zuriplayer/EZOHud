@@ -7,6 +7,7 @@ local PANEL_WIDTH = 440
 local PANEL_HEIGHT = 150
 local OBJECTIVE_LINES = 2
 local HINT_LINES = 2
+local TOOLTIP_TASK_LINES = 12
 
 local function GetCustomQuestTrackerSettings()
     if EZO_HUD.sv and not EZO_HUD.sv.customQuestTracker then
@@ -37,6 +38,17 @@ end
 local function AddLine(lines, value, maxLines)
     if #lines >= maxLines or not IsStringPresent(value) then return end
     table.insert(lines, zo_strformat(value))
+end
+
+local function AddUniqueLine(lines, value, maxLines)
+    if #lines >= maxLines or not IsStringPresent(value) then return end
+    local formatted = zo_strformat(value)
+    for _, existing in ipairs(lines) do
+        if existing == formatted then
+            return
+        end
+    end
+    table.insert(lines, formatted)
 end
 
 local function SetLabelMaxOneLine(label)
@@ -148,6 +160,107 @@ local function CollectStepLines(questIndex, startStep, desiredVisibility, maxLin
     return lines
 end
 
+local function CollectQuestTaskLines(questIndex, maxLines)
+    local lines = {}
+    local numSteps = SafeCall(GetJournalQuestNumSteps, questIndex) or 0
+    for stepIndex = 1, numSteps do
+        local _, visibility, stepType, stepOverrideText, conditionCount = SafeCall(GetJournalQuestStepInfo, questIndex, stepIndex)
+        if visibility ~= QUEST_STEP_VISIBILITY_HINT then
+            if IsStringPresent(stepOverrideText) then
+                AddUniqueLine(lines, stepOverrideText, maxLines)
+            elseif conditionCount then
+                for conditionIndex = 1, conditionCount do
+                    local conditionText, _curCount, _maxCount, isFailCondition, isComplete, _isGroupCreditShared, isVisible =
+                        SafeCall(GetJournalQuestConditionInfo, questIndex, stepIndex, conditionIndex)
+                    if not isFailCondition and not isComplete and isVisible and IsStringPresent(conditionText) then
+                        if stepType == QUEST_STEP_TYPE_OR then
+                            AddUniqueLine(lines, FormatOrText(conditionText), maxLines)
+                        else
+                            AddUniqueLine(lines, conditionText, maxLines)
+                        end
+                    end
+                    if #lines >= maxLines then return lines end
+                end
+            end
+        end
+        if #lines >= maxLines then return lines end
+    end
+    return lines
+end
+
+local function IsQuestRepeatable(questIndex)
+    if type(GetJournalQuestRepeatType) ~= "function" then return false end
+    local repeatType = SafeCall(GetJournalQuestRepeatType, questIndex)
+    if repeatType == nil then return false end
+    if QUEST_REPEAT_NOT_REPEATABLE ~= nil then
+        return repeatType ~= QUEST_REPEAT_NOT_REPEATABLE
+    end
+    return repeatType ~= 0
+end
+
+local function AddTooltipTextLine(lines, value)
+    if IsStringPresent(value) then
+        table.insert(lines, zo_strformat(value))
+    end
+end
+
+local function BuildQuestTooltipText(questIndex)
+    if not questIndex or not IsValidQuestIndex or not IsValidQuestIndex(questIndex) then
+        return nil
+    end
+
+    local questName, backgroundText, activeStepText, _activeStepType, activeStepTrackerText, isComplete, _tracked, questLevel =
+        SafeCall(GetJournalQuestInfo, questIndex)
+    if not IsStringPresent(questName) then
+        return nil
+    end
+
+    local lines = {}
+    AddTooltipTextLine(lines, questName)
+
+    local meta = {}
+    if tonumber(questLevel) and tonumber(questLevel) > 0 then
+        table.insert(meta, zo_strformat(GetString(EZO_HUD_CUSTOM_QUEST_TOOLTIP_LEVEL), questLevel))
+    end
+    if IsQuestRepeatable(questIndex) then
+        table.insert(meta, GetString(EZO_HUD_CUSTOM_QUEST_TOOLTIP_REPEATABLE))
+    end
+    if #meta > 0 then
+        table.insert(lines, table.concat(meta, "    "))
+    end
+
+    local detailLines = {}
+    AddTooltipTextLine(detailLines, backgroundText)
+    AddTooltipTextLine(detailLines, activeStepText)
+    AddTooltipTextLine(detailLines, activeStepTrackerText)
+    if isComplete then
+        AddTooltipTextLine(detailLines, GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_COMPLETE))
+    end
+    if #detailLines > 0 then
+        table.insert(lines, "")
+        for _, line in ipairs(detailLines) do
+            AddTooltipTextLine(lines, line)
+        end
+    end
+
+    local tasks = CollectQuestTaskLines(questIndex, TOOLTIP_TASK_LINES)
+    if #tasks > 0 then
+        table.insert(lines, "")
+        table.insert(lines, GetString(EZO_HUD_CUSTOM_QUEST_TOOLTIP_TASKS))
+        for _, task in ipairs(tasks) do
+            table.insert(lines, zo_strformat("* <<1>>", task))
+        end
+    end
+
+    return table.concat(lines, "\n")
+end
+
+local function HideCustomQuestTooltip()
+    if type(ClearTooltip) == "function" and InformationTooltip then
+        ClearTooltip(InformationTooltip)
+    end
+end
+
 local function GetQuestDisplayData(questIndex)
     if not questIndex or not IsValidQuestIndex or not IsValidQuestIndex(questIndex) then
         return nil
@@ -239,6 +352,7 @@ local function BuildCustomQuestTracker()
     SetLabelMaxOneLine(hintTwo)
 
     root:SetHandler("OnMouseDown", function(control, button)
+        HideCustomQuestTooltip()
         if button == MOUSE_BUTTON_INDEX_LEFT
             and EZO_HUD:IsMoveModeEnabled("customQuestTracker")
             and not EZO_HUD.customQuestTrackerDragActive then
@@ -258,9 +372,18 @@ local function BuildCustomQuestTracker()
     root:SetHandler("OnMoveStop", function(control)
         control:SetMovable(false)
         EZO_HUD.customQuestTrackerDragActive = false
+        HideCustomQuestTooltip()
         if EZO_HUD.SaveCustomQuestTrackerPosition then
             EZO_HUD:SaveCustomQuestTrackerPosition()
         end
+    end)
+    root:SetHandler("OnMouseEnter", function(control)
+        if EZO_HUD.ShowCustomQuestTooltip then
+            EZO_HUD:ShowCustomQuestTooltip(control)
+        end
+    end)
+    root:SetHandler("OnMouseExit", function()
+        HideCustomQuestTooltip()
     end)
 
     return {
@@ -332,13 +455,35 @@ function EZO_HUD:RefreshCustomQuestTrackerMovementState()
     if not self.customQuestTracker then return end
 
     local isMovable = self:IsMoveModeEnabled("customQuestTracker")
+    local settings = GetCustomQuestTrackerSettings()
     if self.customQuestTrackerDragActive and not isMovable then
         self.customQuestTracker.root:StopMovingOrResizing()
         self.customQuestTrackerDragActive = false
     end
     self.customQuestTracker.root:SetMovable(false)
-    self.customQuestTracker.root:SetMouseEnabled(isMovable)
+    self.customQuestTracker.root:SetMouseEnabled(isMovable or settings.enabled == true)
     self.customQuestTracker.bg:SetHidden(not isMovable)
+end
+
+function EZO_HUD:ShowCustomQuestTooltip(anchorControl)
+    if not self.customQuestTracker or self.customQuestTrackerDragActive or self:IsMoveModeEnabled("customQuestTracker") then
+        return
+    end
+
+    local questIndex = self.customQuestTracker.currentQuestIndex or GetFocusedQuestIndex()
+    local tooltipText = BuildQuestTooltipText(questIndex)
+    if not tooltipText or type(InitializeTooltip) ~= "function" or type(SetTooltipText) ~= "function" or not InformationTooltip then
+        return
+    end
+
+    local guiWidth = GuiRoot:GetWidth()
+    local rootCenter = anchorControl:GetCenter()
+    if rootCenter and guiWidth and rootCenter > (guiWidth / 2) then
+        InitializeTooltip(InformationTooltip, anchorControl, LEFT, -8, 0, RIGHT)
+    else
+        InitializeTooltip(InformationTooltip, anchorControl, RIGHT, 8, 0, LEFT)
+    end
+    SetTooltipText(InformationTooltip, tooltipText)
 end
 
 local function SetHintLabel(label, text)
@@ -357,10 +502,14 @@ function EZO_HUD:RefreshCustomQuestTracker()
 
     if (not isHudVisible and not isMovable) or (not settings.enabled and not isMovable) then
         self.customQuestTracker.root:SetHidden(true)
+        self.customQuestTracker.currentQuestIndex = nil
+        HideCustomQuestTooltip()
         return
     end
 
     if isMovable then
+        self.customQuestTracker.currentQuestIndex = nil
+        HideCustomQuestTooltip()
         self.customQuestTracker.title:SetText(GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_TITLE))
         self.customQuestTracker.objective:SetText(GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_OBJECTIVE))
         SetHintLabel(self.customQuestTracker.hints[1], settings.showHints and GetString(EZO_HUD_CUSTOM_QUEST_TRACKER_PREVIEW_HINT) or nil)
@@ -373,9 +522,12 @@ function EZO_HUD:RefreshCustomQuestTracker()
     local questData = GetQuestDisplayData(questIndex)
     if not questData then
         self.customQuestTracker.root:SetHidden(true)
+        self.customQuestTracker.currentQuestIndex = nil
+        HideCustomQuestTooltip()
         return
     end
 
+    self.customQuestTracker.currentQuestIndex = questIndex
     self.customQuestTracker.title:SetText(questData.title)
     self.customQuestTracker.objective:SetText(questData.objective)
 
