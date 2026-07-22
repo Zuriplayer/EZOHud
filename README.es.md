@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.89`
-- AddOnVersion: `10089`
+- Versión del addon: `0.1.90`
+- AddOnVersion: `10090`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -40,7 +40,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical más compacta alineada a la izquierda para Salud, Estamina y Magia.
 - Ajustes de anchura de barra para Salud, Magia y Estamina.
 - Selectores de color de recurso limitados a la familia de color de cada recurso.
-- Umbrales de aviso por recurso que cambian solo los números del recurso a un color de alarma.
+- Umbrales de aviso por recurso que cambian los números del recurso y el fondo consumido a un tinte de alarma suave.
 - Alpha fuera de combate para el HUD de atributos personalizado.
 - Escalado de barras basado en el valor máximo de cada recurso, para que el recurso máximo dominante pueda verse más grande.
 - Indicadores de HUD de ultimate para los slots de ultimate principal y secundaria.

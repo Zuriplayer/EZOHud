@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.90 - Soft Resource Warning Background
+
+- Added a soft alarm tint to the consumed background of resource bars when their warning threshold is active.
+
 ## 0.1.89 - Stamina Stack Order
 
 - Reordered the left-stacked Attribute HUD model to show Stamina above Magicka and tightened the vertical spacing.

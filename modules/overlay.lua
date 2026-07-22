@@ -7,6 +7,7 @@ local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local FEEDBACK_URL = "https://discord.gg/ekw8zUAcRm"
 local NORMAL_TEXT_COLOR = { 0.98, 0.98, 0.98, 0.96 }
 local CONSUMED_BAR_COLOR = { 0.24, 0.24, 0.24, 0.88 }
+local WARNING_CONSUMED_BAR_COLOR = { 0.38, 0.30, 0.16, 0.88 }
 local FILL_SHEEN_COLOR = { 1.0, 1.0, 1.0, 0.12 }
 local INNER_SHADE_COLOR = { 0, 0, 0, 0.16 }
 local WARNING_TEXT_COLOR = { 1.0, 0.72, 0.18, 0.96 }
@@ -356,11 +357,12 @@ local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alpha
         percentValue = zo_floor(ratio * 100)
     end
 
-    resource.consumed:SetColor(unpack(CONSUMED_BAR_COLOR))
+    local consumedColor = warningActive and WARNING_CONSUMED_BAR_COLOR or CONSUMED_BAR_COLOR
+    resource.consumed:SetColor(unpack(consumedColor))
     resource.consumed:SetMinMax(0, math.max(1, maximum))
     resource.consumed:SetValue(math.max(1, maximum))
-    resource.consumedLeftCap:SetColor(unpack(CONSUMED_BAR_COLOR))
-    resource.consumedRightCap:SetColor(unpack(CONSUMED_BAR_COLOR))
+    resource.consumedLeftCap:SetColor(unpack(consumedColor))
+    resource.consumedRightCap:SetColor(unpack(consumedColor))
 
     resource.fill:SetColor(r, g, b, 1)
     resource.fill:SetMinMax(0, math.max(1, maximum))
