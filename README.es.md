@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.86`
-- AddOnVersion: `10086`
+- Versión del addon: `0.1.87`
+- AddOnVersion: `10087`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -37,6 +37,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de atributos para Salud, Magia y Estamina.
 - Ocultación opcional de las barras de atributos del jugador por defecto de ESO.
 - Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
+- Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical alineada a la derecha para Salud, Magia y Estamina.
 - Ajustes de anchura de barra para Salud, Magia y Estamina.
 - Selectores de color de recurso limitados a la familia de color de cada recurso.
 - Umbrales de aviso por recurso que cambian solo los números del recurso a un color de alarma.
@@ -68,8 +69,10 @@ EZOhud sigue el estilo de configuración de la familia EZO: cada sección de aju
 
 Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute, Crux, Sinergia personalizada e Historial de Botín personalizado se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. Los Ajustes de Interfaz Nativa solo se controlan desde ajustes y no son superficies del modo compartido de disposición.
 
+Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
+
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
-- HUD de atributos: activar barras personalizadas, ocultar barras vanilla, habilitar movimiento del HUD, alpha fuera de combate, y tamaño, color y umbral de aviso por recurso.
+- HUD de atributos: activar barras personalizadas, ocultar barras vanilla, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.

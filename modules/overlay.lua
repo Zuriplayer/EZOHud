@@ -15,6 +15,8 @@ local TEXT_INSET = 12
 local SIDE_GAP = 6
 local ROW_GAP = 10
 local LEGACY_RESOURCE_LAYER_SUFFIXES = { "_Shadow", "_Frame", "_Background", "_Alert" }
+local OVERLAY_LAYOUT_CLASSIC = "classic"
+local OVERLAY_LAYOUT_RIGHT_STACK = "rightStack"
 
 local RESOURCE_ORDER = { "health", "magicka", "stamina" }
 local RESOURCE_META = {
@@ -149,6 +151,14 @@ end
 
 local function GetAnchorFromCenter(centerX, centerY, width, height)
     return zo_floor(centerX - (width / 2)), zo_floor(centerY - (height / 2))
+end
+
+local function GetOverlayLayoutMode(settings)
+    local mode = settings and settings.layoutMode
+    if mode == OVERLAY_LAYOUT_RIGHT_STACK then
+        return OVERLAY_LAYOUT_RIGHT_STACK
+    end
+    return OVERLAY_LAYOUT_CLASSIC
 end
 
 local function HideLegacyResourceLayers(rootName)
@@ -522,10 +532,28 @@ function EZO_HUD:ApplyOverlayLayout()
         }
     end
 
-    local bottomWidth = layout.magicka.width + SIDE_GAP + layout.stamina.width
-    local bottomHeight = math.max(layout.magicka.height, layout.stamina.height)
-    local groupWidth = math.max(layout.health.width, bottomWidth)
-    local groupHeight = layout.health.height + ROW_GAP + bottomHeight
+    local layoutMode = GetOverlayLayoutMode(settings)
+    local groupWidth
+    local groupHeight
+
+    if layoutMode == OVERLAY_LAYOUT_RIGHT_STACK then
+        groupWidth = 0
+        groupHeight = 0
+        for index, resourceName in ipairs(RESOURCE_ORDER) do
+            local entry = layout[resourceName]
+            groupWidth = math.max(groupWidth, entry.width)
+            groupHeight = groupHeight + entry.height
+            if index < #RESOURCE_ORDER then
+                groupHeight = groupHeight + ROW_GAP
+            end
+        end
+    else
+        local bottomWidth = layout.magicka.width + SIDE_GAP + layout.stamina.width
+        local bottomHeight = math.max(layout.magicka.height, layout.stamina.height)
+        groupWidth = math.max(layout.health.width, bottomWidth)
+        groupHeight = layout.health.height + ROW_GAP + bottomHeight
+    end
+
     local centerX, centerY = GetHudGroupCenter(settings)
     local left, top = GetAnchorFromCenter(centerX, centerY, groupWidth, groupHeight)
 
@@ -533,20 +561,30 @@ function EZO_HUD:ApplyOverlayLayout()
     self.overlay.root:ClearAnchors()
     self.overlay.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
 
-    layout.health.resource.root:ClearAnchors()
-    layout.health.resource.root:SetAnchor(TOP, self.overlay.root, TOP, 0, 0)
+    if layoutMode == OVERLAY_LAYOUT_RIGHT_STACK then
+        local currentTop = 0
+        for _, resourceName in ipairs(RESOURCE_ORDER) do
+            local entry = layout[resourceName]
+            entry.resource.root:ClearAnchors()
+            entry.resource.root:SetAnchor(TOPRIGHT, self.overlay.root, TOPRIGHT, 0, currentTop)
+            currentTop = currentTop + entry.height + ROW_GAP
+        end
+    else
+        layout.health.resource.root:ClearAnchors()
+        layout.health.resource.root:SetAnchor(TOP, self.overlay.root, TOP, 0, 0)
 
-    local bottomTop = layout.health.height + ROW_GAP
-    local centerLine = zo_floor(groupWidth / 2)
-    local leftGap = zo_floor(SIDE_GAP / 2)
-    local rightGap = SIDE_GAP - leftGap
-    local magickaLeft = centerLine - leftGap - layout.magicka.width
-    local staminaLeft = centerLine + rightGap
+        local bottomTop = layout.health.height + ROW_GAP
+        local centerLine = zo_floor(groupWidth / 2)
+        local leftGap = zo_floor(SIDE_GAP / 2)
+        local rightGap = SIDE_GAP - leftGap
+        local magickaLeft = centerLine - leftGap - layout.magicka.width
+        local staminaLeft = centerLine + rightGap
 
-    layout.magicka.resource.root:ClearAnchors()
-    layout.magicka.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, magickaLeft, bottomTop)
-    layout.stamina.resource.root:ClearAnchors()
-    layout.stamina.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, staminaLeft, bottomTop)
+        layout.magicka.resource.root:ClearAnchors()
+        layout.magicka.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, magickaLeft, bottomTop)
+        layout.stamina.resource.root:ClearAnchors()
+        layout.stamina.resource.root:SetAnchor(TOPLEFT, self.overlay.root, TOPLEFT, staminaLeft, bottomTop)
+    end
 
     self:RefreshMovementState()
     self:RefreshOverlayValues()
@@ -781,6 +819,11 @@ function EZO_HUD:InitializeSettings()
     end)
 
     EZOhud_LAM.RegisterSection("overlay", 20, function()
+        local layoutChoices = {
+            GetString(EZO_HUD_OVERLAY_LAYOUT_CLASSIC),
+            GetString(EZO_HUD_OVERLAY_LAYOUT_RIGHT_STACK),
+        }
+
         local options = {
             EZOhud_LAM.CreateInfoHeader(
                 GetString(EZO_HUD_OPTION_OVERLAY),
@@ -803,6 +846,22 @@ function EZO_HUD:InitializeSettings()
                 setFunc = function(value) self.sv.overlay.hideVanillaAttributes = value; self:ApplyVanillaVisibility() end,
                 default = self.defaults.overlay.hideVanillaAttributes,
                 width = "full",
+            },
+            {
+                type = "dropdown",
+                name = GetString(EZO_HUD_OPTION_OVERLAY_LAYOUT),
+                tooltip = GetString(EZO_HUD_OPTION_OVERLAY_LAYOUT_TOOLTIP),
+                choices = layoutChoices,
+                choicesValues = { OVERLAY_LAYOUT_CLASSIC, OVERLAY_LAYOUT_RIGHT_STACK },
+                getFunc = function()
+                    return GetOverlayLayoutMode(self.sv.overlay)
+                end,
+                setFunc = function(value)
+                    self.sv.overlay.layoutMode = GetOverlayLayoutMode({ layoutMode = value })
+                    self:ApplyOverlayLayout()
+                end,
+                default = self.defaults.overlay.layoutMode,
+                width = "half",
             },
             {
                 type = "checkbox",

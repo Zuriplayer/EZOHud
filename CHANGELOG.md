@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.87 - Attribute Layout Selector
+
+- Added an Attribute HUD layout selector with a classic split layout and a right-aligned Health, Magicka, and Stamina stack.
+- Follows EZOCore's family preference storage policy for HUD settings, with one-time account-to-character migration when the default scope is per character.
+
 ## 0.1.86 - HUD Scene Blocking Hotfix
 
 - Restricted Custom Loot History and custom Synergy windows to HUD/HUD UI scenes so they do not cover native menu panels.

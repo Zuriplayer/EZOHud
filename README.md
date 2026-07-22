@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.86`
-- AddOnVersion: `10086`
+- Addon version: `0.1.87`
+- AddOnVersion: `10087`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -37,6 +37,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Attribute HUD for Health, Magicka, and Stamina.
 - Optional hiding of the default ESO player attribute bars.
 - Attribute HUD movement mode that lets the three resource bars move as a group.
+- Attribute HUD layout selector with the classic split model and a right-aligned vertical stack for Health, Magicka, and Stamina.
 - Resource bar width settings for Health, Magicka, and Stamina.
 - Resource color pickers constrained to each resource color family.
 - Per-resource warning thresholds that change only the resource numbers to an alarm color.
@@ -68,8 +69,10 @@ EZOhud follows the EZO-family settings style: every settings section uses a purp
 
 When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Execute, Crux, custom Synergy, and custom Loot History surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel. Native UI Tweaks are settings-driven only and are not shared layout-mode surfaces.
 
+With EZOCore active, EZOhud follows the EZO family preference storage policy: ordinary HUD settings use the selected account-wide or per-character scope. When the scope is per character, the first load copies existing account-wide EZOhud settings into that character profile. Without EZOCore, EZOhud keeps its historical account-wide storage.
+
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
-- Attribute HUD: enable custom bars, hide vanilla bars, enable HUD movement, out-of-combat alpha, and per-resource size, color, and warning threshold.
+- Attribute HUD: enable custom bars, hide vanilla bars, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
