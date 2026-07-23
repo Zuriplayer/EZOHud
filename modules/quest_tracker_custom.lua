@@ -261,6 +261,20 @@ local function HideCustomQuestTooltip()
     end
 end
 
+local function RaiseCustomQuestTooltip()
+    if not InformationTooltip then return end
+
+    if type(InformationTooltip.SetDrawLayer) == "function" and DL_OVERLAY then
+        InformationTooltip:SetDrawLayer(DL_OVERLAY)
+    end
+    if type(InformationTooltip.SetDrawTier) == "function" and DT_HIGH then
+        InformationTooltip:SetDrawTier(DT_HIGH)
+    end
+    if type(InformationTooltip.BringWindowToTop) == "function" then
+        InformationTooltip:BringWindowToTop()
+    end
+end
+
 local function GetQuestDisplayData(questIndex)
     if not questIndex or not IsValidQuestIndex or not IsValidQuestIndex(questIndex) then
         return nil
@@ -303,7 +317,7 @@ local function BuildCustomQuestTracker()
     root:SetClampedToScreen(true)
     root:SetMovable(false)
     root:SetMouseEnabled(false)
-    root:SetDrawLayer(DL_OVERLAY)
+    root:SetDrawLayer(DL_CONTROLS)
     root:SetDrawTier(DT_HIGH)
     root:SetHidden(true)
 
@@ -339,9 +353,9 @@ local function BuildCustomQuestTracker()
     hintOne:SetFont("ZoFontGameLarge")
     hintOne:SetColor(0.72, 0.72, 0.64, 0.92)
     hintOne:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    hintOne:SetVerticalAlignment(TEXT_ALIGN_TOP)
+    hintOne:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     hintOne:SetMouseEnabled(false)
-    SetLabelMaxLines(hintOne, HINT_LINES)
+    SetLabelMaxOneLine(hintOne)
 
     local hintTwo = WINDOW_MANAGER:CreateControl(CUSTOM_QUEST_TRACKER_NAME .. "_HintTwo", root, CT_LABEL)
     hintTwo:SetFont("ZoFontGameLarge")
@@ -422,9 +436,9 @@ function EZO_HUD:ApplyCustomQuestTrackerLayout()
     self.customQuestTracker.objective:ClearAnchors()
     self.customQuestTracker.objective:SetAnchor(TOPLEFT, self.customQuestTracker.root, TOPLEFT, 0, 48)
 
-    self.customQuestTracker.hints[1]:SetDimensions(PANEL_WIDTH, 48)
+    self.customQuestTracker.hints[1]:SetDimensions(PANEL_WIDTH, 24)
     self.customQuestTracker.hints[1]:ClearAnchors()
-    self.customQuestTracker.hints[1]:SetAnchor(TOPRIGHT, self.customQuestTracker.objective, BOTTOMRIGHT, 0, 4)
+    self.customQuestTracker.hints[1]:SetAnchor(TOPRIGHT, self.customQuestTracker.objective, BOTTOMRIGHT, 0, 6)
 
     self.customQuestTracker.hints[2]:SetDimensions(PANEL_WIDTH, 24)
     self.customQuestTracker.hints[2]:ClearAnchors()
@@ -479,11 +493,12 @@ function EZO_HUD:ShowCustomQuestTooltip(anchorControl)
     local guiWidth = GuiRoot:GetWidth()
     local rootCenter = anchorControl:GetCenter()
     if rootCenter and guiWidth and rootCenter > (guiWidth / 2) then
-        InitializeTooltip(InformationTooltip, anchorControl, LEFT, -8, 0, RIGHT)
+        InitializeTooltip(InformationTooltip, anchorControl, LEFT, -12, 0, RIGHT)
     else
-        InitializeTooltip(InformationTooltip, anchorControl, RIGHT, 8, 0, LEFT)
+        InitializeTooltip(InformationTooltip, anchorControl, RIGHT, 12, 0, LEFT)
     end
     SetTooltipText(InformationTooltip, tooltipText)
+    RaiseCustomQuestTooltip()
 end
 
 local function SetHintLabel(label, text)
@@ -532,8 +547,8 @@ function EZO_HUD:RefreshCustomQuestTracker()
     self.customQuestTracker.objective:SetText(questData.objective)
 
     local showHints = settings.showHints == true and #questData.hints > 0
-    SetHintLabel(self.customQuestTracker.hints[1], showHints and table.concat(questData.hints, "\n") or nil)
-    SetHintLabel(self.customQuestTracker.hints[2], nil)
+    SetHintLabel(self.customQuestTracker.hints[1], showHints and questData.hints[1] or nil)
+    SetHintLabel(self.customQuestTracker.hints[2], showHints and questData.hints[2] or nil)
 
     self.customQuestTracker.root:SetHidden(false)
 end

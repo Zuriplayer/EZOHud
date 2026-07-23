@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.107 - Quest Tracker Tooltip Layering
+
+- Raised the Custom Quest Tracker hover tooltip above the custom tracker text so quest details remain readable when they overlap.
+- Split optional quest hints into separate right-aligned one-line labels so the hint block keeps native-style right alignment.
+
 ## 0.1.106 - Group Search Instance Label Cleanup
 
 - Changed Custom Group Search to show queued Activity Finder requests as `Selection` instead of presenting them as the final destination instance.
