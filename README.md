@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.104`
-- AddOnVersion: `10104`
+- Addon version: `0.1.105`
+- AddOnVersion: `10105`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -56,7 +56,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Experimental native widget positioning for center screen announcements and active combat tips with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls.
 - Custom Quest Tracker that can hide ESO's native focused quest tracker on the HUD and show a movable, scalable native-style panel with the focused quest, current objective, optional hints, ESO's native Cycle Focused Quest keybind display, and a full quest-detail tooltip on mouse hover.
 - Custom Synergy UI that hides ESO's native synergy prompt and uses an independent movable overlay.
-- Custom Group Search label that hides ESO's native on-screen Activity Finder status tracker, keeps a compact native-style category/status format, and adds smaller left-aligned destination and search-duration/role-acronym lines.
+- Custom Group Search label that hides ESO's native on-screen Activity Finder status tracker, keeps a compact native-style category/status format, and adds smaller left-aligned destination, search-duration, and role-composition lines.
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
 - Custom Loot History, custom Quest Tracker, custom Group Search, and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
@@ -82,7 +82,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Native UI Tweaks: apply custom positioning for ESO's native center screen announcements and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
 - Custom Quest Tracker: enable the custom focused-quest panel, allow movement, adjust scale, and choose whether optional hints are shown. The panel mirrors ESO's focused quest, shows a full quest-detail tooltip on mouse hover, and leaves keyboard/gamepad quest cycling on the native `ASSIST_NEXT_TRACKED_QUEST` binding.
 - Custom Synergy UI: enable the custom synergy prompt, allow movement, and adjust scale.
-- Custom Group Search: enable the custom Activity Finder status label, allow movement, and adjust scale. The label replaces only the small HUD status tracker, not the full finder window, and shows a left-aligned destination line plus a search-duration and `DD`/`T`/`H` role line below the native-style lines.
+- Custom Group Search: enable the custom Activity Finder status label, allow movement, and adjust scale. The label replaces only the small HUD status tracker, not the full finder window, and shows left-aligned destination, search-duration, and role-composition lines. For role-based dungeon searches it reports composition as `T 0/1 H 1/1 DD 1/2` so missing roles are visible.
 - Custom Loot History: enable the custom loot panel, allow movement, and adjust scale and the time loot remains visible before fading.
 - Debug: enable debug logging and optionally mirror debug output to chat.
 
@@ -107,7 +107,7 @@ Recommended beta checks:
 - Test normal HUD, HUD UI, menus, champion points, Tales of Tribute, and other non-HUD scenes.
 - Test native configuration panels such as Skills and Settings while Custom Loot History is enabled to confirm HUD-only panels do not block them.
 - Test Custom Quest Tracker with several tracked quests, `T` / Cycle Focused Quest on keyboard, and the matching gamepad button to confirm the custom panel follows the native focused quest without breaking cycling. Hover the custom panel in HUD UI to confirm the tooltip shows the title, level/repeatable metadata when available, quest text, and current tasks.
-- Test Custom Group Search while queued for a dungeon or other Activity Finder activity, during ready check, and after queue completion to confirm the native tracker hides, the native-style category/status text updates, the left-aligned destination and search-duration/role lines display, the label can be dragged in move mode, and it disappears outside HUD scenes.
+- Test Custom Group Search while queued for a dungeon or other Activity Finder activity, during ready check, and after queue completion to confirm the native tracker hides, the native-style category/status text updates, the left-aligned destination, search-duration, and role-composition lines display, role counts update when group members or roles change, the label can be dragged in move mode, and it disappears outside HUD scenes.
 - Test combat and out-of-combat alpha behavior.
 - Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
 - Test each ultimate display mode and active/inactive bar state.

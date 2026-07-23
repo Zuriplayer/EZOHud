@@ -160,7 +160,7 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Scales the custom synergy UI.",
 
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH = "Custom Group Search",
-    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Replaces ESO's native on-screen Activity Finder status tracker with a compact movable HUD label that keeps the native-style header/status and adds smaller destination and search-duration/role lines. It supports scaling and does not join, leave, accept, decline, or automate queue actions.",
+    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Replaces ESO's native on-screen Activity Finder status tracker with a compact movable HUD label that keeps the native-style header/status and adds smaller destination, search-duration, and role-composition lines. It supports scaling and does not join, leave, accept, decline, or automate queue actions.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE = "Enable custom group search label",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE_TOOLTIP = "Hides ESO's native Activity Finder status tracker and shows EZOhud's movable native-style label while queued, in an LFG group, or in ready check.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE = "Move Group Search",
@@ -171,7 +171,9 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS = "Queued",
     EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY = "Selected activity",
     EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT = "Destination: <<1>>",
-    EZO_HUD_CUSTOM_GROUP_SEARCH_META_FORMAT = "Search: <<1>> - <<2>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT = "Search: <<1>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_ROLE_FORMAT = "Role: <<1>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT = "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>",
 
     EZO_HUD_OPTION_CUSTOM_LOOT = "Custom Loot History",
     EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Replaces ESO's native loot history with a configurable custom panel with memory, scrolling, fade timing, and a bottom hover zone for reviewing recent loot.",

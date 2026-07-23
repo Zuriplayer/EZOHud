@@ -4,7 +4,7 @@ local EZO_HUD = EZOhud
 local CUSTOM_GROUP_SEARCH_NAME = "EZOhud_CustomGroupSearch"
 local NATIVE_HIDDEN_REASON = "EZOhud_CustomGroupSearch"
 local PANEL_WIDTH = 250
-local PANEL_HEIGHT = 96
+local PANEL_HEIGHT = 114
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -78,13 +78,15 @@ local function GetActivityCategoryName(activityId)
         return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE, "Group Search")
     end
 
-    if activityType == LFG_ACTIVITY_DUNGEON or activityType == LFG_ACTIVITY_MASTER_DUNGEON then
+    if (LFG_ACTIVITY_DUNGEON ~= nil and activityType == LFG_ACTIVITY_DUNGEON)
+        or (LFG_ACTIVITY_MASTER_DUNGEON ~= nil and activityType == LFG_ACTIVITY_MASTER_DUNGEON) then
         return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder")
-    elseif activityType == LFG_ACTIVITY_BATTLE_GROUND_CHAMPION
-        or activityType == LFG_ACTIVITY_BATTLE_GROUND_NON_CHAMPION
-        or activityType == LFG_ACTIVITY_BATTLE_GROUND_LOW_LEVEL then
+    elseif (LFG_ACTIVITY_BATTLE_GROUND_CHAMPION ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_CHAMPION)
+        or (LFG_ACTIVITY_BATTLE_GROUND_NON_CHAMPION ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_NON_CHAMPION)
+        or (LFG_ACTIVITY_BATTLE_GROUND_LOW_LEVEL ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_LOW_LEVEL) then
         return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS, "Battlegrounds")
-    elseif activityType == LFG_ACTIVITY_TRIBUTE_COMPETITIVE or activityType == LFG_ACTIVITY_TRIBUTE_CASUAL then
+    elseif (LFG_ACTIVITY_TRIBUTE_COMPETITIVE ~= nil and activityType == LFG_ACTIVITY_TRIBUTE_COMPETITIVE)
+        or (LFG_ACTIVITY_TRIBUTE_CASUAL ~= nil and activityType == LFG_ACTIVITY_TRIBUTE_CASUAL) then
         return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_TRIBUTE, "Tales of Tribute")
     end
 
@@ -111,15 +113,54 @@ end
 
 local function GetSelectedRoleAcronym()
     local role = SafeCall(GetSelectedLFGRole)
-    if role == LFG_ROLE_TANK then
+    if LFG_ROLE_TANK ~= nil and role == LFG_ROLE_TANK then
         return "T"
-    elseif role == LFG_ROLE_HEAL then
+    elseif LFG_ROLE_HEAL ~= nil and role == LFG_ROLE_HEAL then
         return "H"
-    elseif role == LFG_ROLE_DPS then
+    elseif LFG_ROLE_DPS ~= nil and role == LFG_ROLE_DPS then
         return "DD"
     end
 
     return "-"
+end
+
+local function AddRoleCount(counts, role)
+    if LFG_ROLE_TANK ~= nil and role == LFG_ROLE_TANK then
+        counts.tank = counts.tank + 1
+    elseif LFG_ROLE_HEAL ~= nil and role == LFG_ROLE_HEAL then
+        counts.heal = counts.heal + 1
+    elseif LFG_ROLE_DPS ~= nil and role == LFG_ROLE_DPS then
+        counts.dps = counts.dps + 1
+    end
+end
+
+local function IsRoleBasedActivity(activityId)
+    local activityType = activityId and SafeCall(GetActivityType, activityId) or nil
+    return (LFG_ACTIVITY_DUNGEON ~= nil and activityType == LFG_ACTIVITY_DUNGEON)
+        or (LFG_ACTIVITY_MASTER_DUNGEON ~= nil and activityType == LFG_ACTIVITY_MASTER_DUNGEON)
+end
+
+local function GetCurrentRoleCounts()
+    local counts = { tank = 0, heal = 0, dps = 0 }
+    local validRoles = 0
+    local groupSize = tonumber(SafeCall(GetGroupSize) or 0) or 0
+
+    if groupSize > 0 and type(GetGroupMemberSelectedRole) == "function" then
+        for index = 1, groupSize do
+            local role = SafeCall(GetGroupMemberSelectedRole, "group" .. tostring(index))
+            local before = counts.tank + counts.heal + counts.dps
+            AddRoleCount(counts, role)
+            if counts.tank + counts.heal + counts.dps > before then
+                validRoles = validRoles + 1
+            end
+        end
+    end
+
+    if validRoles < zo_max(groupSize, 1) then
+        AddRoleCount(counts, SafeCall(GetSelectedLFGRole))
+    end
+
+    return counts
 end
 
 local function FormatMilliseconds(milliseconds)
@@ -153,11 +194,30 @@ local function GetDestinationText(activityId)
     )
 end
 
-local function GetMetaText(status)
+local function GetSearchTimeText(status)
     return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_META_FORMAT, "Search: <<1>> - <<2>>"),
-        GetSearchDurationText(status),
-        GetSelectedRoleAcronym()
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT, "Search: <<1>>"),
+        GetSearchDurationText(status)
+    )
+end
+
+local function GetRoleStatusText(activityId)
+    if not IsRoleBasedActivity(activityId) then
+        return zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLE_FORMAT, "Role: <<1>>"),
+            GetSelectedRoleAcronym()
+        )
+    end
+
+    local counts = GetCurrentRoleCounts()
+    return zo_strformat(
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT, "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+        zo_min(counts.tank, 1),
+        1,
+        zo_min(counts.heal, 1),
+        1,
+        zo_min(counts.dps, 2),
+        2
     )
 end
 
@@ -236,17 +296,30 @@ local function BuildCustomGroupSearchPanel()
         destination:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
     end
 
-    local meta = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Meta", root, CT_LABEL)
-    meta:SetFont("ZoFontGameSmall")
-    meta:SetColor(0.82, 0.82, 0.74, 1)
-    meta:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
-    meta:SetVerticalAlignment(TEXT_ALIGN_CENTER)
-    meta:SetMouseEnabled(false)
-    if type(meta.SetMaxLineCount) == "function" then
-        meta:SetMaxLineCount(1)
+    local time = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Time", root, CT_LABEL)
+    time:SetFont("ZoFontGameSmall")
+    time:SetColor(0.82, 0.82, 0.74, 1)
+    time:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+    time:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    time:SetMouseEnabled(false)
+    if type(time.SetMaxLineCount) == "function" then
+        time:SetMaxLineCount(1)
     end
-    if type(meta.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
-        meta:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+    if type(time.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
+        time:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
+    end
+
+    local roles = WINDOW_MANAGER:CreateControl(CUSTOM_GROUP_SEARCH_NAME .. "_Roles", root, CT_LABEL)
+    roles:SetFont("ZoFontGameSmall")
+    roles:SetColor(0.82, 0.82, 0.74, 1)
+    roles:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+    roles:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    roles:SetMouseEnabled(false)
+    if type(roles.SetMaxLineCount) == "function" then
+        roles:SetMaxLineCount(1)
+    end
+    if type(roles.SetWrapMode) == "function" and TEXT_WRAP_MODE_ELLIPSIS then
+        roles:SetWrapMode(TEXT_WRAP_MODE_ELLIPSIS)
     end
 
     root:SetHandler("OnMouseDown", function(control, button)
@@ -282,7 +355,8 @@ local function BuildCustomGroupSearchPanel()
         title = title,
         status = status,
         destination = destination,
-        meta = meta,
+        time = time,
+        roles = roles,
     }
 end
 
@@ -312,9 +386,13 @@ function EZO_HUD:ApplyCustomGroupSearchLayout()
     self.customGroupSearch.destination:ClearAnchors()
     self.customGroupSearch.destination:SetAnchor(TOPLEFT, self.customGroupSearch.status, BOTTOMLEFT, 0, -2)
 
-    self.customGroupSearch.meta:SetDimensions(PANEL_WIDTH, 18)
-    self.customGroupSearch.meta:ClearAnchors()
-    self.customGroupSearch.meta:SetAnchor(TOPLEFT, self.customGroupSearch.destination, BOTTOMLEFT, 0, -2)
+    self.customGroupSearch.time:SetDimensions(PANEL_WIDTH, 18)
+    self.customGroupSearch.time:ClearAnchors()
+    self.customGroupSearch.time:SetAnchor(TOPLEFT, self.customGroupSearch.destination, BOTTOMLEFT, 0, -2)
+
+    self.customGroupSearch.roles:SetDimensions(PANEL_WIDTH, 18)
+    self.customGroupSearch.roles:ClearAnchors()
+    self.customGroupSearch.roles:SetAnchor(TOPLEFT, self.customGroupSearch.time, BOTTOMLEFT, 0, -2)
 
     self:RefreshCustomGroupSearchMovementState()
 end
@@ -374,10 +452,13 @@ function EZO_HUD:RefreshCustomGroupSearch()
             GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT, "Destination: <<1>>"),
             GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
         ))
-        self.customGroupSearch.meta:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_META_FORMAT, "Search: <<1>> - <<2>>"),
-            "0:00",
-            "DD"
+        self.customGroupSearch.time:SetText(zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT, "Search: <<1>>"),
+            "0:00"
+        ))
+        self.customGroupSearch.roles:SetText(zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT, "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+            0, 1, 1, 1, 1, 2
         ))
         self.customGroupSearch.root:SetHidden(false)
         return
@@ -396,7 +477,8 @@ function EZO_HUD:RefreshCustomGroupSearch()
     self.customGroupSearch.title:SetText(title)
     self.customGroupSearch.status:SetText(statusText)
     self.customGroupSearch.destination:SetText(GetDestinationText(activityId))
-    self.customGroupSearch.meta:SetText(GetMetaText(status))
+    self.customGroupSearch.time:SetText(GetSearchTimeText(status))
+    self.customGroupSearch.roles:SetText(GetRoleStatusText(activityId))
     self.customGroupSearch.root:SetHidden(false)
 end
 
@@ -424,6 +506,21 @@ function EZO_HUD:InitializeCustomGroupSearch()
     end
     if EVENT_GROUPING_TOOLS_READY_CHECK_CANCELLED then
         EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUPING_TOOLS_READY_CHECK_CANCELLED, refresh)
+    end
+    if EVENT_GROUP_UPDATE then
+        EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUP_UPDATE, refresh)
+    end
+    if EVENT_GROUP_MEMBER_JOINED then
+        EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUP_MEMBER_JOINED, refresh)
+    end
+    if EVENT_GROUP_MEMBER_LEFT then
+        EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUP_MEMBER_LEFT, refresh)
+    end
+    if EVENT_GROUP_MEMBER_ROLE_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUP_MEMBER_ROLE_CHANGED, refresh)
+    end
+    if EVENT_GROUP_MEMBER_ROLES_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(self.ADDON_NAME .. "_CustomGroupSearch", EVENT_GROUP_MEMBER_ROLES_CHANGED, refresh)
     end
     if ZO_ACTIVITY_FINDER_ROOT_MANAGER and type(ZO_ACTIVITY_FINDER_ROOT_MANAGER.RegisterCallback) == "function" then
         ZO_ACTIVITY_FINDER_ROOT_MANAGER:RegisterCallback("OnActivityFinderStatusUpdate", refresh)

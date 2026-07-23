@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.105 - Group Search Role Composition
+
+- Changed Custom Group Search to show separate search-duration and role-composition lines instead of only the player's selected role.
+- Added role-count refreshes for group joins, leaves, updates, and role changes so dungeon queue composition can show missing `T`, `H`, or `DD` slots.
+
 ## 0.1.104 - Custom Quest Tracker Tooltip
 
 - Added a hover tooltip to the Custom Quest Tracker with focused quest title, level/repeatable metadata when available, long quest text, and current visible tasks.
