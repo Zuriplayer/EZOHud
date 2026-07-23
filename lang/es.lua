@@ -157,7 +157,7 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_CUSTOM_SYNERGY_SIZE_TOOLTIP = "Escala el tamaño del aviso personalizado.",
 
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH = "Búsqueda de Grupo Personalizada",
-    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Reemplaza el tracker nativo en pantalla del Buscador de actividades de ESO por una etiqueta compacta movible que mantiene cabecera/estado con estilo nativo y añade líneas menores de destino, duración de búsqueda y composición de roles. Permite ajustar la escala y no pone en cola, abandona, acepta, rechaza ni automatiza acciones del buscador.",
+    EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_HEADER_TOOLTIP = "Reemplaza el tracker nativo en pantalla del Buscador de actividades de ESO por una etiqueta compacta movible que mantiene cabecera/estado con estilo nativo y añade líneas menores de actividad seleccionada o instancia, duración de búsqueda y roles visibles del grupo. Permite ajustar la escala y no pone en cola, abandona, acepta, rechaza ni automatiza acciones del buscador.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE = "Activar etiqueta personalizada de búsqueda de grupo",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE_TOOLTIP = "Oculta el tracker nativo del Buscador de actividades de ESO y muestra la etiqueta movible con estilo nativo de EZOhud mientras estás en cola, en un grupo LFG o en ready check.",
     EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE = "Mover Búsqueda de Grupo",
@@ -167,10 +167,12 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE = "Búsqueda de Grupo",
     EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS = "En cola",
     EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY = "Actividad seleccionada",
-    EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT = "Destino: <<1>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT = "Selección: <<1>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_FORMAT = "Instancia: <<1>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_PENDING = "Instancia: pendiente",
     EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT = "Búsqueda: <<1>>",
     EZO_HUD_CUSTOM_GROUP_SEARCH_ROLE_FORMAT = "Rol: <<1>>",
-    EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT = "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>",
+    EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT = "Grupo: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>",
 
     EZO_HUD_OPTION_CUSTOM_LOOT = "Historial de Botín (Personalizado)",
     EZO_HUD_OPTION_CUSTOM_LOOT_HEADER_TOOLTIP = "Reemplaza el historial de botín nativo de ESO por un panel personalizado configurable con memoria, desplazamiento, tiempo de desvanecimiento y una zona inferior para revisar el botín reciente.",

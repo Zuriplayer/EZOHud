@@ -60,16 +60,61 @@ local function GetActivityStatus()
     return SafeCall(GetActivityFinderStatus)
 end
 
-local function GetTrackedActivityId()
-    if SafeCall(IsCurrentlySearchingForGroup) then
-        return SafeCall(GetActivityRequestIds, 1)
-    end
+local function IsValidActivityId(activityId)
+    activityId = tonumber(activityId)
+    return activityId ~= nil and activityId > 0
+end
 
-    if SafeCall(IsInLFGGroup) then
-        return SafeCall(GetCurrentLFGActivityId)
+local function GetQueuedActivityRequestId()
+    if SafeCall(IsCurrentlySearchingForGroup) then
+        local activityId = SafeCall(GetActivityRequestIds, 1)
+        if IsValidActivityId(activityId) then
+            return activityId
+        end
     end
 
     return nil
+end
+
+local function GetReadyCheckActivityId()
+    local activityId = SafeCall(_G.GetLFGReadyCheckActivityId)
+    if IsValidActivityId(activityId) then
+        return activityId
+    end
+
+    activityId = SafeCall(_G.GetLFGReadyCheckActivity)
+    if IsValidActivityId(activityId) then
+        return activityId
+    end
+
+    return nil
+end
+
+local function GetFinalActivityId(status)
+    if SafeCall(IsInLFGGroup) then
+        local activityId = SafeCall(GetCurrentLFGActivityId)
+        if IsValidActivityId(activityId) then
+            return activityId
+        end
+    end
+
+    if status == ACTIVITY_FINDER_STATUS_READY_CHECK then
+        return GetReadyCheckActivityId()
+    end
+
+    return nil
+end
+
+local function GetActivityContext(status)
+    local finalActivityId = GetFinalActivityId(status)
+    local requestActivityId = GetQueuedActivityRequestId()
+
+    return {
+        finalActivityId = finalActivityId,
+        requestActivityId = requestActivityId,
+        displayActivityId = finalActivityId or requestActivityId,
+        hasFinalInstance = IsValidActivityId(finalActivityId),
+    }
 end
 
 local function GetActivityCategoryName(activityId)
@@ -94,7 +139,7 @@ local function GetActivityCategoryName(activityId)
 end
 
 local function GetActivityDisplayName(activityId)
-    if activityId == nil or activityId == 0 then
+    if not IsValidActivityId(activityId) then
         return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
     end
 
@@ -187,11 +232,22 @@ local function GetSearchDurationText(status)
     return FormatMilliseconds(zo_max(0, GetFrameTimeMilliseconds() - searchStartTimeMs))
 end
 
-local function GetDestinationText(activityId)
-    return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT, "Destination: <<1>>"),
-        GetActivityDisplayName(activityId)
-    )
+local function GetDestinationText(context)
+    if context.hasFinalInstance then
+        return zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_FORMAT, "Instance: <<1>>"),
+            GetActivityDisplayName(context.finalActivityId)
+        )
+    end
+
+    if IsValidActivityId(context.requestActivityId) then
+        return zo_strformat(
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT, "Selection: <<1>>"),
+            GetActivityDisplayName(context.requestActivityId)
+        )
+    end
+
+    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_PENDING, "Instance: pending")
 end
 
 local function GetSearchTimeText(status)
@@ -211,7 +267,7 @@ local function GetRoleStatusText(activityId)
 
     local counts = GetCurrentRoleCounts()
     return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT, "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT, "Group: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
         zo_min(counts.tank, 1),
         1,
         zo_min(counts.heal, 1),
@@ -449,7 +505,7 @@ function EZO_HUD:RefreshCustomGroupSearch()
         self.customGroupSearch.title:SetText(GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder"))
         self.customGroupSearch.status:SetText(GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS, "Queued"))
         self.customGroupSearch.destination:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_DESTINATION_FORMAT, "Destination: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT, "Selection: <<1>>"),
             GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
         ))
         self.customGroupSearch.time:SetText(zo_strformat(
@@ -457,7 +513,7 @@ function EZO_HUD:RefreshCustomGroupSearch()
             "0:00"
         ))
         self.customGroupSearch.roles:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLES_FORMAT, "Roles: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT, "Group: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
             0, 1, 1, 1, 1, 2
         ))
         self.customGroupSearch.root:SetHidden(false)
@@ -470,13 +526,14 @@ function EZO_HUD:RefreshCustomGroupSearch()
     end
 
     local status = GetActivityStatus()
-    local activityId = GetTrackedActivityId()
+    local activityContext = GetActivityContext(status)
+    local activityId = activityContext.displayActivityId
     local title = GetActivityCategoryName(activityId)
     local statusText = status and GetString("SI_ACTIVITYFINDERSTATUS", status) or ""
 
     self.customGroupSearch.title:SetText(title)
     self.customGroupSearch.status:SetText(statusText)
-    self.customGroupSearch.destination:SetText(GetDestinationText(activityId))
+    self.customGroupSearch.destination:SetText(GetDestinationText(activityContext))
     self.customGroupSearch.time:SetText(GetSearchTimeText(status))
     self.customGroupSearch.roles:SetText(GetRoleStatusText(activityId))
     self.customGroupSearch.root:SetHidden(false)

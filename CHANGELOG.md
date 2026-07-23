@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.106 - Group Search Instance Label Cleanup
+
+- Changed Custom Group Search to show queued Activity Finder requests as `Selection` instead of presenting them as the final destination instance.
+- Added guarded final/current LFG activity detection so the panel only labels an activity as `Instance` when ESO exposes a concrete activity id, otherwise it leaves the instance pending.
+- Relabeled dungeon role counts as visible group composition because the addon can only count roles exposed through the current group and local LFG role API.
+
 ## 0.1.105 - Group Search Role Composition
 
 - Changed Custom Group Search to show separate search-duration and role-composition lines instead of only the player's selected role.
