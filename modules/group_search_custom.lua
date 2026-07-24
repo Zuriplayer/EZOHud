@@ -45,7 +45,7 @@ local function SafeCall(func, ...)
     return result1, result2, result3, result4, result5, result6
 end
 
-local function GetLocalizedString(id, fallback)
+local function GetLocalizedString(id, fallbackStringId)
     if id ~= nil then
         local value = GetString(id)
         if value ~= nil and value ~= "" then
@@ -53,7 +53,14 @@ local function GetLocalizedString(id, fallback)
         end
     end
 
-    return fallback or ""
+    if fallbackStringId ~= nil then
+        local value = GetString(fallbackStringId)
+        if value ~= nil and value ~= "" then
+            return value
+        end
+    end
+
+    return ""
 end
 
 local function GetActivityStatus()
@@ -120,27 +127,27 @@ end
 local function GetActivityCategoryName(activityId)
     local activityType = activityId and SafeCall(GetActivityType, activityId) or nil
     if activityType == nil then
-        return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE, "Group Search")
+        return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE)
     end
 
     if (LFG_ACTIVITY_DUNGEON ~= nil and activityType == LFG_ACTIVITY_DUNGEON)
         or (LFG_ACTIVITY_MASTER_DUNGEON ~= nil and activityType == LFG_ACTIVITY_MASTER_DUNGEON) then
-        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder")
+        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, EZO_HUD_CUSTOM_GROUP_SEARCH_CATEGORY_DUNGEON_FINDER)
     elseif (LFG_ACTIVITY_BATTLE_GROUND_CHAMPION ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_CHAMPION)
         or (LFG_ACTIVITY_BATTLE_GROUND_NON_CHAMPION ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_NON_CHAMPION)
         or (LFG_ACTIVITY_BATTLE_GROUND_LOW_LEVEL ~= nil and activityType == LFG_ACTIVITY_BATTLE_GROUND_LOW_LEVEL) then
-        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS, "Battlegrounds")
+        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_BATTLEGROUNDS, EZO_HUD_CUSTOM_GROUP_SEARCH_CATEGORY_BATTLEGROUNDS)
     elseif (LFG_ACTIVITY_TRIBUTE_COMPETITIVE ~= nil and activityType == LFG_ACTIVITY_TRIBUTE_COMPETITIVE)
         or (LFG_ACTIVITY_TRIBUTE_CASUAL ~= nil and activityType == LFG_ACTIVITY_TRIBUTE_CASUAL) then
-        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_TRIBUTE, "Tales of Tribute")
+        return GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_TRIBUTE, EZO_HUD_CUSTOM_GROUP_SEARCH_CATEGORY_TRIBUTE)
     end
 
-    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE, "Group Search")
+    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TITLE)
 end
 
 local function GetActivityDisplayName(activityId)
     if not IsValidActivityId(activityId) then
-        return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+        return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY)
     end
 
     local activityName = SafeCall(GetActivityName, activityId)
@@ -153,7 +160,7 @@ local function GetActivityDisplayName(activityId)
         return zo_strformat("<<C:1>>", activityName)
     end
 
-    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY)
 end
 
 local function GetSelectedRoleAcronym()
@@ -235,24 +242,24 @@ end
 local function GetDestinationText(context)
     if context.hasFinalInstance then
         return zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_FORMAT, "Instance: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_FORMAT),
             GetActivityDisplayName(context.finalActivityId)
         )
     end
 
     if IsValidActivityId(context.requestActivityId) then
         return zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT, "Selection: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT),
             GetActivityDisplayName(context.requestActivityId)
         )
     end
 
-    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_PENDING, "Instance: pending")
+    return GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_INSTANCE_PENDING)
 end
 
 local function GetSearchTimeText(status)
     return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT, "Search: <<1>>"),
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT),
         GetSearchDurationText(status)
     )
 end
@@ -260,14 +267,14 @@ end
 local function GetRoleStatusText(activityId)
     if not IsRoleBasedActivity(activityId) then
         return zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLE_FORMAT, "Role: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_ROLE_FORMAT),
             GetSelectedRoleAcronym()
         )
     end
 
     local counts = GetCurrentRoleCounts()
     return zo_strformat(
-        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT, "Group: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+        GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT),
         zo_min(counts.tank, 1),
         1,
         zo_min(counts.heal, 1),
@@ -502,18 +509,18 @@ function EZO_HUD:RefreshCustomGroupSearch()
     end
 
     if isMovable then
-        self.customGroupSearch.title:SetText(GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, "Dungeon Finder"))
-        self.customGroupSearch.status:SetText(GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS, "Queued"))
+        self.customGroupSearch.title:SetText(GetLocalizedString(SI_ACTIVITY_FINDER_CATEGORY_DUNGEON_FINDER, EZO_HUD_CUSTOM_GROUP_SEARCH_CATEGORY_DUNGEON_FINDER))
+        self.customGroupSearch.status:SetText(GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_PREVIEW_STATUS))
         self.customGroupSearch.destination:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT, "Selection: <<1>>"),
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY, "Selected activity")
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_SELECTION_FORMAT),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_UNKNOWN_ACTIVITY)
         ))
         self.customGroupSearch.time:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT, "Search: <<1>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_TIME_FORMAT),
             "0:00"
         ))
         self.customGroupSearch.roles:SetText(zo_strformat(
-            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT, "Group: T <<1>>/<<2>> H <<3>>/<<4>> DD <<5>>/<<6>>"),
+            GetLocalizedString(EZO_HUD_CUSTOM_GROUP_SEARCH_GROUP_ROLES_FORMAT),
             0, 1, 1, 1, 1, 2
         ))
         self.customGroupSearch.root:SetHidden(false)

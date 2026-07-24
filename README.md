@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.107`
-- AddOnVersion: `10107`
+- Addon version: `0.1.108`
+- AddOnVersion: `10108`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -60,7 +60,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
 - Custom Loot History, custom Quest Tracker, custom Group Search, and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
-- English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection.
+- English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection, including localized fallback labels for custom HUD text when ESO does not expose a native string.
 - Debug options in a dedicated settings section, with optional LibDebugLogger output and optional chat output.
 - Local `/ezohudcrux` debug command for focused Crux diagnostics.
 - Settings reset through the LibAddonMenu defaults mechanism.

@@ -787,8 +787,8 @@ function EZO_HUD:InitializeSettings()
                 tooltip = GetString(EZO_HUD_OPTION_LANGUAGE_TOOLTIP),
                 choices = {
                     GetString(EZO_HUD_OPTION_LANGUAGE_AUTO),
-                    "English",
-                    "Español",
+                    GetString(EZO_HUD_OPTION_LANGUAGE_ENGLISH),
+                    GetString(EZO_HUD_OPTION_LANGUAGE_SPANISH),
                 },
                 choicesValues = { "auto", "en", "es" },
                 getFunc = function()

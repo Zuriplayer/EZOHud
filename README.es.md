@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.107`
-- AddOnVersion: `10107`
+- Versión del addon: `0.1.108`
+- AddOnVersion: `10108`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -60,7 +60,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, revisión al pasar el ratón por la parte inferior, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
 - Las ventanas de Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada quedan restringidas a escenas HUD para que los paneles nativos de menú sigan siendo accesibles.
-- Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español.
+- Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español, incluidos textos de reserva localizados para el HUD personalizado cuando ESO no expone una cadena nativa.
 - Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
 - Comando local `/ezohudcrux` para diagnóstico puntual de Crux.
 - Restablecimiento de ajustes mediante el mecanismo de valores por defecto de LibAddonMenu.

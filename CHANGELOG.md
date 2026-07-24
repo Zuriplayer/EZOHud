@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.108 - Bilingual Text Fallbacks
+
+- Localized the language selector choices instead of hardcoding visible language labels in the settings panel.
+- Added English and Spanish fallback labels for Custom Group Search category text when ESO does not expose a native Activity Finder string.
+- Refreshed EZOFamilyTools announcement metadata for the current EZOhud version with bilingual EN/ES copy.
+
 ## 0.1.107 - Quest Tracker Tooltip Layering
 
 - Raised the Custom Quest Tracker hover tooltip above the custom tracker text so quest details remain readable when they overlap.
