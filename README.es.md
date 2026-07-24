@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.108`
-- AddOnVersion: `10108`
+- Versión del addon: `0.1.109`
+- AddOnVersion: `10109`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -54,7 +54,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
 - Posicionamiento experimental de elementos nativos como anuncios centrales y consejos de combate activos con controles para aplicar posición, mostrar un tirador cada vez, ajustar desplazamiento X/Y, escala y restablecer.
-- Tracker de Misiones Personalizado que puede ocultar el tracker nativo de misión enfocada de ESO en el HUD y mostrar un panel movible y escalable con estilo nativo, misión enfocada, objetivo actual, pistas opcionales alineadas a la derecha, el keybind nativo de cambiar misión y un tooltip con el detalle completo de la misión al pasar el ratón.
+- Tracker de Misiones Personalizado que puede ocultar el tracker nativo de misión enfocada de ESO en el HUD y mostrar un panel movible y escalable con estilo nativo, misión enfocada, objetivo actual, pistas opcionales alineadas a la derecha, ocultación opcional en combate, el keybind nativo de cambiar misión y un tooltip con el detalle completo de la misión al pasar el ratón.
 - Interfaz de Sinergia Personalizada que oculta el aviso de sinergia nativo de ESO y usa una capa movible independiente.
 - Etiqueta de Búsqueda de Grupo Personalizada que oculta el tracker nativo en pantalla del Buscador de actividades de ESO, mantiene categoría/estado compactos con estilo nativo y añade líneas menores alineadas a la izquierda para actividad seleccionada o instancia, duración de búsqueda y roles visibles del grupo.
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, revisión al pasar el ratón por la parte inferior, desplazamiento y tiempo de desvanecimiento ajustable.
@@ -80,7 +80,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
 - Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para anuncios centrales y consejos de combate activos nativos de ESO. Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
-- Tracker de Misiones Personalizado: activar el panel personalizado de misión enfocada, habilitar movimiento, ajustar escala y elegir si se muestran pistas opcionales. El panel refleja la misión enfocada de ESO, muestra las pistas como líneas separadas alineadas a la derecha, eleva el tooltip con el detalle completo de la misión por encima del tracker al pasar el ratón y deja el cambio de misión por teclado/mando en el binding nativo `ASSIST_NEXT_TRACKED_QUEST`.
+- Tracker de Misiones Personalizado: activar el panel personalizado de misión enfocada, elegir si se oculta en combate, habilitar movimiento, ajustar escala y elegir si se muestran pistas opcionales. El panel refleja la misión enfocada de ESO, muestra las pistas como líneas separadas alineadas a la derecha, eleva el tooltip con el detalle completo de la misión por encima del tracker al pasar el ratón y deja el cambio de misión por teclado/mando en el binding nativo `ASSIST_NEXT_TRACKED_QUEST`.
 - Sinergia Personalizada: activar el aviso de sinergia personalizado, habilitar movimiento y ajustar la escala.
 - Búsqueda de Grupo Personalizada: activar la etiqueta personalizada de estado del Buscador de actividades, habilitar movimiento y ajustar la escala. La etiqueta reemplaza solo el pequeño tracker de estado del HUD, no la ventana completa del buscador, y muestra líneas alineadas a la izquierda con actividad seleccionada o instancia actual, duración de búsqueda y roles visibles del grupo. Mientras estás en cola etiqueta la actividad solicitada como `Selección`; solo etiqueta una actividad final/actual como `Instancia` cuando ESO expone ese id de actividad LFG, y si no lo expone mantiene la instancia pendiente en vez de reutilizar una solicitud de cola potencialmente engañosa. En búsquedas de mazmorra con roles muestra la composición visible del grupo como `T 0/1 H 1/1 DD 1/2` para que se vea qué falta sin afirmar que conoce roles ocultos del matchmaking.
 - Historial de Botín Personalizado: activar el panel de botín, habilitar movimiento y ajustar la escala y el tiempo que los objetos permanecen visibles antes de desvanecerse.

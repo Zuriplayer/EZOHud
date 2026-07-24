@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.108"
-EZO_HUD.ADDON_VERSION_NUM = 10108
+EZO_HUD.ADDON_VERSION = "0.1.109"
+EZO_HUD.ADDON_VERSION_NUM = 10109
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -93,6 +93,7 @@ EZO_HUD.defaults = {
         offsetY = -210,
         scale = 1.0,
         showHints = true,
+        hideInCombat = false,
     },
     customSynergy = {
         enabled = false,

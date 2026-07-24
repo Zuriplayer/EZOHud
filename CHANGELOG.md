@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.109 - Quest Tracker Combat Visibility
+
+- Added a Custom Quest Tracker setting to hide the custom focused-quest panel while the player is in combat.
+- Kept movement mode able to show the panel temporarily so placement remains possible.
+
 ## 0.1.108 - Bilingual Text Fallbacks
 
 - Localized the language selector choices instead of hardcoding visible language labels in the settings panel.

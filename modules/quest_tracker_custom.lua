@@ -18,7 +18,10 @@ local function GetCustomQuestTrackerSettings()
             offsetY = EZO_HUD.defaults.customQuestTracker.offsetY,
             scale = EZO_HUD.defaults.customQuestTracker.scale,
             showHints = EZO_HUD.defaults.customQuestTracker.showHints,
+            hideInCombat = EZO_HUD.defaults.customQuestTracker.hideInCombat,
         }
+    elseif EZO_HUD.sv and EZO_HUD.sv.customQuestTracker.hideInCombat == nil then
+        EZO_HUD.sv.customQuestTracker.hideInCombat = EZO_HUD.defaults.customQuestTracker.hideInCombat
     end
     return (EZO_HUD.sv and EZO_HUD.sv.customQuestTracker) or EZO_HUD.defaults.customQuestTracker
 end
@@ -33,6 +36,10 @@ end
 
 local function IsStringPresent(value)
     return value ~= nil and value ~= ""
+end
+
+local function IsPlayerInCombat()
+    return IsUnitInCombat and IsUnitInCombat("player") == true
 end
 
 local function AddLine(lines, value, maxLines)
@@ -512,10 +519,13 @@ function EZO_HUD:RefreshCustomQuestTracker()
     local settings = GetCustomQuestTrackerSettings()
     local isHudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
     local isMovable = self:IsMoveModeEnabled("customQuestTracker")
+    local isHiddenByCombat = settings.hideInCombat == true and IsPlayerInCombat()
 
     SetNativeQuestTrackerHidden(settings.enabled == true)
 
-    if (not isHudVisible and not isMovable) or (not settings.enabled and not isMovable) then
+    if (not isHudVisible and not isMovable)
+        or (not settings.enabled and not isMovable)
+        or (isHiddenByCombat and not isMovable) then
         self.customQuestTracker.root:SetHidden(true)
         self.customQuestTracker.currentQuestIndex = nil
         HideCustomQuestTooltip()
@@ -578,6 +588,7 @@ function EZO_HUD:InitializeCustomQuestTracker()
         EVENT_QUEST_CONDITION_OVERRIDE_TEXT_CHANGED,
         EVENT_TRACKING_UPDATE,
         EVENT_GAMEPAD_PREFERRED_MODE_CHANGED,
+        EVENT_PLAYER_COMBAT_STATE,
     }
 
     for _, eventId in ipairs(events) do
@@ -616,6 +627,18 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 EZO_HUD:RefreshCustomQuestTracker()
             end,
             default = EZO_HUD.defaults.customQuestTracker.enabled,
+        },
+        {
+            type = "checkbox",
+            name = GetString(EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_HIDE_COMBAT),
+            tooltip = GetString(EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_HIDE_COMBAT_TOOLTIP),
+            getFunc = function() return settings.hideInCombat end,
+            setFunc = function(value)
+                settings.hideInCombat = value
+                EZO_HUD:RefreshCustomQuestTracker()
+            end,
+            disabled = function() return not settings.enabled end,
+            default = EZO_HUD.defaults.customQuestTracker.hideInCombat,
         },
         {
             type = "checkbox",

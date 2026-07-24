@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.108`
-- AddOnVersion: `10108`
+- Addon version: `0.1.109`
+- AddOnVersion: `10109`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -54,7 +54,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
 - Experimental native widget positioning for center screen announcements and active combat tips with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls.
-- Custom Quest Tracker that can hide ESO's native focused quest tracker on the HUD and show a movable, scalable native-style panel with the focused quest, current objective, right-aligned optional hints, ESO's native Cycle Focused Quest keybind display, and a full quest-detail tooltip on mouse hover.
+- Custom Quest Tracker that can hide ESO's native focused quest tracker on the HUD and show a movable, scalable native-style panel with the focused quest, current objective, right-aligned optional hints, optional combat hiding, ESO's native Cycle Focused Quest keybind display, and a full quest-detail tooltip on mouse hover.
 - Custom Synergy UI that hides ESO's native synergy prompt and uses an independent movable overlay.
 - Custom Group Search label that hides ESO's native on-screen Activity Finder status tracker, keeps a compact native-style category/status format, and adds smaller left-aligned selected-activity or instance, search-duration, and visible group-role lines.
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
@@ -80,7 +80,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
 - Native UI Tweaks: apply custom positioning for ESO's native center screen announcements and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
-- Custom Quest Tracker: enable the custom focused-quest panel, allow movement, adjust scale, and choose whether optional hints are shown. The panel mirrors ESO's focused quest, shows hints as separate right-aligned lines, raises the full quest-detail tooltip above the tracker on mouse hover, and leaves keyboard/gamepad quest cycling on the native `ASSIST_NEXT_TRACKED_QUEST` binding.
+- Custom Quest Tracker: enable the custom focused-quest panel, choose whether it hides in combat, allow movement, adjust scale, and choose whether optional hints are shown. The panel mirrors ESO's focused quest, shows hints as separate right-aligned lines, raises the full quest-detail tooltip above the tracker on mouse hover, and leaves keyboard/gamepad quest cycling on the native `ASSIST_NEXT_TRACKED_QUEST` binding.
 - Custom Synergy UI: enable the custom synergy prompt, allow movement, and adjust scale.
 - Custom Group Search: enable the custom Activity Finder status label, allow movement, and adjust scale. The label replaces only the small HUD status tracker, not the full finder window, and shows left-aligned selected-activity or current-instance, search-duration, and visible group-role lines. While queued it labels the requested activity as `Selection`; it labels a final/current activity as `Instance` only when ESO exposes that LFG activity id, otherwise it keeps the instance pending instead of reusing a potentially misleading queue request. For role-based dungeon searches it reports visible group composition as `T 0/1 H 1/1 DD 1/2` so missing roles are visible without claiming to know hidden matchmaking roles.
 - Custom Loot History: enable the custom loot panel, allow movement, and adjust scale and the time loot remains visible before fading.
