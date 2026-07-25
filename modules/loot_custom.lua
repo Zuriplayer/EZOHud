@@ -164,6 +164,13 @@ function EZO_HUD:RefreshCustomLootVisibility()
     self.customLoot.root:SetHidden(not shouldShow)
     self.customLoot.root:SetMouseEnabled(shouldShow and (isMovable or self.customLoot.root.isHovered == true))
     self.customLoot.interactionHotspot:SetMouseEnabled(shouldShow and settings.enabled == true and not isMovable)
+
+    if KEYBOARD_LOOT_HISTORY_FRAGMENT then
+        KEYBOARD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", settings.enabled == true)
+    end
+    if GAMEPAD_LOOT_HISTORY_FRAGMENT then
+        GAMEPAD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", settings.enabled == true)
+    end
 end
 
 function EZO_HUD:ApplyCustomLootLayout()
@@ -247,17 +254,7 @@ function EZO_HUD:InitializeCustomLoot()
 
     local settings = GetCustomLootSettings()
 
-    -- Ensure native panels are invisible if our custom one is enabled
-    -- by hiding their scene fragments natively. This prevents any animations
-    -- or scene changes from unhiding them.
-    if settings.enabled then
-        if KEYBOARD_LOOT_HISTORY_FRAGMENT then
-            KEYBOARD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", true)
-        end
-        if GAMEPAD_LOOT_HISTORY_FRAGMENT then
-            GAMEPAD_LOOT_HISTORY_FRAGMENT:SetHiddenForReason("EZOHud_CustomLoot", true)
-        end
-    end
+    -- Initial native panel visibility will be set by ApplyCustomLootLayout -> RefreshCustomLootVisibility
 
     EVENT_MANAGER:RegisterForEvent("EZOhud_CustomLoot", EVENT_LOOT_RECEIVED, function(_eventCode, _receivedBy, itemName, quantity, _itemSound, lootType, lootedBySelf, _isPickpocketLoot, questItemIcon, itemId, _isStolen)
         if not GetCustomLootSettings().enabled then return end
@@ -334,7 +331,10 @@ function EZO_HUD:InitializeCustomLoot()
                 name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE),
                 tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP),
                 getFunc = function() return s.enabled end,
-                setFunc = function(v) s.enabled = v end,
+                setFunc = function(v) 
+                    s.enabled = v 
+                    EZO_HUD:RefreshCustomLootVisibility()
+                end,
                 default = EZO_HUD.defaults.customLoot.enabled,
             },
             {
