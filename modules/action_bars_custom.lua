@@ -19,6 +19,10 @@ local DISPLAY_MAIN = "main"
 local DISPLAY_BACKUP = "backup"
 local DISPLAY_BOTH = "both"
 local DISPLAY_ACTIVE = "active"
+local KEYBIND_MODE_OFF = "off"
+local KEYBIND_MODE_AUTO = "auto"
+local KEYBIND_MODE_KEYBOARD = "keyboard"
+local KEYBIND_MODE_GAMEPAD = "gamepad"
 local LAM_REFERENCE_PREFIX = "EZOhud_CustomActionBars_LAM_"
 local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "Display",
@@ -28,11 +32,14 @@ local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "IconSize",
     LAM_REFERENCE_PREFIX .. "Spacing",
     LAM_REFERENCE_PREFIX .. "ShowTimers",
+    LAM_REFERENCE_PREFIX .. "KeybindMode",
     LAM_REFERENCE_PREFIX .. "InactiveAlpha",
     LAM_REFERENCE_PREFIX .. "DimmedAlpha",
 }
 local TIMER_UPDATE_MS = 250
 local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
+local MAX_ICON_SIZE = 96
+local KEYBIND_LABEL_SCALE_PERCENT = 115
 
 local BAR_DEFS = {
     main = {
@@ -157,6 +164,16 @@ end
 
 local function GetOrientation(settings)
     return settings.orientation == LAYOUT_VERTICAL and LAYOUT_VERTICAL or LAYOUT_HORIZONTAL
+end
+
+local function GetKeybindMode(settings)
+    local mode = settings.keybindMode
+    if mode == KEYBIND_MODE_AUTO
+        or mode == KEYBIND_MODE_KEYBOARD
+        or mode == KEYBIND_MODE_GAMEPAD then
+        return mode
+    end
+    return KEYBIND_MODE_OFF
 end
 
 local function GetNativeActiveBarName()
@@ -309,6 +326,36 @@ local function GetActionSlotIcon(slotKey, hotbarCategory)
     return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE, hasAbility
 end
 
+local function GetUltimatePower()
+    if type(GetUnitPower) ~= "function" or COMBAT_MECHANIC_FLAGS_ULTIMATE == nil then return 0 end
+    return GetUnitPower("player", COMBAT_MECHANIC_FLAGS_ULTIMATE) or 0
+end
+
+local function GetUltimateSlotState(slotKey, hotbarCategory)
+    if slotKey ~= "ultimate"
+        or type(GetSlotBoundId) ~= "function"
+        or type(GetSlotAbilityCost) ~= "function"
+        or COMBAT_MECHANIC_FLAGS_ULTIMATE == nil then
+        return nil
+    end
+
+    local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
+    local boundId = GetSlotBoundId(slotIndex, hotbarCategory)
+    if boundId == nil or boundId == 0 then return nil end
+
+    local cost = GetSlotAbilityCost(slotIndex, COMBAT_MECHANIC_FLAGS_ULTIMATE, hotbarCategory) or 0
+    if cost <= 0 then
+        cost = GetSlotAbilityCost(slotIndex, COMBAT_MECHANIC_FLAGS_ULTIMATE) or 0
+    end
+
+    local current = GetUltimatePower()
+    return {
+        current = current,
+        cost = cost,
+        ready = cost > 0 and current >= cost,
+    }
+end
+
 local function ReadActionSlotEffect(slotIndex, hotbarCategory)
     local remainingMs = GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0
     if remainingMs <= MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS then return nil end
@@ -404,6 +451,91 @@ local function UpdateSlotTimer(slot, effect, visible, alpha)
     end
 end
 
+local function UpdateSlotUltimate(slot, ultimateState, visible, alpha)
+    if not (slot and slot.ultimateLabel) then return end
+    if not visible or ultimateState == nil or (ultimateState.cost or 0) <= 0 then
+        slot.ultimateLabel:SetHidden(true)
+        return
+    end
+
+    local labelAlpha = Clamp(alpha or 1, 0.25, 1.0)
+    slot.ultimateLabel:SetText(string.format("%d/%d", zo_floor(ultimateState.current or 0), zo_floor(ultimateState.cost or 0)))
+    slot.ultimateLabel:SetAlpha(labelAlpha)
+    slot.ultimateLabel:SetHidden(false)
+end
+
+local function GetSlotKeybindActionNames(slotKey)
+    local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
+    if not slotIndex then return nil, nil end
+    return "ACTION_BUTTON_" .. tostring(slotIndex), "GAMEPAD_ACTION_BUTTON_" .. tostring(slotIndex)
+end
+
+local function RegisterSlotKeybindLabel(slot, slotKey, mode)
+    if not (slot and slot.keyLabel) then return end
+    if slot.keybindMode == mode then return end
+
+    if type(ZO_Keybindings_UnregisterLabelForBindingUpdate) == "function" then
+        ZO_Keybindings_UnregisterLabelForBindingUpdate(slot.keyLabel)
+    end
+
+    slot.keybindMode = mode
+    slot.keyLabel:SetText("")
+    slot.keyLabel:SetHidden(true)
+
+    if mode == KEYBIND_MODE_OFF or slotKey == "weapon" then return end
+    if type(ZO_Keybindings_RegisterLabelForBindingUpdate) ~= "function" then return end
+
+    local keyboardAction, gamepadAction = GetSlotKeybindActionNames(slotKey)
+    if not keyboardAction then return end
+
+    local HIDE_UNBOUND = false
+    if mode == KEYBIND_MODE_KEYBOARD then
+        ZO_Keybindings_RegisterLabelForBindingUpdate(
+            slot.keyLabel,
+            keyboardAction,
+            HIDE_UNBOUND,
+            nil,
+            nil,
+            false,
+            nil,
+            KEYBIND_LABEL_SCALE_PERCENT
+        )
+    elseif mode == KEYBIND_MODE_GAMEPAD then
+        ZO_Keybindings_RegisterLabelForBindingUpdate(
+            slot.keyLabel,
+            keyboardAction,
+            HIDE_UNBOUND,
+            gamepadAction,
+            nil,
+            true,
+            nil,
+            KEYBIND_LABEL_SCALE_PERCENT
+        )
+    else
+        ZO_Keybindings_RegisterLabelForBindingUpdate(
+            slot.keyLabel,
+            keyboardAction,
+            HIDE_UNBOUND,
+            gamepadAction,
+            nil,
+            false,
+            nil,
+            KEYBIND_LABEL_SCALE_PERCENT
+        )
+    end
+end
+
+local function UpdateSlotKeybind(slot, slotKey, mode, visible, hasAbility, alpha)
+    RegisterSlotKeybindLabel(slot, slotKey, mode)
+    if not (slot and slot.keyLabel) then return end
+
+    local shouldShow = visible and hasAbility and mode ~= KEYBIND_MODE_OFF and slotKey ~= "weapon"
+    slot.keyLabel:SetHidden(not shouldShow)
+    if shouldShow then
+        slot.keyLabel:SetAlpha(Clamp(alpha or 1, 0.25, 1.0))
+    end
+end
+
 local function CreateSlot(parent, name)
     local root = WINDOW_MANAGER:CreateControl(name, parent, CT_CONTROL)
     root:SetMouseEnabled(false)
@@ -434,7 +566,7 @@ local function CreateSlot(parent, name)
     timerBar:SetHidden(true)
 
     local timerLabel = WINDOW_MANAGER:CreateControl(name .. "_TimerLabel", root, CT_LABEL)
-    timerLabel:SetFont("ZoFontGameSmall")
+    timerLabel:SetFont("ZoFontGameLargeBold")
     timerLabel:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
     timerLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
     timerLabel:SetColor(1, 0.86, 0.30, 1)
@@ -442,12 +574,28 @@ local function CreateSlot(parent, name)
     timerLabel:SetHidden(true)
 
     local stackLabel = WINDOW_MANAGER:CreateControl(name .. "_StackLabel", root, CT_LABEL)
-    stackLabel:SetFont("ZoFontGameSmall")
+    stackLabel:SetFont("ZoFontGameLargeBold")
     stackLabel:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
     stackLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
     stackLabel:SetColor(1, 1, 1, 1)
     stackLabel:SetMouseEnabled(false)
     stackLabel:SetHidden(true)
+
+    local ultimateLabel = WINDOW_MANAGER:CreateControl(name .. "_UltimateLabel", root, CT_LABEL)
+    ultimateLabel:SetFont("ZoFontGameLargeBold")
+    ultimateLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    ultimateLabel:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    ultimateLabel:SetColor(1, 0.86, 0.30, 1)
+    ultimateLabel:SetMouseEnabled(false)
+    ultimateLabel:SetHidden(true)
+
+    local keyLabel = WINDOW_MANAGER:CreateControl(name .. "_KeyLabel", root, CT_LABEL)
+    keyLabel:SetFont("ZoFontGameSmall")
+    keyLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    keyLabel:SetVerticalAlignment(TEXT_ALIGN_TOP)
+    keyLabel:SetColor(0.92, 0.92, 0.98, 0.95)
+    keyLabel:SetMouseEnabled(false)
+    keyLabel:SetHidden(true)
 
     return {
         root = root,
@@ -458,6 +606,8 @@ local function CreateSlot(parent, name)
         timerBar = timerBar,
         timerLabel = timerLabel,
         stackLabel = stackLabel,
+        ultimateLabel = ultimateLabel,
+        keyLabel = keyLabel,
     }
 end
 
@@ -520,7 +670,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     if not self.customActionBars then return end
 
     local settings = GetSettings()
-    local iconSize = Clamp(settings.iconSize, 28, 72)
+    local iconSize = Clamp(settings.iconSize, 28, MAX_ICON_SIZE)
     local spacing = Clamp(settings.spacing, 0, 16)
     local orientation = GetOrientation(settings)
     local count = #SLOT_ORDER
@@ -561,20 +711,31 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.border:SetAnchorFill(slot.root)
 
             slot.timerBg:ClearAnchors()
-            slot.timerBg:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 3, -3)
-            slot.timerBg:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -3, -3)
-            slot.timerBg:SetHeight(math.max(3, zo_floor(iconSize * 0.09)))
+            slot.timerBg:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 4, -4)
+            slot.timerBg:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -4, -4)
+            slot.timerBg:SetHeight(math.max(5, zo_floor(iconSize * 0.14)))
 
             slot.timerBar:ClearAnchors()
             slot.timerBar:SetAnchorFill(slot.timerBg)
 
             slot.timerLabel:ClearAnchors()
-            slot.timerLabel:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -4, -7)
-            slot.timerLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.45))
+            slot.timerLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
+            slot.timerLabel:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -5, -10)
+            slot.timerLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.52))
 
             slot.stackLabel:ClearAnchors()
-            slot.stackLabel:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 4, -7)
-            slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.45))
+            slot.stackLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
+            slot.stackLabel:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 5, -10)
+            slot.stackLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.52))
+
+            slot.ultimateLabel:ClearAnchors()
+            slot.ultimateLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
+            slot.ultimateLabel:SetAnchor(CENTER, slot.root, CENTER, 0, zo_floor(iconSize * 0.15))
+            slot.ultimateLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.46))
+
+            slot.keyLabel:ClearAnchors()
+            slot.keyLabel:SetAnchor(TOP, slot.root, TOP, 0, 2)
+            slot.keyLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.32))
         end
     end
 
@@ -590,6 +751,7 @@ function EZO_HUD:RefreshCustomActionBars()
     local inactiveAlpha = Clamp(settings.inactiveAlpha, 0.2, 1.0)
     local dimmedAlpha = Clamp(settings.dimmedAlpha, 0.05, 1.0)
     local showTimers = settings.showTimers == true
+    local keybindMode = GetKeybindMode(settings)
 
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
@@ -612,11 +774,18 @@ function EZO_HUD:RefreshCustomActionBars()
 
             local isDimmed = settings.dimSlots and settings.dimSlots[slotKey] == true
             local alpha = isDimmed and dimmedAlpha or barAlpha
+            local ultimateState = GetUltimateSlotState(slotKey, bar.hotbarCategory)
+            local iconAlpha = alpha
+            if slotKey == "ultimate" and ultimateState ~= nil and not ultimateState.ready then
+                iconAlpha = math.min(iconAlpha, 0.38)
+            end
             slot.icon:SetTexture(texture)
-            slot.icon:SetColor(1, 1, 1, hasAbility and alpha or 0.18)
+            slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
             local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha)
+            UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
+            UpdateSlotKeybind(slot, slotKey, keybindMode, shouldShow, hasAbility, alpha)
 
             if slotKey == "weapon" and isActive then
                 slot.border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
@@ -660,6 +829,16 @@ local function RegisterEvents()
     if EVENT_ACTION_SLOT_EFFECTS_CLEARED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_EFFECTS_CLEARED, refresh)
     end
+    if EVENT_POWER_UPDATE then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_POWER_UPDATE, function(_, unitTag, _, powerType)
+            if unitTag == "player" and powerType == COMBAT_MECHANIC_FLAGS_ULTIMATE then
+                refresh()
+            end
+        end)
+    end
+    if EVENT_ULTIMATE_ABILITY_COST_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ULTIMATE_ABILITY_COST_CHANGED, refresh)
+    end
     if EVENT_INVENTORY_SINGLE_SLOT_UPDATE then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, refresh)
         if REGISTER_FILTER_BAG_ID ~= nil and BAG_WORN ~= nil then
@@ -690,6 +869,15 @@ local function BuildOrientationChoices()
     return {
         GetString(EZO_HUD_CUSTOM_ACTION_BARS_ORIENTATION_HORIZONTAL),
         GetString(EZO_HUD_CUSTOM_ACTION_BARS_ORIENTATION_VERTICAL),
+    }
+end
+
+local function BuildKeybindModeChoices()
+    return {
+        GetString(EZO_HUD_CUSTOM_ACTION_BARS_KEYBIND_MODE_OFF),
+        GetString(EZO_HUD_CUSTOM_ACTION_BARS_KEYBIND_MODE_AUTO),
+        GetString(EZO_HUD_CUSTOM_ACTION_BARS_KEYBIND_MODE_KEYBOARD),
+        GetString(EZO_HUD_CUSTOM_ACTION_BARS_KEYBIND_MODE_GAMEPAD),
     }
 end
 
@@ -849,9 +1037,9 @@ function EZO_HUD:InitializeCustomActionBars()
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ICON_SIZE),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ICON_SIZE_TOOLTIP),
                     min = 28,
-                    max = 72,
+                    max = MAX_ICON_SIZE,
                     step = 2,
-                    getFunc = function() return settings.iconSize end,
+                    getFunc = function() return Clamp(settings.iconSize, 28, MAX_ICON_SIZE) end,
                     setFunc = function(value)
                         settings.iconSize = value
                         EZO_HUD:ApplyCustomActionBarsLayout()
@@ -889,6 +1077,27 @@ function EZO_HUD:InitializeCustomActionBars()
                     end,
                     disabled = function() return not settings.enabled end,
                     default = EZO_HUD.defaults.customActionBars.showTimers,
+                    width = "half",
+                },
+                {
+                    type = "dropdown",
+                    reference = LAM_REFERENCE_PREFIX .. "KeybindMode",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_KEYBIND_MODE),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_KEYBIND_MODE_TOOLTIP),
+                    choices = BuildKeybindModeChoices(),
+                    choicesValues = {
+                        KEYBIND_MODE_OFF,
+                        KEYBIND_MODE_AUTO,
+                        KEYBIND_MODE_KEYBOARD,
+                        KEYBIND_MODE_GAMEPAD,
+                    },
+                    getFunc = function() return GetKeybindMode(settings) end,
+                    setFunc = function(value)
+                        settings.keybindMode = GetKeybindMode({ keybindMode = value })
+                        EZO_HUD:RefreshCustomActionBars()
+                    end,
+                    disabled = function() return not settings.enabled end,
+                    default = EZO_HUD.defaults.customActionBars.keybindMode,
                     width = "half",
                 },
                 {

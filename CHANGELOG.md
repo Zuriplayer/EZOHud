@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.119 - Custom Action Bar Readability Controls
+
+- Raised the Custom Action Bars icon-size limit to 96 px and enlarged the timer text and bottom timer bar.
+- Added a Custom Action Bars key-label selector for off, automatic, keyboard, or gamepad native action-button labels.
+- Added current/cost ultimate text on the custom ultimate slot and dims that slot while the ultimate is not ready.
+
 ## 0.1.118 - Custom Action Bar Slot Active Detection
 
 - Added active-bar detection by comparing the current active action slots against the main and backup custom bars before falling back to ESO's native active hotbar and weapon-pair state.

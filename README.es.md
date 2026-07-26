@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.118`
-- AddOnVersion: `10118`
+- Versión del addon: `0.1.119`
+- AddOnVersion: `10119`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -49,7 +49,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Ajuste de tamaño del icono de ultimate, barra de progreso, valor actual de ultimate, coste, estado de lista y estado de barra activa.
 - Barras de Habilidades Personalizadas que muestran copias visuales movibles de las barras principal y secundaria sin ocultar la barra de habilidades nativa de ESO.
 - Modos de visualización de Barras de Habilidades Personalizadas: desactivadas, principal, secundaria, ambas o solo barra activa.
-- Barras de Habilidades Personalizadas horizontales o verticales con iconos genéricos por categoría de arma, temporizadores nativos opcionales de efectos de slot y acumulaciones, tamaño de iconos, separación, alpha de barra no activa, alpha de slot opacado y opciones globales guardadas para opacar arma, habilidades 1-5 y ultimate.
+- Barras de Habilidades Personalizadas horizontales o verticales con iconos genéricos por categoría de arma, temporizadores nativos opcionales de efectos de slot y acumulaciones, etiquetas nativas opcionales de tecla, tamaño de iconos hasta 96 px, separación, alpha de barra no activa, alpha de slot opacado, texto de poder/coste de ultimate con opacidad reducida si no está listo y opciones globales guardadas para opacar arma, habilidades 1-5 y ultimate.
 - HUD de execute que analiza las habilidades de execute equipadas en la barra activa y muestra un aviso cuando el objetivo actual está dentro del umbral detectado.
 - Umbrales de execute para habilidades conocidas, con detección adicional basada en el tooltip cuando está disponible.
 - Aviso de execute movible y ajuste de tamaño del aviso.
@@ -80,7 +80,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
-- Barras de Habilidades Personalizadas: activar copias visuales de las barras de habilidades, elegir barras visibles, definir orientación horizontal o vertical, mover principal y secundaria independientemente, ajustar tamaño/separación/alpha de iconos, activar temporizadores nativos de efectos de slot y acumulaciones, y elegir slots lógicos opacados globalmente.
+- Barras de Habilidades Personalizadas: activar copias visuales de las barras de habilidades, elegir barras visibles, definir orientación horizontal o vertical, mover principal y secundaria independientemente, ajustar tamaño/separación/alpha de iconos, activar temporizadores nativos de efectos de slot y acumulaciones, elegir etiquetas de tecla desactivadas/automáticas/teclado/mando y elegir slots lógicos opacados globalmente.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
 - Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para anuncios centrales y consejos de combate activos nativos de ESO. Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
@@ -97,7 +97,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - Los indicadores de execute, ultimate, barras de habilidades personalizadas, recursos y Crux son solo informativos.
 - Los ajustes de interfaz nativa solo reanclan y escalan los elementos nativos de ESO; no los reemplazan ni alteran su comportamiento principal.
 - El Tracker de Misiones Personalizado es solo informativo. Puede ocultar el tracker nativo de misión enfocada mientras está activado y mostrar detalles estilo diario en un tooltip al pasar el ratón, pero no añade atajos, abandona, comparte, selecciona, cambia ni automatiza acciones de misión; el keybind nativo de cambiar misión de ESO sigue siendo responsable de cambiar la misión enfocada.
-- Las Barras de Habilidades Personalizadas son solo informativas. No ocultan la barra de habilidades nativa de ESO, no lanzan habilidades, no cambian armas, no activan keybinds ni automatizan rotaciones. Los temporizadores de efectos y acumulaciones solo se muestran cuando ESO expone datos nativos de efecto para ese slot; los slots sin datos nativos de temporizador quedan en blanco.
+- Las Barras de Habilidades Personalizadas son solo informativas. No ocultan la barra de habilidades nativa de ESO, no lanzan habilidades, no cambian armas, no activan keybinds ni automatizan rotaciones. Los temporizadores de efectos y acumulaciones solo se muestran cuando ESO expone datos nativos de efecto para ese slot; los slots sin datos nativos de temporizador quedan en blanco. Las etiquetas de tecla son solo visuales y siguen los atajos actuales de ESO cuando están activadas.
 - La Búsqueda de Grupo Personalizada es solo informativa. Puede ocultar el tracker nativo en pantalla del Buscador de actividades mientras está activada, pero no pone en cola, abandona, acepta, rechaza ni automatiza acciones del buscador de grupo. Los detalles de instancia y roles quedan limitados a los datos del Buscador de actividades y roles de grupo que expone la API de interfaz de ESO.
 - Las superficies de Barras de Habilidades Personalizadas, Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada se ocultan fuera de las escenas HUD normales, y el Historial de Botín personalizado solo captura el mouse mientras su modo de movimiento está activo.
 - Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir; las posiciones guardadas del HUD permanecen.
@@ -116,7 +116,7 @@ Comprobaciones recomendadas para la beta:
 - Probar el comportamiento en combate y el alpha fuera de combate.
 - Probar que al activar el HUD de atributos de EZOhud se ocultan automáticamente las barras vanilla de ESO, y que el ajuste manual de barras vanilla sigue aplicándose después.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
-- Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas, solo activa, horizontal y vertical. Confirmar que los iconos de arma cambian al cambiar de arma, el resaltado de barra activa sigue los cambios de barra, los slots opacados se aplican a ambas barras, los temporizadores nativos y acumulaciones siguen los datos de efecto de slot de ESO, la barra nativa permanece visible y ambas barras personalizadas se pueden arrastrar de forma independiente.
+- Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas, solo activa, horizontal y vertical. Confirmar que los iconos de arma cambian al cambiar de arma, el resaltado de barra activa sigue los cambios de barra, los slots opacados se aplican a ambas barras, los temporizadores nativos y acumulaciones siguen los datos de efecto de slot de ESO, los modos de etiquetas muestran las teclas de teclado/mando esperadas, ultimate muestra actual/coste y se opaca antes de estar listo, la barra nativa permanece visible y ambas barras personalizadas se pueden arrastrar de forma independiente.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
 - Probar los modos de idioma compartido de EZOCore, Inglés, Español y Automático.
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.
