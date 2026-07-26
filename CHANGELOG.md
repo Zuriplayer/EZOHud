@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.112 - Custom Action Bars LAM Refresh
+
+- Refreshes dependent Custom Action Bars settings immediately after toggling `Enable custom action bars`, so display, movement, sizing, alpha, and dimmed-slot controls become available without `/reloadui`.
+
 ## 0.1.111 - Custom Action Bars Phase One
 
 - Added disabled-by-default Custom Action Bars that show movable visual copies of the main and backup ability bars without replacing ESO's native action bar.

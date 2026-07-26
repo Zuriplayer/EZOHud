@@ -11,6 +11,17 @@ local DISPLAY_MAIN = "main"
 local DISPLAY_BACKUP = "backup"
 local DISPLAY_BOTH = "both"
 local DISPLAY_ACTIVE = "active"
+local LAM_REFERENCE_PREFIX = "EZOhud_CustomActionBars_LAM_"
+local LAM_DEPENDENT_REFERENCES = {
+    LAM_REFERENCE_PREFIX .. "Display",
+    LAM_REFERENCE_PREFIX .. "Orientation",
+    LAM_REFERENCE_PREFIX .. "MoveMain",
+    LAM_REFERENCE_PREFIX .. "MoveBackup",
+    LAM_REFERENCE_PREFIX .. "IconSize",
+    LAM_REFERENCE_PREFIX .. "Spacing",
+    LAM_REFERENCE_PREFIX .. "InactiveAlpha",
+    LAM_REFERENCE_PREFIX .. "DimmedAlpha",
+}
 
 local BAR_DEFS = {
     main = {
@@ -360,6 +371,35 @@ local function BuildOrientationChoices()
     }
 end
 
+local function RefreshLamControl(reference)
+    local control = _G[reference]
+    if not control then return end
+
+    if control.UpdateValue then
+        control:UpdateValue(false)
+    end
+    if control.UpdateDisabled then
+        control:UpdateDisabled()
+    end
+end
+
+function EZO_HUD.RefreshCustomActionBarsLamControls()
+    local function refresh()
+        for _, reference in ipairs(LAM_DEPENDENT_REFERENCES) do
+            RefreshLamControl(reference)
+        end
+        for _, slotKey in ipairs(SLOT_ORDER) do
+            RefreshLamControl(LAM_REFERENCE_PREFIX .. "Dim_" .. slotKey)
+        end
+    end
+
+    if zo_callLater then
+        zo_callLater(refresh, 1)
+    else
+        refresh()
+    end
+end
+
 function EZO_HUD:InitializeCustomActionBars()
     if self.customActionBars then return end
 
@@ -415,11 +455,13 @@ function EZO_HUD:InitializeCustomActionBars()
                     setFunc = function(value)
                         settings.enabled = value == true
                         EZO_HUD:RefreshCustomActionBars()
+                        EZO_HUD.RefreshCustomActionBarsLamControls()
                     end,
                     default = EZO_HUD.defaults.customActionBars.enabled,
                 },
                 {
                     type = "dropdown",
+                    reference = LAM_REFERENCE_PREFIX .. "Display",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DISPLAY),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DISPLAY_TOOLTIP),
                     choices = BuildDisplayChoices(),
@@ -435,6 +477,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "dropdown",
+                    reference = LAM_REFERENCE_PREFIX .. "Orientation",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION_TOOLTIP),
                     choices = BuildOrientationChoices(),
@@ -450,6 +493,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "MoveMain",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN_TOOLTIP),
                     getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBarMain") end,
@@ -464,6 +508,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "MoveBackup",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP_TOOLTIP),
                     getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBarBackup") end,
@@ -478,6 +523,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "slider",
+                    reference = LAM_REFERENCE_PREFIX .. "IconSize",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ICON_SIZE),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ICON_SIZE_TOOLTIP),
                     min = 28,
@@ -494,6 +540,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "slider",
+                    reference = LAM_REFERENCE_PREFIX .. "Spacing",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_SPACING),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_SPACING_TOOLTIP),
                     min = 0,
@@ -510,6 +557,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "slider",
+                    reference = LAM_REFERENCE_PREFIX .. "InactiveAlpha",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_INACTIVE_ALPHA),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_INACTIVE_ALPHA_TOOLTIP),
                     min = 20,
@@ -526,6 +574,7 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "slider",
+                    reference = LAM_REFERENCE_PREFIX .. "DimmedAlpha",
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DIMMED_ALPHA),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DIMMED_ALPHA_TOOLTIP),
                     min = 5,
@@ -550,6 +599,7 @@ function EZO_HUD:InitializeCustomActionBars()
             for _, slotKey in ipairs(SLOT_ORDER) do
                 table.insert(options, {
                     type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "Dim_" .. slotKey,
                     name = GetString(_G["EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DIM_" .. string.upper(slotKey)]),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_DIM_SLOT_TOOLTIP),
                     getFunc = function() return settings.dimSlots and settings.dimSlots[slotKey] == true end,
