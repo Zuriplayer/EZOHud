@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.119`
-- AddOnVersion: `10119`
+- Addon version: `0.1.120`
+- AddOnVersion: `10120`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -49,7 +49,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Ultimate icon size setting, progress bar, current ultimate value, cost, readiness, and active-bar state.
 - Custom Action Bars that show movable visual copies of the main and backup ability bars without hiding ESO's native action bar.
 - Custom Action Bars display modes: off, main, backup, both, or active bar only.
-- Horizontal or vertical Custom Action Bars with generic weapon-category icons, optional native action-slot effect timers and stack counts, optional native key labels, icon size up to 96 px, spacing, inactive-bar alpha, dimmed-slot alpha, ultimate power/cost text with not-ready dimming, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
+- Horizontal or vertical Custom Action Bars with generic weapon-category icons, optional native action-slot effect timers and stack counts, scalable native key labels, configurable shared timer-bar color, icon size up to 96 px, spacing, inactive-bar alpha, dimmed-slot alpha, ultimate power/cost text with not-ready dimming, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
 - Execute HUD that scans slotted execute abilities on the active bar and shows an alert when the current target is inside the detected threshold.
 - Execute thresholds for known execute abilities, with additional tooltip-based threshold detection when available.
 - Movable execute alert and execute alert size setting.
@@ -80,7 +80,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
-- Custom Action Bars: enable visual copies of ability bars, choose visible bars, set horizontal or vertical orientation, move main and backup bars independently, adjust icon size/spacing/alpha, toggle native action-slot effect timers and stack counts, choose key labels off/auto/keyboard/gamepad, and choose globally dimmed logical slots.
+- Custom Action Bars: enable visual copies of ability bars, choose visible bars, set horizontal or vertical orientation, move main and backup bars independently, adjust icon size/spacing/alpha, toggle native action-slot effect timers and stack counts, choose the shared timer-bar color, choose key labels off/auto/keyboard/gamepad, and choose globally dimmed logical slots.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
 - Native UI Tweaks: apply custom positioning for ESO's native center screen announcements and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
@@ -116,7 +116,7 @@ Recommended beta checks:
 - Test combat and out-of-combat alpha behavior.
 - Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
 - Test each ultimate display mode and active/inactive bar state.
-- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm weapon icons update after weapon swap, active-bar highlighting follows bar swaps, dimmed slot choices apply to both bars, native action-slot timers and stack counts follow ESO's own slot effect data, key-label modes render the expected keyboard/gamepad labels, ultimate shows current/cost and dims before it is ready, the native action bar remains visible, and both custom bars can be dragged independently.
+- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm weapon icons update after weapon swap, active-bar highlighting follows bar swaps, dimmed slot choices apply to both bars, native action-slot timers and stack counts follow ESO's own slot effect data, the shared timer-bar color applies to all slots, key-label modes render the expected keyboard/gamepad labels and scale with icon size, ultimate shows current/cost and dims before it is ready, the native action bar remains visible, and both custom bars can be dragged independently across both axes.
 - Test execute alert behavior with known execute abilities on the active bar.
 - Test shared EZOCore, English, Spanish, and Automatic language modes.
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it.

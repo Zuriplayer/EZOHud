@@ -32,6 +32,7 @@ local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "IconSize",
     LAM_REFERENCE_PREFIX .. "Spacing",
     LAM_REFERENCE_PREFIX .. "ShowTimers",
+    LAM_REFERENCE_PREFIX .. "TimerBarColor",
     LAM_REFERENCE_PREFIX .. "KeybindMode",
     LAM_REFERENCE_PREFIX .. "InactiveAlpha",
     LAM_REFERENCE_PREFIX .. "DimmedAlpha",
@@ -39,7 +40,10 @@ local LAM_DEPENDENT_REFERENCES = {
 local TIMER_UPDATE_MS = 250
 local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
 local MAX_ICON_SIZE = 96
-local KEYBIND_LABEL_SCALE_PERCENT = 115
+local KEYBIND_BASE_ICON_SIZE = 42
+local KEYBIND_BASE_SCALE_PERCENT = 150
+local KEYBIND_MIN_SCALE_PERCENT = 120
+local KEYBIND_MAX_SCALE_PERCENT = 320
 
 local BAR_DEFS = {
     main = {
@@ -174,6 +178,20 @@ local function GetKeybindMode(settings)
         return mode
     end
     return KEYBIND_MODE_OFF
+end
+
+local function GetTimerBarColor(settings)
+    local defaultColor = EZO_HUD.defaults.customActionBars.timerBarColor
+    local color = type(settings.timerBarColor) == "table" and settings.timerBarColor or defaultColor
+    return Clamp(color.r ~= nil and color.r or defaultColor.r, 0, 1),
+        Clamp(color.g ~= nil and color.g or defaultColor.g, 0, 1),
+        Clamp(color.b ~= nil and color.b or defaultColor.b, 0, 1),
+        Clamp(color.a ~= nil and color.a or defaultColor.a, 0, 1)
+end
+
+local function GetKeybindScalePercent(iconSize)
+    iconSize = Clamp(iconSize, 28, MAX_ICON_SIZE)
+    return zo_floor(Clamp((iconSize / KEYBIND_BASE_ICON_SIZE) * KEYBIND_BASE_SCALE_PERCENT, KEYBIND_MIN_SCALE_PERCENT, KEYBIND_MAX_SCALE_PERCENT))
 end
 
 local function GetNativeActiveBarName()
@@ -470,15 +488,17 @@ local function GetSlotKeybindActionNames(slotKey)
     return "ACTION_BUTTON_" .. tostring(slotIndex), "GAMEPAD_ACTION_BUTTON_" .. tostring(slotIndex)
 end
 
-local function RegisterSlotKeybindLabel(slot, slotKey, mode)
+local function RegisterSlotKeybindLabel(slot, slotKey, mode, iconSize)
     if not (slot and slot.keyLabel) then return end
-    if slot.keybindMode == mode then return end
+    local scalePercent = GetKeybindScalePercent(iconSize)
+    if slot.keybindMode == mode and slot.keybindScalePercent == scalePercent then return end
 
     if type(ZO_Keybindings_UnregisterLabelForBindingUpdate) == "function" then
         ZO_Keybindings_UnregisterLabelForBindingUpdate(slot.keyLabel)
     end
 
     slot.keybindMode = mode
+    slot.keybindScalePercent = scalePercent
     slot.keyLabel:SetText("")
     slot.keyLabel:SetHidden(true)
 
@@ -498,7 +518,7 @@ local function RegisterSlotKeybindLabel(slot, slotKey, mode)
             nil,
             false,
             nil,
-            KEYBIND_LABEL_SCALE_PERCENT
+            scalePercent
         )
     elseif mode == KEYBIND_MODE_GAMEPAD then
         ZO_Keybindings_RegisterLabelForBindingUpdate(
@@ -509,7 +529,7 @@ local function RegisterSlotKeybindLabel(slot, slotKey, mode)
             nil,
             true,
             nil,
-            KEYBIND_LABEL_SCALE_PERCENT
+            scalePercent
         )
     else
         ZO_Keybindings_RegisterLabelForBindingUpdate(
@@ -520,13 +540,13 @@ local function RegisterSlotKeybindLabel(slot, slotKey, mode)
             nil,
             false,
             nil,
-            KEYBIND_LABEL_SCALE_PERCENT
+            scalePercent
         )
     end
 end
 
-local function UpdateSlotKeybind(slot, slotKey, mode, visible, hasAbility, alpha)
-    RegisterSlotKeybindLabel(slot, slotKey, mode)
+local function UpdateSlotKeybind(slot, slotKey, mode, iconSize, visible, hasAbility, alpha)
+    RegisterSlotKeybindLabel(slot, slotKey, mode, iconSize)
     if not (slot and slot.keyLabel) then return end
 
     local shouldShow = visible and hasAbility and mode ~= KEYBIND_MODE_OFF and slotKey ~= "weapon"
@@ -643,7 +663,7 @@ function EZO_HUD:RefreshCustomActionBarsMovementState()
             entry.root:StopMovingOrResizing()
             self.customActionBarsDragActive[barName] = false
         end
-        entry.root:SetMovable(false)
+        entry.root:SetMovable(movable and self.customActionBarsDragActive[barName] == true)
         entry.root:SetMouseEnabled(movable)
     end
 end
@@ -673,6 +693,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     local iconSize = Clamp(settings.iconSize, 28, MAX_ICON_SIZE)
     local spacing = Clamp(settings.spacing, 0, 16)
     local orientation = GetOrientation(settings)
+    local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
     local count = #SLOT_ORDER
     local width = orientation == LAYOUT_HORIZONTAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
     local height = orientation == LAYOUT_VERTICAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
@@ -717,6 +738,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
 
             slot.timerBar:ClearAnchors()
             slot.timerBar:SetAnchorFill(slot.timerBg)
+            slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
 
             slot.timerLabel:ClearAnchors()
             slot.timerLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
@@ -734,8 +756,9 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.ultimateLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.46))
 
             slot.keyLabel:ClearAnchors()
+            slot.keyLabel:SetFont(iconSize >= 72 and "ZoFontWinH4" or iconSize >= 54 and "ZoFontGameLargeBold" or "ZoFontGameBold")
             slot.keyLabel:SetAnchor(TOP, slot.root, TOP, 0, 2)
-            slot.keyLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.32))
+            slot.keyLabel:SetDimensions(iconSize - 4, zo_floor(iconSize * 0.42))
         end
     end
 
@@ -785,7 +808,7 @@ function EZO_HUD:RefreshCustomActionBars()
             local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha)
             UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
-            UpdateSlotKeybind(slot, slotKey, keybindMode, shouldShow, hasAbility, alpha)
+            UpdateSlotKeybind(slot, slotKey, keybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
 
             if slotKey == "weapon" and isActive then
                 slot.border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
@@ -1077,6 +1100,22 @@ function EZO_HUD:InitializeCustomActionBars()
                     end,
                     disabled = function() return not settings.enabled end,
                     default = EZO_HUD.defaults.customActionBars.showTimers,
+                    width = "half",
+                },
+                {
+                    type = "colorpicker",
+                    reference = LAM_REFERENCE_PREFIX .. "TimerBarColor",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_TIMER_BAR_COLOR),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_TIMER_BAR_COLOR_TOOLTIP),
+                    getFunc = function()
+                        return GetTimerBarColor(settings)
+                    end,
+                    setFunc = function(r, g, b, a)
+                        settings.timerBarColor = { r = r, g = g, b = b, a = a }
+                        EZO_HUD:ApplyCustomActionBarsLayout()
+                    end,
+                    disabled = function() return not settings.enabled end,
+                    default = EZO_HUD.defaults.customActionBars.timerBarColor,
                     width = "half",
                 },
                 {

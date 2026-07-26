@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.119"
-EZO_HUD.ADDON_VERSION_NUM = 10119
+EZO_HUD.ADDON_VERSION = "0.1.120"
+EZO_HUD.ADDON_VERSION_NUM = 10120
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -64,6 +64,7 @@ EZO_HUD.defaults = {
         iconSize = 42,
         spacing = 4,
         showTimers = true,
+        timerBarColor = { r = 0.95, g = 0.72, b = 0.22, a = 0.96 },
         keybindMode = "off",
         inactiveAlpha = 0.55,
         dimmedAlpha = 0.28,

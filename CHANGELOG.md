@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.120 - Custom Action Bar Movement and Timer Controls
+
+- Scaled Custom Action Bars key labels with the configured icon size and re-registered native key labels after icon-size changes.
+- Added a shared Custom Action Bars timer-bar color picker.
+- Fixed Custom Action Bars drag mode so timer refreshes no longer interrupt active dragging.
+
 ## 0.1.119 - Custom Action Bar Readability Controls
 
 - Raised the Custom Action Bars icon-size limit to 96 px and enlarged the timer text and bottom timer bar.
