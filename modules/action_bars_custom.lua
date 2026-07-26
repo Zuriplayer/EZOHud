@@ -11,6 +11,7 @@ local WEAPON_ICON_RESTORATION_STAFF = "EZOhud/media/weapons/weapon_restoration_s
 local WEAPON_ICON_SWORD_SHIELD = "EZOhud/media/weapons/weapon_sword_shield.dds"
 local WEAPON_ICON_BOW = "EZOhud/media/weapons/weapon_bow.dds"
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
+local QUICK_SLOT_NAME = "EZOhud_CustomActionBars_Quickslot"
 local SLOT_FIRST = 3
 local LAYOUT_HORIZONTAL = "horizontal"
 local LAYOUT_VERTICAL = "vertical"
@@ -26,9 +27,11 @@ local KEYBIND_MODE_GAMEPAD = "gamepad"
 local LAM_REFERENCE_PREFIX = "EZOhud_CustomActionBars_LAM_"
 local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "Display",
+    LAM_REFERENCE_PREFIX .. "HideNativeActionBar",
     LAM_REFERENCE_PREFIX .. "Orientation",
     LAM_REFERENCE_PREFIX .. "MoveMain",
     LAM_REFERENCE_PREFIX .. "MoveBackup",
+    LAM_REFERENCE_PREFIX .. "MoveQuickslot",
     LAM_REFERENCE_PREFIX .. "IconSize",
     LAM_REFERENCE_PREFIX .. "Spacing",
     LAM_REFERENCE_PREFIX .. "ShowTimers",
@@ -192,6 +195,45 @@ end
 local function GetKeybindScalePercent(iconSize)
     iconSize = Clamp(iconSize, 28, MAX_ICON_SIZE)
     return zo_floor(Clamp((iconSize / KEYBIND_BASE_ICON_SIZE) * KEYBIND_BASE_SCALE_PERCENT, KEYBIND_MIN_SCALE_PERCENT, KEYBIND_MAX_SCALE_PERCENT))
+end
+
+local function ShouldUseCustomActionBars(settings)
+    return settings.enabled == true and GetDisplayMode(settings) ~= DISPLAY_OFF
+end
+
+local function ShouldHideNativeActionBar(settings)
+    if not (settings.hideNativeActionBar == true and ShouldUseCustomActionBars(settings)) then
+        return false
+    end
+    return EZO_HUD.IsHudSceneVisible == nil or EZO_HUD:IsHudSceneVisible()
+end
+
+local function ShouldShowCustomQuickslot(settings)
+    if EZO_HUD:IsMoveModeEnabled("customActionBarQuickslot") then return true end
+    if EZO_HUD.IsHudSceneVisible and not EZO_HUD:IsHudSceneVisible() then return false end
+    return ShouldUseCustomActionBars(settings)
+end
+
+local function GetQuickslotState()
+    if type(GetCurrentQuickslot) ~= "function"
+        or type(GetSlotTexture) ~= "function"
+        or HOTBAR_CATEGORY_QUICKSLOT_WHEEL == nil then
+        return WHITE_TEXTURE, false, nil
+    end
+
+    local slotIndex = GetCurrentQuickslot()
+    local slotType = type(GetSlotType) == "function" and GetSlotType(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL) or nil
+    local hasAction = slotType ~= nil and slotType ~= ACTION_TYPE_NOTHING
+    local texture = GetSlotTexture(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
+    local count
+
+    if hasAction
+        and slotType == ACTION_TYPE_ITEM
+        and type(GetSlotItemCount) == "function" then
+        count = GetSlotItemCount(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
+    end
+
+    return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE, hasAction, count
 end
 
 local function GetNativeActiveBarName()
@@ -652,6 +694,45 @@ local function BuildActionBar(barName)
     }
 end
 
+local function BuildQuickslot()
+    local root = WINDOW_MANAGER:CreateTopLevelWindow(QUICK_SLOT_NAME)
+    root:SetClampedToScreen(true)
+    root:SetMovable(false)
+    root:SetMouseEnabled(false)
+    root:SetDrawLayer(DL_OVERLAY)
+    root:SetDrawTier(DT_HIGH)
+    root:SetHidden(true)
+
+    local bg = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Bg", root, CT_TEXTURE)
+    bg:SetTexture(WHITE_TEXTURE)
+    bg:SetColor(0.02, 0.025, 0.03, 0.82)
+    bg:SetMouseEnabled(false)
+
+    local icon = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Icon", root, CT_TEXTURE)
+    icon:SetMouseEnabled(false)
+
+    local border = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Border", root, CT_BACKDROP)
+    border:SetCenterColor(0, 0, 0, 0)
+    border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
+    border:SetMouseEnabled(false)
+
+    local countLabel = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Count", root, CT_LABEL)
+    countLabel:SetFont("ZoFontGameLargeBold")
+    countLabel:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+    countLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
+    countLabel:SetColor(1, 1, 1, 1)
+    countLabel:SetMouseEnabled(false)
+    countLabel:SetHidden(true)
+
+    return {
+        root = root,
+        bg = bg,
+        icon = icon,
+        border = border,
+        countLabel = countLabel,
+    }
+end
+
 function EZO_HUD:RefreshCustomActionBarsMovementState()
     if not self.customActionBars then return end
 
@@ -666,6 +747,19 @@ function EZO_HUD:RefreshCustomActionBarsMovementState()
         entry.root:SetMovable(movable and self.customActionBarsDragActive[barName] == true)
         entry.root:SetMouseEnabled(movable)
     end
+end
+
+function EZO_HUD:RefreshCustomQuickslotMovementState()
+    local quickslot = self.customActionBars and self.customActionBars.quickslot
+    if not quickslot then return end
+
+    local movable = self:IsMoveModeEnabled("customActionBarQuickslot")
+    if self.customActionBarsQuickslotDragActive and not movable then
+        quickslot.root:StopMovingOrResizing()
+        self.customActionBarsQuickslotDragActive = false
+    end
+    quickslot.root:SetMovable(movable and self.customActionBarsQuickslotDragActive == true)
+    quickslot.root:SetMouseEnabled(movable)
 end
 
 function EZO_HUD:SaveCustomActionBarPosition(barName)
@@ -684,6 +778,73 @@ function EZO_HUD:SaveCustomActionBarPosition(barName)
     settings[bar.offsetXKey] = zo_floor((left + (width / 2)) - (guiWidth / 2))
     settings[bar.offsetYKey] = zo_floor((top + (height / 2)) - (guiHeight / 2))
     self:ApplyCustomActionBarsLayout()
+end
+
+function EZO_HUD:SaveCustomQuickslotPosition()
+    local quickslot = self.customActionBars and self.customActionBars.quickslot
+    local settings = self.sv and self.sv.customActionBars
+    if not (quickslot and settings) then return end
+
+    local left = quickslot.root:GetLeft()
+    local top = quickslot.root:GetTop()
+    local width = quickslot.root:GetWidth()
+    local height = quickslot.root:GetHeight()
+    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+    if not (left and top and width and height) then return end
+
+    settings.quickslotOffsetX = zo_floor((left + (width / 2)) - (guiWidth / 2))
+    settings.quickslotOffsetY = zo_floor((top + (height / 2)) - (guiHeight / 2))
+    self:ApplyCustomQuickslotLayout()
+end
+
+function EZO_HUD:ApplyCustomActionBarsNativeVisibility()
+    local settings = GetSettings()
+    local actionBar = ZO_ActionBar1
+    if not (actionBar and actionBar.SetHidden) then return end
+
+    local hudVisible = EZO_HUD.IsHudSceneVisible == nil or EZO_HUD:IsHudSceneVisible()
+    if ShouldHideNativeActionBar(settings) then
+        self.customActionBarsNativeHidden = true
+        actionBar:SetHidden(true)
+    elseif self.customActionBarsNativeHidden
+        and hudVisible
+        and (settings.hideNativeActionBar ~= true or not ShouldUseCustomActionBars(settings)) then
+        actionBar:SetHidden(false)
+        self.customActionBarsNativeHidden = false
+    end
+end
+
+function EZO_HUD:ApplyCustomQuickslotLayout()
+    local quickslot = self.customActionBars and self.customActionBars.quickslot
+    if not quickslot then return end
+
+    local settings = GetSettings()
+    local iconSize = Clamp(settings.iconSize, 28, MAX_ICON_SIZE)
+    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+    local left = zo_floor((guiWidth / 2) + (settings.quickslotOffsetX or -210) - (iconSize / 2))
+    local top = zo_floor((guiHeight / 2) + (settings.quickslotOffsetY or 320) - (iconSize / 2))
+
+    quickslot.root:SetDimensions(iconSize, iconSize)
+    quickslot.root:ClearAnchors()
+    quickslot.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
+
+    quickslot.bg:ClearAnchors()
+    quickslot.bg:SetAnchorFill(quickslot.root)
+
+    quickslot.icon:ClearAnchors()
+    quickslot.icon:SetAnchor(CENTER, quickslot.root, CENTER, 0, 0)
+    quickslot.icon:SetDimensions(iconSize - 4, iconSize - 4)
+
+    quickslot.border:ClearAnchors()
+    quickslot.border:SetAnchorFill(quickslot.root)
+
+    quickslot.countLabel:ClearAnchors()
+    quickslot.countLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
+    quickslot.countLabel:SetAnchor(BOTTOMRIGHT, quickslot.root, BOTTOMRIGHT, -5, -5)
+    quickslot.countLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.45))
+
+    self:RefreshCustomQuickslotMovementState()
+    self:RefreshCustomQuickslot()
 end
 
 function EZO_HUD:ApplyCustomActionBarsLayout()
@@ -764,6 +925,35 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
 
     self:RefreshCustomActionBarsMovementState()
     self:RefreshCustomActionBars()
+    self:ApplyCustomQuickslotLayout()
+end
+
+function EZO_HUD:RefreshCustomQuickslot()
+    local quickslot = self.customActionBars and self.customActionBars.quickslot
+    if not quickslot then return end
+
+    local settings = GetSettings()
+    local shouldShow = ShouldShowCustomQuickslot(settings)
+    local texture, hasAction, count = GetQuickslotState()
+    local moving = self:IsMoveModeEnabled("customActionBarQuickslot")
+
+    quickslot.root:SetHidden(not shouldShow or (not hasAction and not moving))
+    quickslot.icon:SetTexture(texture)
+    quickslot.icon:SetColor(1, 1, 1, hasAction and 1 or 0.25)
+    quickslot.bg:SetAlpha(hasAction and 1 or 0.45)
+    quickslot.border:SetEdgeColor(0.90, 0.62, 1.0, hasAction and 0.95 or 0.45)
+
+    if count ~= nil and count >= 0 then
+        local formattedCount = type(ZO_AbbreviateAndLocalizeRadialMenuEntryCount) == "function"
+            and ZO_AbbreviateAndLocalizeRadialMenuEntryCount(count, false)
+            or tostring(count)
+        quickslot.countLabel:SetText(formattedCount)
+        quickslot.countLabel:SetHidden(false)
+    else
+        quickslot.countLabel:SetHidden(true)
+    end
+
+    self:RefreshCustomQuickslotMovementState()
 end
 
 function EZO_HUD:RefreshCustomActionBars()
@@ -787,6 +977,8 @@ function EZO_HUD:RefreshCustomActionBars()
 
         for _, slotKey in ipairs(SLOT_ORDER) do
             local slot = entry.slots[slotKey]
+            local hideInactiveWeapon = slotKey == "weapon" and not isActive
+            slot.root:SetHidden(hideInactiveWeapon)
             local texture
             local hasAbility = true
             if slotKey == "weapon" then
@@ -823,6 +1015,8 @@ function EZO_HUD:RefreshCustomActionBars()
     end
 
     self:RefreshCustomActionBarsMovementState()
+    self:RefreshCustomQuickslot()
+    self:ApplyCustomActionBarsNativeVisibility()
 end
 
 local function RegisterEvents()
@@ -842,6 +1036,12 @@ local function RegisterEvents()
     end
     if EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED, refresh)
+    end
+    if EVENT_HOTBAR_SLOT_UPDATED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_HOTBAR_SLOT_UPDATED, refresh)
+    end
+    if EVENT_ACTIVE_QUICKSLOT_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTIVE_QUICKSLOT_CHANGED, refresh)
     end
     if EVENT_ACTIVE_WEAPON_PAIR_CHANGED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTIVE_WEAPON_PAIR_CHANGED, refresh)
@@ -864,9 +1064,6 @@ local function RegisterEvents()
     end
     if EVENT_INVENTORY_SINGLE_SLOT_UPDATE then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, refresh)
-        if REGISTER_FILTER_BAG_ID ~= nil and BAG_WORN ~= nil then
-            EVENT_MANAGER:AddFilterForEvent(namespace, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, REGISTER_FILTER_BAG_ID, BAG_WORN)
-        end
     end
     if EVENT_MANAGER.RegisterForUpdate then
         EVENT_MANAGER:RegisterForUpdate(namespace .. "_Timers", TIMER_UPDATE_MS, function()
@@ -939,6 +1136,7 @@ function EZO_HUD:InitializeCustomActionBars()
     GetSettings()
     self.customActionBars = { bars = {} }
     self.customActionBarsDragActive = {}
+    self.customActionBarsQuickslotDragActive = false
 
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
@@ -969,6 +1167,32 @@ function EZO_HUD:InitializeCustomActionBars()
         self.customActionBars.bars[barName] = entry
     end
 
+    local quickslot = BuildQuickslot()
+    quickslot.root:SetHandler("OnMouseDown", function(control, button)
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBarQuickslot") then
+            self.customActionBarsQuickslotDragActive = true
+            control:SetMovable(true)
+            control:StartMoving()
+        end
+    end)
+    quickslot.root:SetHandler("OnMouseUp", function(control, button)
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBarQuickslot") then
+            control:StopMovingOrResizing()
+            self.customActionBarsQuickslotDragActive = false
+            control:SetMovable(false)
+            self:SaveCustomQuickslotPosition()
+        end
+    end)
+    quickslot.root:SetHandler("OnMoveStop", function()
+        self.customActionBarsQuickslotDragActive = false
+        quickslot.root:SetMovable(false)
+        self:SaveCustomQuickslotPosition()
+    end)
+    if self.RegisterHudSceneControl then
+        self:RegisterHudSceneControl(quickslot.root)
+    end
+    self.customActionBars.quickslot = quickslot
+
     self:ApplyCustomActionBarsLayout()
     RegisterEvents()
 
@@ -991,6 +1215,20 @@ function EZO_HUD:InitializeCustomActionBars()
                         EZO_HUD.RefreshCustomActionBarsLamControls()
                     end,
                     default = EZO_HUD.defaults.customActionBars.enabled,
+                },
+                {
+                    type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "HideNativeActionBar",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_NATIVE),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_NATIVE_TOOLTIP),
+                    getFunc = function() return settings.hideNativeActionBar == true end,
+                    setFunc = function(value)
+                        settings.hideNativeActionBar = value == true
+                        EZO_HUD:ApplyCustomActionBarsNativeVisibility()
+                    end,
+                    disabled = function() return not settings.enabled end,
+                    default = EZO_HUD.defaults.customActionBars.hideNativeActionBar,
+                    width = "half",
                 },
                 {
                     type = "dropdown",
@@ -1049,6 +1287,21 @@ function EZO_HUD:InitializeCustomActionBars()
                         EZO_HUD:SetMoveModeEnabled("customActionBarBackup", value)
                         EZO_HUD:RefreshCustomActionBarsMovementState()
                         EZO_HUD:RefreshCustomActionBars()
+                    end,
+                    disabled = function() return not settings.enabled end,
+                    default = false,
+                    width = "half",
+                },
+                {
+                    type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "MoveQuickslot",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT_TOOLTIP),
+                    getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBarQuickslot") end,
+                    setFunc = function(value)
+                        EZO_HUD:SetMoveModeEnabled("customActionBarQuickslot", value)
+                        EZO_HUD:RefreshCustomQuickslotMovementState()
+                        EZO_HUD:RefreshCustomQuickslot()
                     end,
                     disabled = function() return not settings.enabled end,
                     default = false,

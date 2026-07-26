@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.121 - Custom Action Bar Native Toggle and Quickslot
+
+- Added a Custom Action Bars option to hide ESO's native action bar while the custom bars are enabled and visible.
+- Added an independent movable active quickslot icon that scales with the Custom Action Bars icon size and shows item counts when ESO exposes them.
+- Hid the inactive custom weapon icon while preserving the active weapon icon and its purple active-frame treatment.
+
 ## 0.1.120 - Custom Action Bar Movement and Timer Controls
 
 - Scaled Custom Action Bars key labels with the configured icon size and re-registered native key labels after icon-size changes.

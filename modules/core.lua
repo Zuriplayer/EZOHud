@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBarMain", "customActionBarBackup", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBarMain", "customActionBarBackup", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.120"
-EZO_HUD.ADDON_VERSION_NUM = 10120
+EZO_HUD.ADDON_VERSION = "0.1.121"
+EZO_HUD.ADDON_VERSION_NUM = 10121
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -60,6 +60,7 @@ EZO_HUD.defaults = {
     customActionBars = {
         enabled = false,
         displayMode = "both",
+        hideNativeActionBar = false,
         orientation = "horizontal",
         iconSize = 42,
         spacing = 4,
@@ -72,6 +73,8 @@ EZO_HUD.defaults = {
         mainOffsetY = 320,
         backupOffsetX = 0,
         backupOffsetY = 370,
+        quickslotOffsetX = -210,
+        quickslotOffsetY = 320,
         dimSlots = {
             weapon = false,
             slot1 = false,
@@ -314,6 +317,10 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
         and self.RefreshCustomActionBarsMovementState then
         self:RefreshCustomActionBarsMovementState()
         self:RefreshCustomActionBars()
+    elseif sectionName == "customActionBarQuickslot"
+        and self.RefreshCustomQuickslotMovementState then
+        self:RefreshCustomQuickslotMovementState()
+        self:RefreshCustomQuickslot()
     elseif sectionName == "execute" then
         self:RefreshExecuteMovementState()
         self:RefreshExecute()
@@ -359,6 +366,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.ultimate", section = "ultimate", order = 20, name = EZO_HUD_OPTION_ULTIMATE_MOVE, tooltip = EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP },
         { id = "ezohud.customActionBarMain", section = "customActionBarMain", order = 25, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN_TOOLTIP },
         { id = "ezohud.customActionBarBackup", section = "customActionBarBackup", order = 26, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP_TOOLTIP },
+        { id = "ezohud.customActionBarQuickslot", section = "customActionBarQuickslot", order = 27, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT_TOOLTIP },
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
         { id = "ezohud.customQuestTracker", section = "customQuestTracker", order = 50, name = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE_TOOLTIP },
@@ -425,6 +433,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveCustomActionBarPosition("main")
     elseif sectionName == "customActionBarBackup" and self.SaveCustomActionBarPosition then
         self:SaveCustomActionBarPosition("backup")
+    elseif sectionName == "customActionBarQuickslot" and self.SaveCustomQuickslotPosition then
+        self:SaveCustomQuickslotPosition()
     elseif sectionName == "execute" and self.SaveExecutePosition then
         self:SaveExecutePosition()
     elseif sectionName == "crux" and self.SaveCruxPosition then

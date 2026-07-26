@@ -58,6 +58,9 @@ function EZO_HUD:RefreshHudContextVisibility()
     if self.RefreshUltimateVisibility then
         self:RefreshUltimateVisibility()
     end
+    if self.RefreshCustomActionBars then
+        self:RefreshCustomActionBars()
+    end
     if self.RefreshExecute then
         self:RefreshExecute()
     end
