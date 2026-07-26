@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.110 - Custom Loot Visibility Refresh
+
+- Reapplies native loot-history hiding from the Custom Loot visibility refresh path so LAM toggles and scene changes keep native loot panels in sync.
+- Synchronized version metadata that was partially updated in the initial 0.1.110 commit.
+
 ## 0.1.109 - Quest Tracker Combat Visibility
 
 - Added a Custom Quest Tracker setting to hide the custom focused-quest panel while the player is in combat.

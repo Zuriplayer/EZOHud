@@ -252,8 +252,6 @@ function EZO_HUD:InitializeCustomLoot()
         self:RegisterHudSceneControl(self.customLoot.root)
     end
 
-    local settings = GetCustomLootSettings()
-
     -- Initial native panel visibility will be set by ApplyCustomLootLayout -> RefreshCustomLootVisibility
 
     EVENT_MANAGER:RegisterForEvent("EZOhud_CustomLoot", EVENT_LOOT_RECEIVED, function(_eventCode, _receivedBy, itemName, quantity, _itemSound, lootType, lootedBySelf, _isPickpocketLoot, questItemIcon, itemId, _isStolen)
@@ -331,8 +329,8 @@ function EZO_HUD:InitializeCustomLoot()
                 name = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE),
                 tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP),
                 getFunc = function() return s.enabled end,
-                setFunc = function(v) 
-                    s.enabled = v 
+                setFunc = function(v)
+                    s.enabled = v
                     EZO_HUD:RefreshCustomLootVisibility()
                 end,
                 default = EZO_HUD.defaults.customLoot.enabled,
