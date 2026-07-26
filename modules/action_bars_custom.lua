@@ -12,8 +12,8 @@ local WEAPON_ICON_SWORD_SHIELD = "EZOhud/media/weapons/weapon_sword_shield.dds"
 local WEAPON_ICON_BOW = "EZOhud/media/weapons/weapon_bow.dds"
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
 local SLOT_FIRST = 3
-local ORIENTATION_HORIZONTAL = "horizontal"
-local ORIENTATION_VERTICAL = "vertical"
+local LAYOUT_HORIZONTAL = "horizontal"
+local LAYOUT_VERTICAL = "vertical"
 local DISPLAY_OFF = "off"
 local DISPLAY_MAIN = "main"
 local DISPLAY_BACKUP = "backup"
@@ -153,7 +153,7 @@ local function GetDisplayMode(settings)
 end
 
 local function GetOrientation(settings)
-    return settings.orientation == ORIENTATION_VERTICAL and ORIENTATION_VERTICAL or ORIENTATION_HORIZONTAL
+    return settings.orientation == LAYOUT_VERTICAL and LAYOUT_VERTICAL or LAYOUT_HORIZONTAL
 end
 
 local function IsActiveBar(barName)
@@ -467,8 +467,8 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     local spacing = Clamp(settings.spacing, 0, 16)
     local orientation = GetOrientation(settings)
     local count = #SLOT_ORDER
-    local width = orientation == ORIENTATION_HORIZONTAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
-    local height = orientation == ORIENTATION_VERTICAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
+    local width = orientation == LAYOUT_HORIZONTAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
+    local height = orientation == LAYOUT_VERTICAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
 
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
@@ -486,7 +486,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             local offset = (index - 1) * (iconSize + spacing)
             slot.root:SetDimensions(iconSize, iconSize)
             slot.root:ClearAnchors()
-            if orientation == ORIENTATION_VERTICAL then
+            if orientation == LAYOUT_VERTICAL then
                 slot.root:SetAnchor(TOPLEFT, entry.root, TOPLEFT, 0, offset)
             else
                 slot.root:SetAnchor(TOPLEFT, entry.root, TOPLEFT, offset, 0)
@@ -736,7 +736,7 @@ function EZO_HUD:InitializeCustomActionBars()
                     name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION),
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION_TOOLTIP),
                     choices = BuildOrientationChoices(),
-                    choicesValues = { ORIENTATION_HORIZONTAL, ORIENTATION_VERTICAL },
+                    choicesValues = { LAYOUT_HORIZONTAL, LAYOUT_VERTICAL },
                     getFunc = function() return GetOrientation(settings) end,
                     setFunc = function(value)
                         settings.orientation = GetOrientation({ orientation = value })

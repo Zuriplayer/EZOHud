@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.115 - Custom Action Bar Timer Startup Fix
+
+- Fixed Custom Action Bars startup after adding effect timers by avoiding a local layout-orientation constant shadowing ESO's native status-bar orientation constant.
+
 ## 0.1.114 - Custom Action Bar Effect Timers
 
 - Added an optional Custom Action Bars effect-timer overlay that shows remaining time only when ESO exposes an active player or reticle-over effect with the same abilityId as the slot.

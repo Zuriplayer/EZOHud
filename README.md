@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.114`
-- AddOnVersion: `10114`
+- Addon version: `0.1.115`
+- AddOnVersion: `10115`
 - APIVersion: `101049 101050`
 - Status: public beta
 
