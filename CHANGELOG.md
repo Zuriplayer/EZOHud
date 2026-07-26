@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.117 - Native Custom Action Bar Active State Hotfix
+
+- Fixed Custom Action Bars active-bar highlighting by using ESO's active weapon-pair state before falling back to active hotbar category checks.
+- Added active-slot native timer fallbacks so the active custom bar can read ESO's current action-slot effect data even when the explicit primary/backup category does not report it.
+
 ## 0.1.116 - Native Custom Action Bar Timers
 
 - Changed Custom Action Bars effect timers to use ESO's native action-slot effect APIs instead of scanning player and reticle-over buffs by matching abilityId.

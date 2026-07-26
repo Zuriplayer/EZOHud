@@ -37,6 +37,7 @@ local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
 local BAR_DEFS = {
     main = {
         hotbarCategory = HOTBAR_CATEGORY_PRIMARY,
+        weaponPair = ACTIVE_WEAPON_PAIR_MAIN,
         offsetXKey = "mainOffsetX",
         offsetYKey = "mainOffsetY",
         moveSection = "customActionBarMain",
@@ -45,6 +46,7 @@ local BAR_DEFS = {
     },
     backup = {
         hotbarCategory = HOTBAR_CATEGORY_BACKUP,
+        weaponPair = ACTIVE_WEAPON_PAIR_BACKUP,
         offsetXKey = "backupOffsetX",
         offsetYKey = "backupOffsetY",
         moveSection = "customActionBarBackup",
@@ -159,7 +161,27 @@ end
 
 local function IsActiveBar(barName)
     local bar = BAR_DEFS[barName]
-    return bar and GetActiveHotbarCategory and GetActiveHotbarCategory() == bar.hotbarCategory
+    if not bar then return false end
+
+    if type(GetActiveWeaponPairInfo) == "function" and bar.weaponPair ~= nil then
+        local activeWeaponPair = GetActiveWeaponPairInfo()
+        if activeWeaponPair == ACTIVE_WEAPON_PAIR_MAIN or activeWeaponPair == ACTIVE_WEAPON_PAIR_BACKUP then
+            return activeWeaponPair == bar.weaponPair
+        end
+    end
+
+    if type(GetActiveHotbarCategory) == "function" then
+        local activeHotbarCategory = GetActiveHotbarCategory()
+        if activeHotbarCategory == HOTBAR_CATEGORY_PRIMARY or activeHotbarCategory == HOTBAR_CATEGORY_BACKUP then
+            return activeHotbarCategory == bar.hotbarCategory
+        end
+
+        if type(GetWeaponPairFromHotbarCategory) == "function" and bar.weaponPair ~= nil then
+            return GetWeaponPairFromHotbarCategory(activeHotbarCategory) == bar.weaponPair
+        end
+    end
+
+    return false
 end
 
 local function ShouldShowBar(barName)
@@ -240,10 +262,7 @@ local function GetActionSlotIcon(slotKey, hotbarCategory)
     return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE, hasAbility
 end
 
-local function GetActionSlotEffect(slotKey, hotbarCategory)
-    local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
-    if not slotIndex or type(GetActionSlotEffectTimeRemaining) ~= "function" then return nil end
-
+local function ReadActionSlotEffect(slotIndex, hotbarCategory)
     local remainingMs = GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0
     if remainingMs <= MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS then return nil end
 
@@ -265,6 +284,25 @@ local function GetActionSlotEffect(slotKey, hotbarCategory)
         duration = durationMs / 1000,
         stackCount = stackCount,
     }
+end
+
+local function GetActionSlotEffect(barName, slotKey)
+    local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
+    local bar = BAR_DEFS[barName]
+    if not slotIndex or not bar or type(GetActionSlotEffectTimeRemaining) ~= "function" then return nil end
+
+    if IsActiveBar(barName) then
+        if type(GetActiveHotbarCategory) == "function" then
+            local activeHotbarCategory = GetActiveHotbarCategory()
+            local effect = ReadActionSlotEffect(slotIndex, activeHotbarCategory)
+            if effect then return effect end
+        end
+
+        local effect = ReadActionSlotEffect(slotIndex, nil)
+        if effect then return effect end
+    end
+
+    return ReadActionSlotEffect(slotIndex, bar.hotbarCategory)
 end
 
 local function FormatTimerSeconds(seconds)
@@ -530,7 +568,7 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.icon:SetTexture(texture)
             slot.icon:SetColor(1, 1, 1, hasAbility and alpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
-            local effect = showTimers and GetActionSlotEffect(slotKey, bar.hotbarCategory) or nil
+            local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha)
 
             if slotKey == "weapon" and isActive then
@@ -565,6 +603,9 @@ local function RegisterEvents()
     end
     if EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED, refresh)
+    end
+    if EVENT_ACTIVE_WEAPON_PAIR_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTIVE_WEAPON_PAIR_CHANGED, refresh)
     end
     if EVENT_ACTION_SLOT_EFFECT_UPDATE then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_EFFECT_UPDATE, refresh)
