@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.111 - Custom Action Bars Phase One
+
+- Added disabled-by-default Custom Action Bars that show movable visual copies of the main and backup ability bars without replacing ESO's native action bar.
+- Added LAM controls for displayed bars, horizontal or vertical orientation, icon size, spacing, inactive-bar alpha, dimmed-slot alpha, and globally remembered dimmed logical slots.
+- Registered independent EZOCore layout surfaces for the main and backup custom action bars.
+
 ## 0.1.110 - Custom Loot Visibility Refresh
 
 - Reapplies native loot-history hiding from the Custom Loot visibility refresh path so LAM toggles and scene changes keep native loot panels in sync.

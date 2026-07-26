@@ -1,7 +1,7 @@
 # EZOhud
 
 ¿Prefieres inglés? Lee el [README en inglés](README.md).
-EZOhud es un addon beta de HUD para The Elder Scrolls Online dentro de la familia de addons EZO. Su propósito actual es ofrecer indicadores visuales configurables para recursos del jugador, disponibilidad de ultimate, oportunidades de execute, seguimiento de Crux del arcanista, pequeños ajustes de posicionamiento para elementos nativos, tracker de misiones personalizado, sinergia personalizada, estado personalizado de búsqueda de grupo e historial de botín personalizado, manteniendo una implementación pequeña y fácil de probar.
+EZOhud es un addon beta de HUD para The Elder Scrolls Online dentro de la familia de addons EZO. Su propósito actual es ofrecer indicadores visuales configurables para recursos del jugador, disponibilidad de ultimate, barras de habilidades personalizadas, oportunidades de execute, seguimiento de Crux del arcanista, pequeños ajustes de posicionamiento para elementos nativos, tracker de misiones personalizado, sinergia personalizada, estado personalizado de búsqueda de grupo e historial de botín personalizado, manteniendo una implementación pequeña y fácil de probar.
 
 Soporte, errores y sugerencias: <https://discord.gg/ekw8zUAcRm>
 
@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.110`
-- AddOnVersion: `10110`
+- Versión del addon: `0.1.111`
+- AddOnVersion: `10111`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -47,6 +47,9 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Modos de visualización de ultimate: principal, secundaria, ambas o solo barra no activa.
 - Indicadores de ultimate movibles, con posiciones independientes para principal y secundaria.
 - Ajuste de tamaño del icono de ultimate, barra de progreso, valor actual de ultimate, coste, estado de lista y estado de barra activa.
+- Barras de Habilidades Personalizadas que muestran copias visuales movibles de las barras principal y secundaria sin ocultar la barra de habilidades nativa de ESO.
+- Modos de visualización de Barras de Habilidades Personalizadas: desactivadas, principal, secundaria, ambas o solo barra activa.
+- Barras de Habilidades Personalizadas horizontales o verticales con tamaño de iconos, separación, alpha de barra no activa, alpha de slot opacado y opciones globales guardadas para opacar arma, habilidades 1-5 y ultimate.
 - HUD de execute que analiza las habilidades de execute equipadas en la barra activa y muestra un aviso cuando el objetivo actual está dentro del umbral detectado.
 - Umbrales de execute para habilidades conocidas, con detección adicional basada en el tooltip cuando está disponible.
 - Aviso de execute movible y ajuste de tamaño del aviso.
@@ -59,7 +62,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Etiqueta de Búsqueda de Grupo Personalizada que oculta el tracker nativo en pantalla del Buscador de actividades de ESO, mantiene categoría/estado compactos con estilo nativo y añade líneas menores alineadas a la izquierda para actividad seleccionada o instancia, duración de búsqueda y roles visibles del grupo.
 - Historial de Botín Personalizado que reemplaza por completo el sistema nativo del juego con un panel moderno alineado a la derecha, con memoria, revisión al pasar el ratón por la parte inferior, desplazamiento y tiempo de desvanecimiento ajustable.
 - Gestión de visibilidad por escenas HUD para que los controles visuales estén pensados para el HUD normal y HUD UI, no para menús.
-- Las ventanas de Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada quedan restringidas a escenas HUD para que los paneles nativos de menú sigan siendo accesibles.
+- Las ventanas de Barras de Habilidades Personalizadas, Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada quedan restringidas a escenas HUD para que los paneles nativos de menú sigan siendo accesibles.
 - Localización en inglés y español con selección de idioma compartido de EZOCore, Automático, Inglés y Español, incluidos textos de reserva localizados para el HUD personalizado cuando ESO no expone una cadena nativa.
 - Opciones de debug en una sección de configuración separada, con salida opcional a LibDebugLogger y salida opcional a chat.
 - Comando local `/ezohudcrux` para diagnóstico puntual de Crux.
@@ -70,13 +73,14 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
 
-Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Execute, Crux, Tracker de Misiones personalizado, Sinergia personalizada, Búsqueda de Grupo personalizada e Historial de Botín personalizado se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. Los Ajustes de Interfaz Nativa solo se controlan desde ajustes y no son superficies del modo compartido de disposición.
+Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Barras de Habilidades Personalizadas, Execute, Crux, Tracker de Misiones personalizado, Sinergia personalizada, Búsqueda de Grupo personalizada e Historial de Botín personalizado se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. Los Ajustes de Interfaz Nativa solo se controlan desde ajustes y no son superficies del modo compartido de disposición.
 
 Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
 - HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
+- Barras de Habilidades Personalizadas: activar copias visuales de las barras de habilidades, elegir barras visibles, definir orientación horizontal o vertical, mover principal y secundaria independientemente, ajustar tamaño/separación/alpha de iconos y elegir slots lógicos opacados globalmente.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
 - HUD de Crux: activar indicador, habilitar movimiento, ocultar sin Crux, definir tamaño del indicador y ajustar la separación de la barra.
 - Ajustes de Interfaz Nativa: aplicar posicionamiento personalizado para anuncios centrales y consejos de combate activos nativos de ESO. Ajustar desplazamientos X/Y, cambiar la escala, mostrar un solo tirador verde cada vez y restablecer los valores. Al desactivar un ajuste de posición personalizada se restaura el anclaje nativo original de ese elemento durante la sesión.
@@ -90,11 +94,12 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 
 - EZOhud es únicamente visual.
 - No lanza habilidades, no pulsa teclas, no automatiza rotaciones, no bloquea, no esquiva, no interrumpe, no selecciona objetivos ni toma decisiones de juego.
-- Los indicadores de execute, ultimate, recursos y Crux son solo informativos.
+- Los indicadores de execute, ultimate, barras de habilidades personalizadas, recursos y Crux son solo informativos.
 - Los ajustes de interfaz nativa solo reanclan y escalan los elementos nativos de ESO; no los reemplazan ni alteran su comportamiento principal.
 - El Tracker de Misiones Personalizado es solo informativo. Puede ocultar el tracker nativo de misión enfocada mientras está activado y mostrar detalles estilo diario en un tooltip al pasar el ratón, pero no añade atajos, abandona, comparte, selecciona, cambia ni automatiza acciones de misión; el keybind nativo de cambiar misión de ESO sigue siendo responsable de cambiar la misión enfocada.
+- Las Barras de Habilidades Personalizadas son solo informativas. No ocultan la barra de habilidades nativa de ESO, no lanzan habilidades, no cambian armas, no activan keybinds ni automatizan rotaciones. La primera fase muestra solo iconos de arma y habilidades equipadas; los temporizadores de efectos aún no están implementados.
 - La Búsqueda de Grupo Personalizada es solo informativa. Puede ocultar el tracker nativo en pantalla del Buscador de actividades mientras está activada, pero no pone en cola, abandona, acepta, rechaza ni automatiza acciones del buscador de grupo. Los detalles de instancia y roles quedan limitados a los datos del Buscador de actividades y roles de grupo que expone la API de interfaz de ESO.
-- Las superficies de Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada se ocultan fuera de las escenas HUD normales, y el Historial de Botín personalizado solo captura el mouse mientras su modo de movimiento está activo.
+- Las superficies de Barras de Habilidades Personalizadas, Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada se ocultan fuera de las escenas HUD normales, y el Historial de Botín personalizado solo captura el mouse mientras su modo de movimiento está activo.
 - Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir; las posiciones guardadas del HUD permanecen.
 - EZOhud no añade atajos de teclado ni gestión de input y está pensado para mantener compatibilidad con juego en teclado y gamepad.
 - Las herramientas de debug son solo diagnósticas y deberían permanecer desactivadas durante el juego normal salvo que se esté investigando un problema.
@@ -111,6 +116,7 @@ Comprobaciones recomendadas para la beta:
 - Probar el comportamiento en combate y el alpha fuera de combate.
 - Probar que al activar el HUD de atributos de EZOhud se ocultan automáticamente las barras vanilla de ESO, y que el ajuste manual de barras vanilla sigue aplicándose después.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
+- Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas, solo activa, horizontal y vertical. Confirmar que los iconos de arma cambian al cambiar de arma, el resaltado de barra activa sigue los cambios de barra, los slots opacados se aplican a ambas barras, la barra nativa permanece visible y ambas barras personalizadas se pueden arrastrar de forma independiente.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
 - Probar los modos de idioma compartido de EZOCore, Inglés, Español y Automático.
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.

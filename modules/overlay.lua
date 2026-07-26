@@ -456,6 +456,7 @@ function EZO_HUD:ResetAllDefaults()
     self.sv.general = DeepCopyTable(self.defaults.general)
     self.sv.overlay = DeepCopyTable(self.defaults.overlay)
     self.sv.ultimate = DeepCopyTable(self.defaults.ultimate)
+    self.sv.customActionBars = DeepCopyTable(self.defaults.customActionBars)
     self.sv.execute = DeepCopyTable(self.defaults.execute)
     self.sv.crux = DeepCopyTable(self.defaults.crux)
     self:InitializeRuntimeState()
@@ -474,6 +475,9 @@ function EZO_HUD:ResetAllDefaults()
         self:ApplyUltimateLayout()
         self:RefreshUltimateVisibility()
         self:RefreshUltimateValues()
+    end
+    if self.ApplyCustomActionBarsLayout then
+        self:ApplyCustomActionBarsLayout()
     end
     if self.ApplyExecuteLayout then
         self:ApplyExecuteLayout()
