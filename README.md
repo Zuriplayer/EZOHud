@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.113`
-- AddOnVersion: `10113`
+- Addon version: `0.1.114`
+- AddOnVersion: `10114`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -49,7 +49,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Ultimate icon size setting, progress bar, current ultimate value, cost, readiness, and active-bar state.
 - Custom Action Bars that show movable visual copies of the main and backup ability bars without hiding ESO's native action bar.
 - Custom Action Bars display modes: off, main, backup, both, or active bar only.
-- Horizontal or vertical Custom Action Bars with generic weapon-category icons, icon size, spacing, inactive-bar alpha, dimmed-slot alpha, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
+- Horizontal or vertical Custom Action Bars with generic weapon-category icons, optional safely matched effect timers, icon size, spacing, inactive-bar alpha, dimmed-slot alpha, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
 - Execute HUD that scans slotted execute abilities on the active bar and shows an alert when the current target is inside the detected threshold.
 - Execute thresholds for known execute abilities, with additional tooltip-based threshold detection when available.
 - Movable execute alert and execute alert size setting.
@@ -80,7 +80,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
 - Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
-- Custom Action Bars: enable visual copies of ability bars, choose visible bars, set horizontal or vertical orientation, move main and backup bars independently, adjust icon size/spacing/alpha, and choose globally dimmed logical slots.
+- Custom Action Bars: enable visual copies of ability bars, choose visible bars, set horizontal or vertical orientation, move main and backup bars independently, adjust icon size/spacing/alpha, toggle safely matched effect timers, and choose globally dimmed logical slots.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
 - Native UI Tweaks: apply custom positioning for ESO's native center screen announcements and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
@@ -97,7 +97,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Execute, ultimate, custom action bar, resource, and Crux indicators are informational only.
 - Native UI tweaks only reanchor and scale ESO's native elements; they do not replace the elements or alter their core behavior.
 - Custom Quest Tracker is informational only. It can hide the native focused quest tracker while enabled and show journal-style details in a hover tooltip, but it does not add keybinds, abandon, share, select, cycle, or automate quest actions; ESO's own Cycle Focused Quest keybind remains responsible for changing the focused mission.
-- Custom Action Bars are informational only. They do not hide ESO's native action bar, cast abilities, change weapons, trigger keybinds, or automate rotations. Phase one displays generic weapon-category icons and slotted ability icons only; effect timers are not implemented yet.
+- Custom Action Bars are informational only. They do not hide ESO's native action bar, cast abilities, change weapons, trigger keybinds, or automate rotations. Effect timers are shown only when ESO exposes an active player or reticle-over effect with the same abilityId as the slot; unmatched effects remain blank.
 - Custom Group Search is informational only. It can hide the native on-screen Activity Finder tracker while enabled, but it does not join, leave, accept, decline, or automate group-finder actions. Instance and role details are limited to the Activity Finder and group-role data exposed by ESO's UI API.
 - Custom Action Bars, Custom Loot History, custom Quest Tracker, custom Group Search, and custom Synergy surfaces are hidden outside normal HUD scenes, and Custom Loot only captures the mouse while its move mode is active.
 - Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
@@ -116,7 +116,7 @@ Recommended beta checks:
 - Test combat and out-of-combat alpha behavior.
 - Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
 - Test each ultimate display mode and active/inactive bar state.
-- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm weapon icons update after weapon swap, active-bar highlighting follows bar swaps, dimmed slot choices apply to both bars, the native action bar remains visible, and both custom bars can be dragged independently.
+- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm weapon icons update after weapon swap, active-bar highlighting follows bar swaps, dimmed slot choices apply to both bars, safely matched effect timers appear only for matching player or reticle-over effects, the native action bar remains visible, and both custom bars can be dragged independently.
 - Test execute alert behavior with known execute abilities on the active bar.
 - Test shared EZOCore, English, Spanish, and Automatic language modes.
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it.

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.114 - Custom Action Bar Effect Timers
+
+- Added an optional Custom Action Bars effect-timer overlay that shows remaining time only when ESO exposes an active player or reticle-over effect with the same abilityId as the slot.
+- Added a `Show effect timers` LAM control and kept unmatched effects blank instead of guessing duration associations.
+
 ## 0.1.113 - Custom Action Bar Weapon Icons
 
 - Added generic Custom Action Bar weapon-category icons for sword and shield, dual wield, two-handed, bow, destruction staff, restoration staff, one-hand fallback, and unknown weapons.
