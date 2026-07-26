@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.113 - Custom Action Bar Weapon Icons
+
+- Added generic Custom Action Bar weapon-category icons for sword and shield, dual wield, two-handed, bow, destruction staff, restoration staff, one-hand fallback, and unknown weapons.
+- Changed the Custom Action Bars weapon slot to classify equipped main/off-hand weapon types instead of showing the exact equipped item icon.
+
 ## 0.1.112 - Custom Action Bars LAM Refresh
 
 - Refreshes dependent Custom Action Bars settings immediately after toggling `Enable custom action bars`, so display, movement, sizing, alpha, and dimmed-slot controls become available without `/reloadui`.

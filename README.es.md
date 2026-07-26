@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.112`
-- AddOnVersion: `10112`
+- Versión del addon: `0.1.113`
+- AddOnVersion: `10113`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -49,7 +49,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Ajuste de tamaño del icono de ultimate, barra de progreso, valor actual de ultimate, coste, estado de lista y estado de barra activa.
 - Barras de Habilidades Personalizadas que muestran copias visuales movibles de las barras principal y secundaria sin ocultar la barra de habilidades nativa de ESO.
 - Modos de visualización de Barras de Habilidades Personalizadas: desactivadas, principal, secundaria, ambas o solo barra activa.
-- Barras de Habilidades Personalizadas horizontales o verticales con tamaño de iconos, separación, alpha de barra no activa, alpha de slot opacado y opciones globales guardadas para opacar arma, habilidades 1-5 y ultimate.
+- Barras de Habilidades Personalizadas horizontales o verticales con iconos genéricos por categoría de arma, tamaño de iconos, separación, alpha de barra no activa, alpha de slot opacado y opciones globales guardadas para opacar arma, habilidades 1-5 y ultimate.
 - HUD de execute que analiza las habilidades de execute equipadas en la barra activa y muestra un aviso cuando el objetivo actual está dentro del umbral detectado.
 - Umbrales de execute para habilidades conocidas, con detección adicional basada en el tooltip cuando está disponible.
 - Aviso de execute movible y ajuste de tamaño del aviso.
@@ -97,7 +97,7 @@ Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferenci
 - Los indicadores de execute, ultimate, barras de habilidades personalizadas, recursos y Crux son solo informativos.
 - Los ajustes de interfaz nativa solo reanclan y escalan los elementos nativos de ESO; no los reemplazan ni alteran su comportamiento principal.
 - El Tracker de Misiones Personalizado es solo informativo. Puede ocultar el tracker nativo de misión enfocada mientras está activado y mostrar detalles estilo diario en un tooltip al pasar el ratón, pero no añade atajos, abandona, comparte, selecciona, cambia ni automatiza acciones de misión; el keybind nativo de cambiar misión de ESO sigue siendo responsable de cambiar la misión enfocada.
-- Las Barras de Habilidades Personalizadas son solo informativas. No ocultan la barra de habilidades nativa de ESO, no lanzan habilidades, no cambian armas, no activan keybinds ni automatizan rotaciones. La primera fase muestra solo iconos de arma y habilidades equipadas; los temporizadores de efectos aún no están implementados.
+- Las Barras de Habilidades Personalizadas son solo informativas. No ocultan la barra de habilidades nativa de ESO, no lanzan habilidades, no cambian armas, no activan keybinds ni automatizan rotaciones. La primera fase muestra solo iconos genéricos por categoría de arma e iconos de habilidades equipadas; los temporizadores de efectos aún no están implementados.
 - La Búsqueda de Grupo Personalizada es solo informativa. Puede ocultar el tracker nativo en pantalla del Buscador de actividades mientras está activada, pero no pone en cola, abandona, acepta, rechaza ni automatiza acciones del buscador de grupo. Los detalles de instancia y roles quedan limitados a los datos del Buscador de actividades y roles de grupo que expone la API de interfaz de ESO.
 - Las superficies de Barras de Habilidades Personalizadas, Historial de Botín personalizado, Tracker de Misiones personalizado, Búsqueda de Grupo personalizada y Sinergia personalizada se ocultan fuera de las escenas HUD normales, y el Historial de Botín personalizado solo captura el mouse mientras su modo de movimiento está activo.
 - Los modos de movimiento son ayudas temporales de posicionamiento de UI y se reinician con `/reloadui` o al salir; las posiciones guardadas del HUD permanecen.

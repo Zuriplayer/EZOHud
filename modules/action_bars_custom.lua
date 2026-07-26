@@ -2,6 +2,14 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
+local WEAPON_ICON_UNKNOWN = "EZOhud/media/weapons/weapon_unknown.dds"
+local WEAPON_ICON_ONE_HAND = "EZOhud/media/weapons/weapon_one_hand.dds"
+local WEAPON_ICON_DUAL = "EZOhud/media/weapons/weapon_dual.dds"
+local WEAPON_ICON_TWO_HANDED = "EZOhud/media/weapons/weapon_two_handed.dds"
+local WEAPON_ICON_DESTRUCTION_STAFF = "EZOhud/media/weapons/weapon_destruction_staff.dds"
+local WEAPON_ICON_RESTORATION_STAFF = "EZOhud/media/weapons/weapon_restoration_staff.dds"
+local WEAPON_ICON_SWORD_SHIELD = "EZOhud/media/weapons/weapon_sword_shield.dds"
+local WEAPON_ICON_BOW = "EZOhud/media/weapons/weapon_bow.dds"
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
 local SLOT_FIRST = 3
 local ORIENTATION_HORIZONTAL = "horizontal"
@@ -30,6 +38,7 @@ local BAR_DEFS = {
         offsetYKey = "mainOffsetY",
         moveSection = "customActionBarMain",
         equipSlot = EQUIP_SLOT_MAIN_HAND,
+        offSlot = EQUIP_SLOT_OFF_HAND,
     },
     backup = {
         hotbarCategory = HOTBAR_CATEGORY_BACKUP,
@@ -37,6 +46,7 @@ local BAR_DEFS = {
         offsetYKey = "backupOffsetY",
         moveSection = "customActionBarBackup",
         equipSlot = EQUIP_SLOT_BACKUP_MAIN,
+        offSlot = EQUIP_SLOT_BACKUP_OFF,
     },
 }
 
@@ -50,6 +60,44 @@ local ACTION_SLOT_BY_KEY = {
     slot5 = SLOT_FIRST + 4,
     ultimate = ACTION_BAR_ULTIMATE_SLOT_INDEX + 1,
 }
+
+local function BuildSet(...)
+    local set = {}
+    for index = 1, select("#", ...) do
+        local value = select(index, ...)
+        if value ~= nil then
+            set[value] = true
+        end
+    end
+    return set
+end
+
+local ONE_HAND_WEAPONS = BuildSet(
+    WEAPONTYPE_AXE,
+    WEAPONTYPE_DAGGER,
+    WEAPONTYPE_HAMMER,
+    WEAPONTYPE_SWORD
+)
+
+local TWO_HANDED_WEAPONS = BuildSet(
+    WEAPONTYPE_TWO_HANDED_AXE,
+    WEAPONTYPE_TWO_HANDED_HAMMER,
+    WEAPONTYPE_TWO_HANDED_SWORD
+)
+
+local DESTRUCTION_STAVES = BuildSet(
+    WEAPONTYPE_FIRE_STAFF,
+    WEAPONTYPE_FROST_STAFF,
+    WEAPONTYPE_LIGHTNING_STAFF
+)
+
+local RESTORATION_STAVES = BuildSet(
+    WEAPONTYPE_HEALING_STAFF,
+    WEAPONTYPE_RESTORATION_STAFF
+)
+
+local SHIELD_WEAPONS = BuildSet(WEAPONTYPE_SHIELD)
+local BOW_WEAPONS = BuildSet(WEAPONTYPE_BOW)
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -127,19 +175,56 @@ end
 
 local function GetWeaponIcon(barName)
     local bar = BAR_DEFS[barName]
-    if not (bar and BAG_WORN and bar.equipSlot and type(GetItemLink) == "function") then
-        return WHITE_TEXTURE
+    if not (bar and BAG_WORN) then
+        return WEAPON_ICON_UNKNOWN
     end
 
-    local itemLink = GetItemLink(BAG_WORN, bar.equipSlot)
-    if itemLink and itemLink ~= "" and type(GetItemLinkInfo) == "function" then
-        local icon = GetItemLinkInfo(itemLink)
-        if icon and icon ~= "" then
-            return icon
+    local function getWeaponType(slot)
+        if slot == nil then return nil end
+        if type(GetItemWeaponType) == "function" then
+            local weaponType = GetItemWeaponType(BAG_WORN, slot)
+            if weaponType ~= nil and weaponType ~= WEAPONTYPE_NONE then
+                return weaponType
+            end
         end
+        if type(GetItemLink) == "function" and type(GetItemLinkWeaponType) == "function" then
+            local itemLink = GetItemLink(BAG_WORN, slot)
+            if itemLink and itemLink ~= "" then
+                local weaponType = GetItemLinkWeaponType(itemLink)
+                if weaponType ~= nil and weaponType ~= WEAPONTYPE_NONE then
+                    return weaponType
+                end
+            end
+        end
+        return nil
     end
 
-    return WHITE_TEXTURE
+    local mainType = getWeaponType(bar.equipSlot)
+    local offType = getWeaponType(bar.offSlot)
+
+    if ONE_HAND_WEAPONS[mainType] == true and SHIELD_WEAPONS[offType] == true then
+        return WEAPON_ICON_SWORD_SHIELD
+    end
+    if ONE_HAND_WEAPONS[mainType] == true and ONE_HAND_WEAPONS[offType] == true then
+        return WEAPON_ICON_DUAL
+    end
+    if TWO_HANDED_WEAPONS[mainType] == true then
+        return WEAPON_ICON_TWO_HANDED
+    end
+    if DESTRUCTION_STAVES[mainType] == true then
+        return WEAPON_ICON_DESTRUCTION_STAFF
+    end
+    if RESTORATION_STAVES[mainType] == true then
+        return WEAPON_ICON_RESTORATION_STAFF
+    end
+    if BOW_WEAPONS[mainType] == true then
+        return WEAPON_ICON_BOW
+    end
+    if ONE_HAND_WEAPONS[mainType] == true then
+        return WEAPON_ICON_ONE_HAND
+    end
+
+    return WEAPON_ICON_UNKNOWN
 end
 
 local function GetActionSlotIcon(slotKey, hotbarCategory)

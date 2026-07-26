@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.112`
-- AddOnVersion: `10112`
+- Addon version: `0.1.113`
+- AddOnVersion: `10113`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -49,7 +49,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Ultimate icon size setting, progress bar, current ultimate value, cost, readiness, and active-bar state.
 - Custom Action Bars that show movable visual copies of the main and backup ability bars without hiding ESO's native action bar.
 - Custom Action Bars display modes: off, main, backup, both, or active bar only.
-- Horizontal or vertical Custom Action Bars with icon size, spacing, inactive-bar alpha, dimmed-slot alpha, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
+- Horizontal or vertical Custom Action Bars with generic weapon-category icons, icon size, spacing, inactive-bar alpha, dimmed-slot alpha, and saved global dimming choices for weapon, ability 1-5, and ultimate slots.
 - Execute HUD that scans slotted execute abilities on the active bar and shows an alert when the current target is inside the detected threshold.
 - Execute thresholds for known execute abilities, with additional tooltip-based threshold detection when available.
 - Movable execute alert and execute alert size setting.
@@ -97,7 +97,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Execute, ultimate, custom action bar, resource, and Crux indicators are informational only.
 - Native UI tweaks only reanchor and scale ESO's native elements; they do not replace the elements or alter their core behavior.
 - Custom Quest Tracker is informational only. It can hide the native focused quest tracker while enabled and show journal-style details in a hover tooltip, but it does not add keybinds, abandon, share, select, cycle, or automate quest actions; ESO's own Cycle Focused Quest keybind remains responsible for changing the focused mission.
-- Custom Action Bars are informational only. They do not hide ESO's native action bar, cast abilities, change weapons, trigger keybinds, or automate rotations. Phase one displays weapon and slotted ability icons only; effect timers are not implemented yet.
+- Custom Action Bars are informational only. They do not hide ESO's native action bar, cast abilities, change weapons, trigger keybinds, or automate rotations. Phase one displays generic weapon-category icons and slotted ability icons only; effect timers are not implemented yet.
 - Custom Group Search is informational only. It can hide the native on-screen Activity Finder tracker while enabled, but it does not join, leave, accept, decline, or automate group-finder actions. Instance and role details are limited to the Activity Finder and group-role data exposed by ESO's UI API.
 - Custom Action Bars, Custom Loot History, custom Quest Tracker, custom Group Search, and custom Synergy surfaces are hidden outside normal HUD scenes, and Custom Loot only captures the mouse while its move mode is active.
 - Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
