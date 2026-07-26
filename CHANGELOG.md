@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.118 - Custom Action Bar Slot Active Detection
+
+- Added active-bar detection by comparing the current active action slots against the main and backup custom bars before falling back to ESO's native active hotbar and weapon-pair state.
+
 ## 0.1.117 - Native Custom Action Bar Active State Hotfix
 
 - Fixed Custom Action Bars active-bar highlighting by using ESO's active weapon-pair state before falling back to active hotbar category checks.

@@ -159,29 +159,76 @@ local function GetOrientation(settings)
     return settings.orientation == LAYOUT_VERTICAL and LAYOUT_VERTICAL or LAYOUT_HORIZONTAL
 end
 
-local function IsActiveBar(barName)
-    local bar = BAR_DEFS[barName]
-    if not bar then return false end
-
-    if type(GetActiveWeaponPairInfo) == "function" and bar.weaponPair ~= nil then
+local function GetNativeActiveBarName()
+    if type(GetActiveWeaponPairInfo) == "function"
+        and ACTIVE_WEAPON_PAIR_MAIN ~= nil
+        and ACTIVE_WEAPON_PAIR_BACKUP ~= nil then
         local activeWeaponPair = GetActiveWeaponPairInfo()
         if activeWeaponPair == ACTIVE_WEAPON_PAIR_MAIN or activeWeaponPair == ACTIVE_WEAPON_PAIR_BACKUP then
-            return activeWeaponPair == bar.weaponPair
+            return activeWeaponPair == ACTIVE_WEAPON_PAIR_MAIN and "main" or "backup"
         end
     end
 
     if type(GetActiveHotbarCategory) == "function" then
         local activeHotbarCategory = GetActiveHotbarCategory()
-        if activeHotbarCategory == HOTBAR_CATEGORY_PRIMARY or activeHotbarCategory == HOTBAR_CATEGORY_BACKUP then
-            return activeHotbarCategory == bar.hotbarCategory
+        if HOTBAR_CATEGORY_PRIMARY ~= nil
+            and HOTBAR_CATEGORY_BACKUP ~= nil
+            and (activeHotbarCategory == HOTBAR_CATEGORY_PRIMARY or activeHotbarCategory == HOTBAR_CATEGORY_BACKUP) then
+            return activeHotbarCategory == HOTBAR_CATEGORY_PRIMARY and "main" or "backup"
         end
 
-        if type(GetWeaponPairFromHotbarCategory) == "function" and bar.weaponPair ~= nil then
-            return GetWeaponPairFromHotbarCategory(activeHotbarCategory) == bar.weaponPair
+        if type(GetWeaponPairFromHotbarCategory) == "function"
+            and ACTIVE_WEAPON_PAIR_MAIN ~= nil
+            and ACTIVE_WEAPON_PAIR_BACKUP ~= nil then
+            local activeWeaponPair = GetWeaponPairFromHotbarCategory(activeHotbarCategory)
+            if activeWeaponPair == ACTIVE_WEAPON_PAIR_MAIN or activeWeaponPair == ACTIVE_WEAPON_PAIR_BACKUP then
+                return activeWeaponPair == ACTIVE_WEAPON_PAIR_MAIN and "main" or "backup"
+            end
         end
     end
 
-    return false
+    return nil
+end
+
+local function GetActiveSlotMatchScore(barName)
+    local bar = BAR_DEFS[barName]
+    if not bar or type(GetSlotBoundId) ~= "function" then return 0 end
+
+    local score = 0
+    for slotKey, slotIndex in pairs(ACTION_SLOT_BY_KEY) do
+        if slotKey ~= "ultimate" then
+            local activeBoundId = GetSlotBoundId(slotIndex)
+            local barBoundId = GetSlotBoundId(slotIndex, bar.hotbarCategory)
+            if activeBoundId ~= nil and activeBoundId ~= 0 and activeBoundId == barBoundId then
+                score = score + 2
+            elseif type(GetSlotTexture) == "function" then
+                local activeTexture = GetSlotTexture(slotIndex)
+                local barTexture = GetSlotTexture(slotIndex, bar.hotbarCategory)
+                if activeTexture ~= nil and activeTexture ~= "" and activeTexture == barTexture then
+                    score = score + 1
+                end
+            end
+        end
+    end
+
+    return score
+end
+
+local function GetSlotDetectedActiveBarName()
+    local mainScore = GetActiveSlotMatchScore("main")
+    local backupScore = GetActiveSlotMatchScore("backup")
+    if mainScore > backupScore and mainScore > 0 then return "main" end
+    if backupScore > mainScore and backupScore > 0 then return "backup" end
+    return nil
+end
+
+local function GetActiveBarName()
+    return GetSlotDetectedActiveBarName() or GetNativeActiveBarName()
+end
+
+local function IsActiveBar(barName)
+    if BAR_DEFS[barName] == nil then return false end
+    return GetActiveBarName() == barName
 end
 
 local function ShouldShowBar(barName)
