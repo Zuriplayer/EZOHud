@@ -32,6 +32,7 @@ local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "DimmedAlpha",
 }
 local TIMER_UPDATE_MS = 250
+local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
 
 local BAR_DEFS = {
     main = {
@@ -161,16 +162,6 @@ local function IsActiveBar(barName)
     return bar and GetActiveHotbarCategory and GetActiveHotbarCategory() == bar.hotbarCategory
 end
 
-local function GetNowSeconds()
-    if type(GetGameTimeSeconds) == "function" then
-        return GetGameTimeSeconds()
-    end
-    if type(GetFrameTimeSeconds) == "function" then
-        return GetFrameTimeSeconds()
-    end
-    return 0
-end
-
 local function ShouldShowBar(barName)
     local settings = GetSettings()
     local bar = BAR_DEFS[barName]
@@ -249,83 +240,46 @@ local function GetActionSlotIcon(slotKey, hotbarCategory)
     return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE, hasAbility
 end
 
-local function GetSlotAbilityId(slotKey, hotbarCategory)
+local function GetActionSlotEffect(slotKey, hotbarCategory)
     local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
-    if not slotIndex or type(GetSlotBoundId) ~= "function" then return nil end
+    if not slotIndex or type(GetActionSlotEffectTimeRemaining) ~= "function" then return nil end
 
-    local boundId = GetSlotBoundId(slotIndex, hotbarCategory)
-    if boundId == nil or boundId == 0 then return nil end
+    local remainingMs = GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0
+    if remainingMs <= MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS then return nil end
 
-    local abilityId = boundId
-    if type(GetSlotType) == "function"
-        and ACTION_TYPE_CRAFTED_ABILITY ~= nil
-        and GetSlotType(slotIndex, hotbarCategory) == ACTION_TYPE_CRAFTED_ABILITY
-        and type(GetAbilityIdForCraftedAbilityId) == "function" then
-        local craftedAbilityId = GetAbilityIdForCraftedAbilityId(boundId)
-        if craftedAbilityId ~= nil and craftedAbilityId ~= 0 then
-            abilityId = craftedAbilityId
-        end
+    local durationMs = remainingMs
+    if type(GetActionSlotEffectDuration) == "function" then
+        durationMs = GetActionSlotEffectDuration(slotIndex, hotbarCategory) or remainingMs
+    end
+    if durationMs <= 0 then
+        durationMs = remainingMs
     end
 
-    if abilityId ~= nil
-        and abilityId ~= 0
-        and type(GetEffectiveAbilityIdForAbilityOnHotbar) == "function" then
-        local effectiveId = GetEffectiveAbilityIdForAbilityOnHotbar(abilityId, hotbarCategory)
-        if effectiveId ~= nil and effectiveId ~= 0 then
-            abilityId = effectiveId
-        end
+    local stackCount = 0
+    if type(GetActionSlotEffectStackCount) == "function" then
+        stackCount = GetActionSlotEffectStackCount(slotIndex, hotbarCategory) or 0
     end
 
-    return abilityId
-end
-
-local function GetAbilityDurationSeconds(abilityId, beginTime, endTime)
-    if beginTime ~= nil and endTime ~= nil and endTime > beginTime then
-        return endTime - beginTime
-    end
-    if abilityId ~= nil and type(GetAbilityDuration) == "function" then
-        local durationMs = GetAbilityDuration(abilityId)
-        if durationMs ~= nil and durationMs > 0 then
-            return durationMs / 1000
-        end
-    end
-    return 0
-end
-
-local function AddUnitEffectsByAbility(result, unitTag, now)
-    if type(GetNumBuffs) ~= "function" or type(GetUnitBuffInfo) ~= "function" then return end
-
-    local count = GetNumBuffs(unitTag) or 0
-    for index = 1, count do
-        local _, beginTime, endTime, _, _, _, _, _, _, _, abilityId, _, castByPlayer = GetUnitBuffInfo(unitTag, index)
-        abilityId = tonumber(abilityId)
-        endTime = tonumber(endTime)
-        if abilityId ~= nil and abilityId > 0 and endTime ~= nil and endTime > now then
-            if unitTag == "player" or castByPlayer == true then
-                local duration = GetAbilityDurationSeconds(abilityId, tonumber(beginTime), endTime)
-                local remaining = endTime - now
-                local current = result[abilityId]
-                if current == nil or remaining > current.remaining then
-                    result[abilityId] = {
-                        remaining = remaining,
-                        duration = duration,
-                    }
-                end
-            end
-        end
-    end
-end
-
-local function BuildActiveEffectsByAbility()
-    local now = GetNowSeconds()
-    local result = {}
-    AddUnitEffectsByAbility(result, "player", now)
-    AddUnitEffectsByAbility(result, "reticleover", now)
-    return result
+    return {
+        remaining = remainingMs / 1000,
+        duration = durationMs / 1000,
+        stackCount = stackCount,
+    }
 end
 
 local function FormatTimerSeconds(seconds)
     seconds = math.max(0, tonumber(seconds) or 0)
+    if type(ZO_FormatTimeShowUnitOverThresholdShowDecimalUnderThreshold) == "function"
+        and TIME_FORMAT_STYLE_SHOW_LARGEST_UNIT ~= nil then
+        local showUnitOverThresholdS = ZO_ONE_MINUTE_IN_SECONDS or 60
+        local showDecimalUnderThresholdS = ZO_EFFECT_EXPIRATION_IMMINENCE_THRESHOLD_S or 3
+        return ZO_FormatTimeShowUnitOverThresholdShowDecimalUnderThreshold(
+            seconds,
+            showUnitOverThresholdS,
+            showDecimalUnderThresholdS,
+            TIME_FORMAT_STYLE_SHOW_LARGEST_UNIT
+        )
+    end
     if seconds >= 60 then
         return tostring(math.ceil(seconds / 60)) .. "m"
     end
@@ -333,11 +287,12 @@ local function FormatTimerSeconds(seconds)
 end
 
 local function UpdateSlotTimer(slot, effect, visible, alpha)
-    if not (slot and slot.timerLabel and slot.timerBg and slot.timerBar) then return end
+    if not (slot and slot.timerLabel and slot.timerBg and slot.timerBar and slot.stackLabel) then return end
     if not visible or effect == nil or (effect.remaining or 0) <= 0 then
         slot.timerLabel:SetHidden(true)
         slot.timerBg:SetHidden(true)
         slot.timerBar:SetHidden(true)
+        slot.stackLabel:SetHidden(true)
         return
     end
 
@@ -354,6 +309,14 @@ local function UpdateSlotTimer(slot, effect, visible, alpha)
     slot.timerBar:SetValue(ratio)
     slot.timerBar:SetAlpha(timerAlpha)
     slot.timerBar:SetHidden(false)
+
+    if (effect.stackCount or 0) > 0 then
+        slot.stackLabel:SetText(tostring(effect.stackCount))
+        slot.stackLabel:SetAlpha(timerAlpha)
+        slot.stackLabel:SetHidden(false)
+    else
+        slot.stackLabel:SetHidden(true)
+    end
 end
 
 local function CreateSlot(parent, name)
@@ -393,6 +356,14 @@ local function CreateSlot(parent, name)
     timerLabel:SetMouseEnabled(false)
     timerLabel:SetHidden(true)
 
+    local stackLabel = WINDOW_MANAGER:CreateControl(name .. "_StackLabel", root, CT_LABEL)
+    stackLabel:SetFont("ZoFontGameSmall")
+    stackLabel:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
+    stackLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
+    stackLabel:SetColor(1, 1, 1, 1)
+    stackLabel:SetMouseEnabled(false)
+    stackLabel:SetHidden(true)
+
     return {
         root = root,
         bg = bg,
@@ -401,6 +372,7 @@ local function CreateSlot(parent, name)
         timerBg = timerBg,
         timerBar = timerBar,
         timerLabel = timerLabel,
+        stackLabel = stackLabel,
     }
 end
 
@@ -514,6 +486,10 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.timerLabel:ClearAnchors()
             slot.timerLabel:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -4, -7)
             slot.timerLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.45))
+
+            slot.stackLabel:ClearAnchors()
+            slot.stackLabel:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 4, -7)
+            slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.45))
         end
     end
 
@@ -529,7 +505,6 @@ function EZO_HUD:RefreshCustomActionBars()
     local inactiveAlpha = Clamp(settings.inactiveAlpha, 0.2, 1.0)
     local dimmedAlpha = Clamp(settings.dimmedAlpha, 0.05, 1.0)
     local showTimers = settings.showTimers == true
-    local activeEffects = showTimers and BuildActiveEffectsByAbility() or nil
 
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
@@ -544,12 +519,10 @@ function EZO_HUD:RefreshCustomActionBars()
             local slot = entry.slots[slotKey]
             local texture
             local hasAbility = true
-            local abilityId
             if slotKey == "weapon" then
                 texture = GetWeaponIcon(barName)
             else
                 texture, hasAbility = GetActionSlotIcon(slotKey, bar.hotbarCategory)
-                abilityId = GetSlotAbilityId(slotKey, bar.hotbarCategory)
             end
 
             local isDimmed = settings.dimSlots and settings.dimSlots[slotKey] == true
@@ -557,7 +530,7 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.icon:SetTexture(texture)
             slot.icon:SetColor(1, 1, 1, hasAbility and alpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
-            local effect = abilityId and activeEffects and activeEffects[abilityId] or nil
+            local effect = showTimers and GetActionSlotEffect(slotKey, bar.hotbarCategory) or nil
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha)
 
             if slotKey == "weapon" and isActive then
@@ -592,6 +565,12 @@ local function RegisterEvents()
     end
     if EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOTS_ALL_HOTBARS_UPDATED, refresh)
+    end
+    if EVENT_ACTION_SLOT_EFFECT_UPDATE then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_EFFECT_UPDATE, refresh)
+    end
+    if EVENT_ACTION_SLOT_EFFECTS_CLEARED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_EFFECTS_CLEARED, refresh)
     end
     if EVENT_INVENTORY_SINGLE_SLOT_UPDATE then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, refresh)

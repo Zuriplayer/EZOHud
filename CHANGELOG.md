@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.116 - Native Custom Action Bar Timers
+
+- Changed Custom Action Bars effect timers to use ESO's native action-slot effect APIs instead of scanning player and reticle-over buffs by matching abilityId.
+- Added native action-slot stack-count display when ESO exposes stacks for a custom action-bar slot.
+- Updated Custom Action Bars settings text and documentation to describe the native slot-timer source and its blank-slot limitation.
+
 ## 0.1.115 - Custom Action Bar Timer Startup Fix
 
 - Fixed Custom Action Bars startup after adding effect timers by avoiding a local layout-orientation constant shadowing ESO's native status-bar orientation constant.
