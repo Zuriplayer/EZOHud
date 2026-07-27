@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.127`
-- AddOnVersion: `10127`
+- Addon version: `0.1.128`
+- AddOnVersion: `10128`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -117,7 +117,7 @@ Recommended beta checks:
 - Test combat and out-of-combat alpha behavior.
 - Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
 - Test each ultimate display mode and active/inactive bar state.
-- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm the master enable toggle immediately enables dependent settings in both Settings > EZO and the standalone LAM panel, vertical mode places the highest action slot at the top while keeping ultimate at the bottom, weapon icons update after weapon swap, only the active weapon icon remains visible with the purple frame, inactive weapon icons disappear, active-bar highlighting follows bar swaps, used slots flash when activated, dimmed slot choices apply to both bars except when a native timer is currently active, native action-slot timers and stack counts follow ESO's own slot effect data, inactive-bar ability slots with active timers remain fully visible, the shared timer-bar color applies to all slots, the warning threshold changes low remaining timers to the warning tint, key-label modes render the expected keyboard/gamepad labels and scale with icon size, the active quickslot icon updates and moves independently, shows item count when ready, switches to a remaining-time label during potion/drink cooldown, and refills vertically back to full visibility, ultimate shows current/cost and dims before it is ready, the native action bar hides/restores with the new toggle, and both custom bars can be dragged independently across both axes.
+- Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm the master enable toggle immediately enables dependent settings in both Settings > EZO and the standalone LAM panel, vertical mode places the highest action slot at the top while keeping ultimate at the bottom, weapon icons update after weapon swap, only the active weapon icon remains visible with the purple frame, inactive weapon icons disappear, active-bar highlighting follows bar swaps, used slots flash when activated, dimmed slot choices apply to both bars except when a native timer is currently active, native action-slot timers and stack counts follow ESO's own slot effect data, inactive-bar ability slots with active timers remain fully visible, the shared timer-bar color applies to all slots, the warning threshold changes low remaining timers to the warning tint, key-label modes render the expected keyboard/gamepad labels and scale with icon size, gamepad labels remain slightly smaller than keyboard labels, the active quickslot icon updates and moves independently, shows item count when ready, switches to a remaining-time label during potion/drink cooldown, and refills vertically back to full visibility, ultimate shows current/cost and dims before it is ready, the native action bar hides/restores with the new toggle, and both custom bars can be dragged independently across both axes.
 - Test execute alert behavior with known execute abilities on the active bar.
 - Test shared EZOCore, English, Spanish, and Automatic language modes.
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it. Toggle each master enable setting from off to on and confirm dependent controls immediately become available without closing or reopening the panel.

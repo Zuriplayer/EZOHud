@@ -57,6 +57,8 @@ local KEYBIND_BASE_ICON_SIZE = 42
 local KEYBIND_BASE_SCALE_PERCENT = 150
 local KEYBIND_MIN_SCALE_PERCENT = 120
 local KEYBIND_MAX_SCALE_PERCENT = 320
+local GAMEPAD_KEYBIND_SCALE_MULTIPLIER = 0.82
+local GAMEPAD_KEYBIND_MIN_SCALE_PERCENT = 100
 
 local BAR_DEFS = {
     main = {
@@ -216,9 +218,15 @@ local function GetTimerWarningPercent(settings)
     return zo_floor(Clamp(settings.timerWarningPercent or defaultValue, 0, TIMER_WARNING_MAX_PERCENT))
 end
 
-local function GetKeybindScalePercent(iconSize)
+local function GetKeybindScalePercent(iconSize, mode)
     iconSize = Clamp(iconSize, 28, MAX_ICON_SIZE)
-    return zo_floor(Clamp((iconSize / KEYBIND_BASE_ICON_SIZE) * KEYBIND_BASE_SCALE_PERCENT, KEYBIND_MIN_SCALE_PERCENT, KEYBIND_MAX_SCALE_PERCENT))
+    local scalePercent = Clamp((iconSize / KEYBIND_BASE_ICON_SIZE) * KEYBIND_BASE_SCALE_PERCENT, KEYBIND_MIN_SCALE_PERCENT, KEYBIND_MAX_SCALE_PERCENT)
+    local useGamepadScale = mode == KEYBIND_MODE_GAMEPAD
+        or (mode == KEYBIND_MODE_AUTO and type(IsInGamepadPreferredMode) == "function" and IsInGamepadPreferredMode())
+    if useGamepadScale then
+        scalePercent = Clamp(scalePercent * GAMEPAD_KEYBIND_SCALE_MULTIPLIER, GAMEPAD_KEYBIND_MIN_SCALE_PERCENT, KEYBIND_MAX_SCALE_PERCENT)
+    end
+    return zo_floor(scalePercent)
 end
 
 local function ShouldUseCustomActionBars(settings)
@@ -620,7 +628,7 @@ end
 
 local function RegisterSlotKeybindLabel(slot, slotKey, mode, iconSize)
     if not (slot and slot.keyLabel) then return end
-    local scalePercent = GetKeybindScalePercent(iconSize)
+    local scalePercent = GetKeybindScalePercent(iconSize, mode)
     if slot.keybindMode == mode and slot.keybindScalePercent == scalePercent then return end
 
     if type(ZO_Keybindings_UnregisterLabelForBindingUpdate) == "function" then

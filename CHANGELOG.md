@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.128 - Smaller Gamepad Action Labels
+
+- Reduced the Custom Action Bars key-label scale when gamepad labels are shown, including Auto mode while ESO is in gamepad-preferred mode.
+
 ## 0.1.127 - Larger Crux Defaults
 
 - Raised the default Crux HUD size to 140 px and the default Crux bar spacing to 25 px.
