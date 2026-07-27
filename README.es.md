@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.128`
-- AddOnVersion: `10128`
+- Versión del addon: `0.1.129`
+- AddOnVersion: `10129`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -38,7 +38,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Ocultación automática de las barras de atributos del jugador por defecto de ESO al activar el HUD de atributos personalizado, manteniendo disponible el ajuste manual.
 - Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
 - Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical más compacta alineada a la izquierda para Salud, Estamina y Magia.
-- Ajustes de anchura de barra para Salud, Magia y Estamina.
+- Ajustes de anchura de barra para Salud, Magia y Estamina, con tamaño máximo de 750.
 - Selectores de color de recurso limitados a la familia de color de cada recurso.
 - Umbrales de aviso por recurso que cambian los números del recurso y el fondo consumido a un tinte de alarma suave.
 - Alpha fuera de combate para el HUD de atributos personalizado.
@@ -79,7 +79,7 @@ Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZ
 Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
-- HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño, color y umbral de aviso por recurso.
+- HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño hasta 750, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - Barras de Habilidades Personalizadas: activar copias visuales de las barras de habilidades, ocultar opcionalmente la barra de habilidades nativa del HUD de ESO, elegir barras visibles, definir orientación horizontal o vertical, mover principal, secundaria e icono de slot rápido activo independientemente, ajustar tamaño/separación/alpha de iconos, activar temporizadores nativos de efectos de slot y acumulaciones, elegir el color compartido de la barra de temporizador y el umbral proporcional de aviso, elegir etiquetas de tecla desactivadas/automáticas/teclado/mando y elegir slots lógicos opacados globalmente. El icono del slot rápido activo refleja el cooldown nativo de ESO con relleno vertical y etiqueta de tiempo restante.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.

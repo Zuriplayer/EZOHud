@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.128`
-- AddOnVersion: `10128`
+- Addon version: `0.1.129`
+- AddOnVersion: `10129`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -38,7 +38,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Automatic hiding of the default ESO player attribute bars when the custom Attribute HUD is enabled, with a manual toggle still available.
 - Attribute HUD movement mode that lets the three resource bars move as a group.
 - Attribute HUD layout selector with the classic split model and a tighter left-aligned vertical stack for Health, Stamina, and Magicka.
-- Resource bar width settings for Health, Magicka, and Stamina.
+- Resource bar width settings for Health, Magicka, and Stamina, with a maximum size of 750.
 - Resource color pickers constrained to each resource color family.
 - Per-resource warning thresholds that change the resource numbers and consumed background to a soft alarm tint.
 - Out-of-combat alpha for the custom attribute HUD.
@@ -79,7 +79,7 @@ When EZOCore is active, the complete panel is rendered inside `Settings > EZO` a
 With EZOCore active, EZOhud follows the EZO family preference storage policy: ordinary HUD settings use the selected account-wide or per-character scope. When the scope is per character, the first load copies existing account-wide EZOhud settings into that character profile. Without EZOCore, EZOhud keeps its historical account-wide storage.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
-- Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size, color, and warning threshold.
+- Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size up to 750, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Custom Action Bars: enable visual copies of ability bars, optionally hide ESO's native HUD action bar, choose visible bars, set horizontal or vertical orientation, move main, backup, and active quickslot indicators independently, adjust icon size/spacing/alpha, toggle native action-slot effect timers and stack counts, choose the shared timer-bar color and proportional warning threshold, choose key labels off/auto/keyboard/gamepad, and choose globally dimmed logical slots. The active quickslot icon mirrors ESO's cooldown data with a vertical refill and remaining-time label.
 - Execute HUD: enable alert, enable movement, and set alert size.

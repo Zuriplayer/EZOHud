@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.129 - Larger Attribute Size Range
+
+- Raised the Attribute HUD Health, Magicka, and Stamina size slider maximum from 500 to 750.
+
 ## 0.1.128 - Smaller Gamepad Action Labels
 
 - Reduced the Custom Action Bars key-label scale when gamepad labels are shown, including Auto mode while ESO is in gamepad-preferred mode.

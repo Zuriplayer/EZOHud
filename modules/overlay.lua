@@ -732,7 +732,7 @@ function EZO_HUD:InitializeSettings()
                 name = GetString(EZO_HUD_OPTION_SIZE),
                 tooltip = GetString(EZO_HUD_OPTION_SIZE_TOOLTIP),
                 min = 90,
-                max = 500,
+                max = 750,
                 step = 5,
                 getFunc = function()
                     return self.sv.overlay[meta.sizeKey]
