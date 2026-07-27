@@ -610,6 +610,7 @@ EZOhud_LAM.RegisterSection("customGroupSearch", 68, function()
                 settings.enabled = value
                 EZO_HUD:RefreshCustomGroupSearchMovementState()
                 EZO_HUD:RefreshCustomGroupSearch()
+                EZO_HUD:RequestSettingsPanelRefresh()
             end,
             default = EZO_HUD.defaults.customGroupSearch.enabled,
         },

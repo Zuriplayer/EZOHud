@@ -489,6 +489,7 @@ function EZO_HUD:InitializeExecute()
                     setFunc = function(value)
                         GetExecuteSettings().enabled = value
                         self:RefreshExecute()
+                        self:RequestSettingsPanelRefresh()
                     end,
                     default = self.defaults.execute.enabled,
                     width = "full",

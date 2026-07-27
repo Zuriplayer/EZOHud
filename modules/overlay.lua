@@ -853,6 +853,7 @@ function EZO_HUD:InitializeSettings()
                         end
                     end
                     self:RefreshOverlayVisibility()
+                    self:RequestSettingsPanelRefresh()
                 end,
                 default = self.defaults.overlay.enabled,
                 width = "full",

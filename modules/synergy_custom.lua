@@ -200,6 +200,7 @@ EZOhud_LAM.RegisterSection("customSynergy", 65, function()
             setFunc = function(value)
                 settings.enabled = value
                 EZO_HUD:RefreshCustomSynergy()
+                EZO_HUD:RequestSettingsPanelRefresh()
             end,
             default = EZO_HUD.defaults.customSynergy.enabled,
         },

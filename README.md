@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.122`
-- AddOnVersion: `10122`
+- Addon version: `0.1.123`
+- AddOnVersion: `10123`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -120,7 +120,7 @@ Recommended beta checks:
 - Test Custom Action Bars with main, backup, both, active-only, horizontal, and vertical modes. Confirm the master enable toggle immediately enables dependent settings in both Settings > EZO and the standalone LAM panel, weapon icons update after weapon swap, only the active weapon icon remains visible with the purple frame, active-bar highlighting follows bar swaps, dimmed slot choices apply to both bars, native action-slot timers and stack counts follow ESO's own slot effect data, the shared timer-bar color applies to all slots, key-label modes render the expected keyboard/gamepad labels and scale with icon size, the active quickslot icon updates and moves independently, ultimate shows current/cost and dims before it is ready, the native action bar hides/restores with the new toggle, and both custom bars can be dragged independently across both axes.
 - Test execute alert behavior with known execute abilities on the active bar.
 - Test shared EZOCore, English, Spanish, and Automatic language modes.
-- Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it.
+- Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it. Toggle each master enable setting from off to on and confirm dependent controls immediately become available without closing or reopening the panel.
 - Test different resolutions and UI scale values.
 - Test `/reloadui` after moving HUD elements.
 - Test native widget positioning with keyboard and gamepad UI for center screen announcements and active combat tips.

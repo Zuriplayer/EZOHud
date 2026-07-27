@@ -625,6 +625,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 settings.enabled = value
                 EZO_HUD:RefreshCustomQuestTrackerMovementState()
                 EZO_HUD:RefreshCustomQuestTracker()
+                EZO_HUD:RequestSettingsPanelRefresh()
             end,
             default = EZO_HUD.defaults.customQuestTracker.enabled,
         },

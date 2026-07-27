@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.123 - Settings Host Refresh Coverage
+
+- Applied the shared settings-panel refresh to the remaining LAM master enable toggles, including Custom Quest Tracker, Custom Group Search, Custom Synergy, Custom Loot, native widget positioning, Attribute HUD, Ultimate HUD, Execute HUD and Crux HUD.
+- Fixed dependent controls staying disabled after first enabling sections in the EZOCore-hosted Settings > EZO panel.
+
 ## 0.1.122 - Custom Action Bars Settings Refresh
 
 - Added a shared settings-panel refresh helper that uses EZOCore's active settings host when present and LibAddonMenu refresh when running standalone.

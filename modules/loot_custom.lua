@@ -332,6 +332,7 @@ function EZO_HUD:InitializeCustomLoot()
                 setFunc = function(v)
                     s.enabled = v
                     EZO_HUD:RefreshCustomLootVisibility()
+                    EZO_HUD:RequestSettingsPanelRefresh()
                 end,
                 default = EZO_HUD.defaults.customLoot.enabled,
             },

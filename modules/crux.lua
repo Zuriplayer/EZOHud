@@ -374,6 +374,7 @@ function EZO_HUD:InitializeCrux()
                     setFunc = function(value)
                         GetCruxSettings().enabled = value
                         self:RefreshCruxDisplay()
+                        self:RequestSettingsPanelRefresh()
                     end,
                     default = self.defaults.crux.enabled,
                     width = "full",

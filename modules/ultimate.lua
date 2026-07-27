@@ -406,6 +406,7 @@ function EZO_HUD:InitializeUltimate()
                     setFunc = function(value)
                         self.sv.ultimate.enabled = value
                         self:RefreshUltimateVisibility()
+                        self:RequestSettingsPanelRefresh()
                     end,
                     default = self.defaults.ultimate.enabled,
                     width = "full",

@@ -436,6 +436,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         else
                             RunOnWidgetControls(widget, widget.onPreviewClose)
                         end
+                        self:RequestSettingsPanelRefresh()
                     end,
                     default = self.defaults[widget.id].enabled,
                     width = "full",
