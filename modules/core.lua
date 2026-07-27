@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.121"
-EZO_HUD.ADDON_VERSION_NUM = 10121
+EZO_HUD.ADDON_VERSION = "0.1.122"
+EZO_HUD.ADDON_VERSION_NUM = 10122
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -421,6 +421,23 @@ function EZO_HUD:IsMoveModeEnabled(sectionName)
     return self.runtime
         and self.runtime.moveMode
         and self.runtime.moveMode[sectionName] == true
+end
+
+function EZO_HUD:RequestSettingsPanelRefresh()
+    if self.ezoSettingsRegistered
+        and EZOCore
+        and type(EZOCore.RefreshSettingsPanel) == "function" then
+        EZOCore:RefreshSettingsPanel()
+        return
+    end
+
+    local lam = _G.LibAddonMenu2 or LibAddonMenu2
+    if lam
+        and lam.util
+        and type(lam.util.RequestRefreshIfNeeded) == "function"
+        and self._lamPanel then
+        lam.util.RequestRefreshIfNeeded(self._lamPanel)
+    end
 end
 
 function EZO_HUD:SaveMoveModeSectionPosition(sectionName)

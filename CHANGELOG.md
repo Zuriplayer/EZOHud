@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.122 - Custom Action Bars Settings Refresh
+
+- Added a shared settings-panel refresh helper that uses EZOCore's active settings host when present and LibAddonMenu refresh when running standalone.
+- Fixed the Custom Action Bars master toggle so dependent settings become available immediately after the first enable in both Settings > EZO and the standalone LAM panel.
+
 ## 0.1.121 - Custom Action Bar Native Toggle and Quickslot
 
 - Added a Custom Action Bars option to hide ESO's native action bar while the custom bars are enabled and visible.

@@ -1121,6 +1121,9 @@ function EZO_HUD.RefreshCustomActionBarsLamControls()
         for _, slotKey in ipairs(SLOT_ORDER) do
             RefreshLamControl(LAM_REFERENCE_PREFIX .. "Dim_" .. slotKey)
         end
+        if EZO_HUD.RequestSettingsPanelRefresh then
+            EZO_HUD:RequestSettingsPanelRefresh()
+        end
     end
 
     if zo_callLater then

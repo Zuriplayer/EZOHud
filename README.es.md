@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.121`
-- AddOnVersion: `10121`
+- Versión del addon: `0.1.122`
+- AddOnVersion: `10122`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -117,7 +117,7 @@ Comprobaciones recomendadas para la beta:
 - Probar el comportamiento en combate y el alpha fuera de combate.
 - Probar que al activar el HUD de atributos de EZOhud se ocultan automáticamente las barras vanilla de ESO, y que el ajuste manual de barras vanilla sigue aplicándose después.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
-- Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas, solo activa, horizontal y vertical. Confirmar que los iconos de arma cambian al cambiar de arma, solo el icono de arma activa queda visible con marco violeta, el resaltado de barra activa sigue los cambios de barra, los slots opacados se aplican a ambas barras, los temporizadores nativos y acumulaciones siguen los datos de efecto de slot de ESO, el color compartido de la barra de temporizador se aplica a todos los slots, los modos de etiquetas muestran las teclas de teclado/mando esperadas y escalan con el tamaño de icono, el icono de slot rápido activo se actualiza y se mueve de forma independiente, ultimate muestra actual/coste y se opaca antes de estar listo, la barra nativa se oculta/restaura con el nuevo ajuste y ambas barras personalizadas se pueden arrastrar de forma independiente en ambos ejes.
+- Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas, solo activa, horizontal y vertical. Confirmar que el toggle maestro activa inmediatamente los ajustes dependientes tanto en Ajustes > EZO como en el panel LAM independiente, los iconos de arma cambian al cambiar de arma, solo el icono de arma activa queda visible con marco violeta, el resaltado de barra activa sigue los cambios de barra, los slots opacados se aplican a ambas barras, los temporizadores nativos y acumulaciones siguen los datos de efecto de slot de ESO, el color compartido de la barra de temporizador se aplica a todos los slots, los modos de etiquetas muestran las teclas de teclado/mando esperadas y escalan con el tamaño de icono, el icono de slot rápido activo se actualiza y se mueve de forma independiente, ultimate muestra actual/coste y se opaca antes de estar listo, la barra nativa se oculta/restaura con el nuevo ajuste y ambas barras personalizadas se pueden arrastrar de forma independiente en ambos ejes.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.
 - Probar los modos de idioma compartido de EZOCore, Inglés, Español y Automático.
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él.
