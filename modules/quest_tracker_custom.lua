@@ -26,6 +26,10 @@ local function GetCustomQuestTrackerSettings()
     return (EZO_HUD.sv and EZO_HUD.sv.customQuestTracker) or EZO_HUD.defaults.customQuestTracker
 end
 
+local function AreCustomQuestTrackerSettingsDisabled()
+    return not GetCustomQuestTrackerSettings().enabled
+end
+
 local function SafeCall(fn, ...)
     if type(fn) ~= "function" then return nil end
     local ok, result1, result2, result3, result4, result5, result6, result7, result8, result9, result10 = pcall(fn, ...)
@@ -622,6 +626,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
             tooltip = GetString(EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_ENABLE_TOOLTIP),
             getFunc = function() return settings.enabled end,
             setFunc = function(value)
+                settings = GetCustomQuestTrackerSettings()
                 settings.enabled = value
                 EZO_HUD:RefreshCustomQuestTrackerMovementState()
                 EZO_HUD:RefreshCustomQuestTracker()
@@ -638,7 +643,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 settings.hideInCombat = value
                 EZO_HUD:RefreshCustomQuestTracker()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomQuestTrackerSettingsDisabled,
             default = EZO_HUD.defaults.customQuestTracker.hideInCombat,
         },
         {
@@ -651,7 +656,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 EZO_HUD:RefreshCustomQuestTrackerMovementState()
                 EZO_HUD:RefreshCustomQuestTracker()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomQuestTrackerSettingsDisabled,
             default = false,
         },
         {
@@ -667,7 +672,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 EZO_HUD:ApplyCustomQuestTrackerLayout()
                 EZO_HUD:RefreshCustomQuestTracker()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomQuestTrackerSettingsDisabled,
             default = zo_floor(EZO_HUD.defaults.customQuestTracker.scale * 100),
         },
         {
@@ -679,7 +684,7 @@ EZOhud_LAM.RegisterSection("customQuestTracker", 62, function()
                 settings.showHints = value
                 EZO_HUD:RefreshCustomQuestTracker()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomQuestTrackerSettingsDisabled,
             default = EZO_HUD.defaults.customQuestTracker.showHints,
         },
     }

@@ -30,6 +30,10 @@ local function GetCustomLootSettings()
     return EZO_HUD.defaults.customLoot
 end
 
+local function AreCustomLootSettingsDisabled()
+    return not GetCustomLootSettings().enabled
+end
+
 local function BuildCustomLootIndicator()
     local root = WINDOW_MANAGER:CreateTopLevelWindow(CUSTOM_LOOT_NAME)
     root:SetClampedToScreen(true)
@@ -330,6 +334,7 @@ function EZO_HUD:InitializeCustomLoot()
                 tooltip = GetString(EZO_HUD_OPTION_CUSTOM_LOOT_ENABLE_TOOLTIP),
                 getFunc = function() return s.enabled end,
                 setFunc = function(v)
+                    s = GetCustomLootSettings()
                     s.enabled = v
                     EZO_HUD:RefreshCustomLootVisibility()
                     EZO_HUD:RequestSettingsPanelRefresh()
@@ -345,7 +350,7 @@ function EZO_HUD:InitializeCustomLoot()
                     EZO_HUD:SetMoveModeEnabled("customLoot", v)
                     EZO_HUD:RefreshCustomLootMovementState()
                 end,
-                disabled = function() return not s.enabled end,
+                disabled = AreCustomLootSettingsDisabled,
                 default = false,
             },
             {
@@ -358,7 +363,7 @@ function EZO_HUD:InitializeCustomLoot()
                     s.fadeTime = v
                     EZO_HUD:ApplyCustomLootLayout()
                 end,
-                disabled = function() return not s.enabled end,
+                disabled = AreCustomLootSettingsDisabled,
                 default = EZO_HUD.defaults.customLoot.fadeTime,
             },
             {
@@ -371,7 +376,7 @@ function EZO_HUD:InitializeCustomLoot()
                     s.scale = v / 100
                     EZO_HUD:ApplyCustomLootLayout()
                 end,
-                disabled = function() return not s.enabled end,
+                disabled = AreCustomLootSettingsDisabled,
                 default = math.floor(EZO_HUD.defaults.customLoot.scale * 100),
             },
         }

@@ -174,6 +174,10 @@ local function GetSettings()
     return settings
 end
 
+local function AreCustomActionBarsSettingsDisabled()
+    return not GetSettings().enabled
+end
+
 local function GetDisplayMode(settings)
     local mode = settings.displayMode
     if mode == DISPLAY_OFF
@@ -1308,10 +1312,9 @@ function EZO_HUD.RefreshCustomActionBarsLamControls()
         end
     end
 
+    refresh()
     if zo_callLater then
         zo_callLater(refresh, 1)
-    else
-        refresh()
     end
 end
 
@@ -1395,6 +1398,7 @@ function EZO_HUD:InitializeCustomActionBars()
                     tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ENABLE_TOOLTIP),
                     getFunc = function() return settings.enabled end,
                     setFunc = function(value)
+                        settings = GetSettings()
                         settings.enabled = value == true
                         EZO_HUD:RefreshCustomActionBars()
                         EZO_HUD.RefreshCustomActionBarsLamControls()
@@ -1411,7 +1415,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.hideNativeActionBar = value == true
                         EZO_HUD:ApplyCustomActionBarsNativeVisibility()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.hideNativeActionBar,
                     width = "half",
                 },
@@ -1427,7 +1431,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.displayMode = GetDisplayMode({ displayMode = value })
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.displayMode,
                     width = "half",
                 },
@@ -1443,7 +1447,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.orientation = GetOrientation({ orientation = value })
                         EZO_HUD:ApplyCustomActionBarsLayout()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.orientation,
                     width = "half",
                 },
@@ -1458,7 +1462,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         EZO_HUD:RefreshCustomActionBarsMovementState()
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = false,
                     width = "half",
                 },
@@ -1473,7 +1477,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         EZO_HUD:RefreshCustomActionBarsMovementState()
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = false,
                     width = "half",
                 },
@@ -1488,7 +1492,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         EZO_HUD:RefreshCustomQuickslotMovementState()
                         EZO_HUD:RefreshCustomQuickslot()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = false,
                     width = "half",
                 },
@@ -1505,7 +1509,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.iconSize = value
                         EZO_HUD:ApplyCustomActionBarsLayout()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.iconSize,
                     width = "half",
                 },
@@ -1522,7 +1526,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.spacing = value
                         EZO_HUD:ApplyCustomActionBarsLayout()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.spacing,
                     width = "half",
                 },
@@ -1536,7 +1540,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.showTimers = value == true
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.showTimers,
                     width = "half",
                 },
@@ -1552,7 +1556,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.timerBarColor = { r = r, g = g, b = b, a = a }
                         EZO_HUD:ApplyCustomActionBarsLayout()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.timerBarColor,
                     width = "half",
                 },
@@ -1569,7 +1573,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.timerWarningPercent = Clamp(value, 0, TIMER_WARNING_MAX_PERCENT)
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.timerWarningPercent,
                     width = "half",
                 },
@@ -1590,7 +1594,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.keybindMode = GetKeybindMode({ keybindMode = value })
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.keybindMode,
                     width = "half",
                 },
@@ -1607,7 +1611,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.inactiveAlpha = value / 100
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = zo_floor(EZO_HUD.defaults.customActionBars.inactiveAlpha * 100),
                     width = "half",
                 },
@@ -1624,7 +1628,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.dimmedAlpha = value / 100
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = zo_floor(EZO_HUD.defaults.customActionBars.dimmedAlpha * 100),
                     width = "half",
                 },
@@ -1647,7 +1651,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings.dimSlots[slotKey] = value == true
                         EZO_HUD:RefreshCustomActionBars()
                     end,
-                    disabled = function() return not settings.enabled end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.dimSlots[slotKey],
                     width = "half",
                 })

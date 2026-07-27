@@ -32,6 +32,10 @@ local function GetCustomGroupSearchSettings()
     return EZO_HUD.defaults.customGroupSearch
 end
 
+local function AreCustomGroupSearchSettingsDisabled()
+    return not GetCustomGroupSearchSettings().enabled
+end
+
 local function SafeCall(func, ...)
     if type(func) ~= "function" then
         return nil
@@ -607,6 +611,7 @@ EZOhud_LAM.RegisterSection("customGroupSearch", 68, function()
             tooltip = GetString(EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_ENABLE_TOOLTIP),
             getFunc = function() return settings.enabled end,
             setFunc = function(value)
+                settings = GetCustomGroupSearchSettings()
                 settings.enabled = value
                 EZO_HUD:RefreshCustomGroupSearchMovementState()
                 EZO_HUD:RefreshCustomGroupSearch()
@@ -624,7 +629,7 @@ EZOhud_LAM.RegisterSection("customGroupSearch", 68, function()
                 EZO_HUD:RefreshCustomGroupSearchMovementState()
                 EZO_HUD:RefreshCustomGroupSearch()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomGroupSearchSettingsDisabled,
             default = false,
         },
         {
@@ -640,7 +645,7 @@ EZOhud_LAM.RegisterSection("customGroupSearch", 68, function()
                 EZO_HUD:ApplyCustomGroupSearchLayout()
                 EZO_HUD:RefreshCustomGroupSearch()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomGroupSearchSettingsDisabled,
             default = zo_floor(EZO_HUD.defaults.customGroupSearch.scale * 100),
         },
     }

@@ -8,6 +8,10 @@ local function GetCustomSynergySettings()
     return EZO_HUD.sv and EZO_HUD.sv.customSynergy or EZO_HUD.defaults.customSynergy
 end
 
+local function AreCustomSynergySettingsDisabled()
+    return not GetCustomSynergySettings().enabled
+end
+
 local function BuildCustomSynergyIndicator()
     local root = WINDOW_MANAGER:CreateTopLevelWindow(CUSTOM_SYNERGY_NAME)
     root:SetClampedToScreen(true)
@@ -198,6 +202,7 @@ EZOhud_LAM.RegisterSection("customSynergy", 65, function()
             tooltip = GetString(EZO_HUD_OPTION_CUSTOM_SYNERGY_ENABLE_TOOLTIP),
             getFunc = function() return settings.enabled end,
             setFunc = function(value)
+                settings = GetCustomSynergySettings()
                 settings.enabled = value
                 EZO_HUD:RefreshCustomSynergy()
                 EZO_HUD:RequestSettingsPanelRefresh()
@@ -213,7 +218,7 @@ EZOhud_LAM.RegisterSection("customSynergy", 65, function()
                 EZO_HUD:SetMoveModeEnabled("customSynergy", value)
                 EZO_HUD:RefreshCustomSynergyMovementState()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomSynergySettingsDisabled,
             default = false,
         },
         {
@@ -228,7 +233,7 @@ EZOhud_LAM.RegisterSection("customSynergy", 65, function()
                 settings.size = value
                 EZO_HUD:ApplyCustomSynergyLayout()
             end,
-            disabled = function() return not settings.enabled end,
+            disabled = AreCustomSynergySettingsDisabled,
             default = EZO_HUD.defaults.customSynergy.size,
         },
     }

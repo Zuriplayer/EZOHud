@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.130 - Custom Action Bars Settings Enable Refresh
+
+- Fixed Custom Action Bars dependent settings remaining visually disabled after enabling the section, including the EZOCore-hosted Settings > EZO panel.
+- Hardened similar dependent settings in Custom Quest Tracker, Custom Group Search, Custom Synergy, and Custom Loot so their disabled state is recalculated from current SavedVariables.
+
 ## 0.1.129 - Larger Attribute Size Range
 
 - Raised the Attribute HUD Health, Magicka, and Stamina size slider maximum from 500 to 750.
