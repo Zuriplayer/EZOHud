@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.124 - Custom Action Bar Vertical Feedback
+
+- Reordered vertical Custom Action Bars so ability slots are inverted for gamepad-style reading while ultimate stays at the bottom.
+- Added a visual flash on used custom action slots using ESO's native action-slot ability-used event.
+- Added a configurable proportional timer-warning threshold that changes low remaining custom action-bar timers to a soft warning tint.
+
 ## 0.1.123 - Settings Host Refresh Coverage
 
 - Applied the shared settings-panel refresh to the remaining LAM master enable toggles, including Custom Quest Tracker, Custom Group Search, Custom Synergy, Custom Loot, native widget positioning, Attribute HUD, Ultimate HUD, Execute HUD and Crux HUD.

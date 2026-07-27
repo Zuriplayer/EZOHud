@@ -36,6 +36,7 @@ local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "Spacing",
     LAM_REFERENCE_PREFIX .. "ShowTimers",
     LAM_REFERENCE_PREFIX .. "TimerBarColor",
+    LAM_REFERENCE_PREFIX .. "TimerWarningPercent",
     LAM_REFERENCE_PREFIX .. "KeybindMode",
     LAM_REFERENCE_PREFIX .. "InactiveAlpha",
     LAM_REFERENCE_PREFIX .. "DimmedAlpha",
@@ -43,6 +44,14 @@ local LAM_DEPENDENT_REFERENCES = {
 local TIMER_UPDATE_MS = 250
 local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
 local MAX_ICON_SIZE = 96
+local SLOT_USE_ANIMATION_MS = 320
+local SLOT_USE_SCALE = 1.15
+local TIMER_WARNING_MAX_PERCENT = 75
+local TIMER_LABEL_COLOR = { r = 1, g = 0.86, b = 0.30, a = 1 }
+local TIMER_WARNING_LABEL_COLOR = { r = 1, g = 0.34, b = 0.24, a = 1 }
+local TIMER_WARNING_BAR_COLOR = { r = 1, g = 0.18, b = 0.12, a = 1 }
+local TIMER_BG_COLOR = { r = 0.02, g = 0.02, b = 0.025, a = 0.82 }
+local TIMER_WARNING_BG_COLOR = { r = 0.34, g = 0.02, b = 0.015, a = 0.9 }
 local KEYBIND_BASE_ICON_SIZE = 42
 local KEYBIND_BASE_SCALE_PERCENT = 150
 local KEYBIND_MIN_SCALE_PERCENT = 120
@@ -71,6 +80,7 @@ local BAR_DEFS = {
 
 local BAR_ORDER = { "main", "backup" }
 local SLOT_ORDER = { "weapon", "slot1", "slot2", "slot3", "slot4", "slot5", "ultimate" }
+local VERTICAL_SLOT_ORDER = { "slot5", "slot4", "slot3", "slot2", "slot1", "weapon", "ultimate" }
 local ACTION_SLOT_BY_KEY = {
     slot1 = SLOT_FIRST,
     slot2 = SLOT_FIRST + 1,
@@ -79,6 +89,10 @@ local ACTION_SLOT_BY_KEY = {
     slot5 = SLOT_FIRST + 4,
     ultimate = ACTION_BAR_ULTIMATE_SLOT_INDEX + 1,
 }
+local SLOT_KEY_BY_ACTION_SLOT = {}
+for slotKey, actionSlotIndex in pairs(ACTION_SLOT_BY_KEY) do
+    SLOT_KEY_BY_ACTION_SLOT[actionSlotIndex] = slotKey
+end
 
 local function BuildSet(...)
     local set = {}
@@ -173,6 +187,10 @@ local function GetOrientation(settings)
     return settings.orientation == LAYOUT_VERTICAL and LAYOUT_VERTICAL or LAYOUT_HORIZONTAL
 end
 
+local function GetLayoutSlotOrder(orientation)
+    return orientation == LAYOUT_VERTICAL and VERTICAL_SLOT_ORDER or SLOT_ORDER
+end
+
 local function GetKeybindMode(settings)
     local mode = settings.keybindMode
     if mode == KEYBIND_MODE_AUTO
@@ -190,6 +208,11 @@ local function GetTimerBarColor(settings)
         Clamp(color.g ~= nil and color.g or defaultColor.g, 0, 1),
         Clamp(color.b ~= nil and color.b or defaultColor.b, 0, 1),
         Clamp(color.a ~= nil and color.a or defaultColor.a, 0, 1)
+end
+
+local function GetTimerWarningPercent(settings)
+    local defaultValue = EZO_HUD.defaults.customActionBars.timerWarningPercent or 25
+    return zo_floor(Clamp(settings.timerWarningPercent or defaultValue, 0, TIMER_WARNING_MAX_PERCENT))
 end
 
 local function GetKeybindScalePercent(iconSize)
@@ -478,7 +501,40 @@ local function FormatTimerSeconds(seconds)
     return tostring(math.ceil(seconds))
 end
 
-local function UpdateSlotTimer(slot, effect, visible, alpha)
+local function GetNowMs()
+    if type(GetFrameTimeMilliseconds) == "function" then
+        return GetFrameTimeMilliseconds()
+    end
+    if type(GetGameTimeMilliseconds) == "function" then
+        return GetGameTimeMilliseconds()
+    end
+    return 0
+end
+
+local function PlaySlotUseAnimation(slot)
+    if not slot then return end
+    slot.useFlashExpiresMs = GetNowMs() + SLOT_USE_ANIMATION_MS
+end
+
+local function UpdateSlotUseAnimation(slot)
+    if not (slot and slot.flash and slot.icon) then return end
+
+    local remainingMs = (slot.useFlashExpiresMs or 0) - GetNowMs()
+    if remainingMs <= 0 then
+        slot.useFlashExpiresMs = nil
+        slot.flash:SetHidden(true)
+        slot.flash:SetAlpha(0)
+        slot.icon:SetScale(1)
+        return
+    end
+
+    local ratio = Clamp(remainingMs / SLOT_USE_ANIMATION_MS, 0, 1)
+    slot.flash:SetHidden(false)
+    slot.flash:SetAlpha(0.72 * ratio)
+    slot.icon:SetScale(1 + ((SLOT_USE_SCALE - 1) * ratio))
+end
+
+local function UpdateSlotTimer(slot, effect, visible, alpha, warningRatio, timerR, timerG, timerB, timerA)
     if not (slot and slot.timerLabel and slot.timerBg and slot.timerBar and slot.stackLabel) then return end
     if not visible or effect == nil or (effect.remaining or 0) <= 0 then
         slot.timerLabel:SetHidden(true)
@@ -492,8 +548,19 @@ local function UpdateSlotTimer(slot, effect, visible, alpha)
     local duration = math.max(0, effect.duration or 0)
     local ratio = duration > 0 and Clamp(remaining / duration, 0, 1) or 1
     local timerAlpha = Clamp(alpha or 1, 0.18, 1.0)
+    local warningEnabled = (warningRatio or 0) > 0
+    local isWarning = warningEnabled and duration > 0 and ratio <= warningRatio
 
     slot.timerLabel:SetText(FormatTimerSeconds(remaining))
+    if isWarning then
+        slot.timerLabel:SetColor(TIMER_WARNING_LABEL_COLOR.r, TIMER_WARNING_LABEL_COLOR.g, TIMER_WARNING_LABEL_COLOR.b, TIMER_WARNING_LABEL_COLOR.a)
+        slot.timerBg:SetColor(TIMER_WARNING_BG_COLOR.r, TIMER_WARNING_BG_COLOR.g, TIMER_WARNING_BG_COLOR.b, TIMER_WARNING_BG_COLOR.a)
+        slot.timerBar:SetColor(TIMER_WARNING_BAR_COLOR.r, TIMER_WARNING_BAR_COLOR.g, TIMER_WARNING_BAR_COLOR.b, TIMER_WARNING_BAR_COLOR.a)
+    else
+        slot.timerLabel:SetColor(TIMER_LABEL_COLOR.r, TIMER_LABEL_COLOR.g, TIMER_LABEL_COLOR.b, TIMER_LABEL_COLOR.a)
+        slot.timerBg:SetColor(TIMER_BG_COLOR.r, TIMER_BG_COLOR.g, TIMER_BG_COLOR.b, TIMER_BG_COLOR.a)
+        slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
+    end
     slot.timerLabel:SetAlpha(timerAlpha)
     slot.timerLabel:SetHidden(false)
     slot.timerBg:SetAlpha(timerAlpha)
@@ -613,9 +680,15 @@ local function CreateSlot(parent, name)
     border:SetCenterColor(0, 0, 0, 0)
     border:SetMouseEnabled(false)
 
+    local flash = WINDOW_MANAGER:CreateControl(name .. "_Flash", root, CT_TEXTURE)
+    flash:SetTexture(WHITE_TEXTURE)
+    flash:SetColor(1, 0.78, 0.28, 1)
+    flash:SetMouseEnabled(false)
+    flash:SetHidden(true)
+
     local timerBg = WINDOW_MANAGER:CreateControl(name .. "_TimerBg", root, CT_TEXTURE)
     timerBg:SetTexture(WHITE_TEXTURE)
-    timerBg:SetColor(0.02, 0.02, 0.025, 0.82)
+    timerBg:SetColor(TIMER_BG_COLOR.r, TIMER_BG_COLOR.g, TIMER_BG_COLOR.b, TIMER_BG_COLOR.a)
     timerBg:SetMouseEnabled(false)
     timerBg:SetHidden(true)
 
@@ -631,7 +704,7 @@ local function CreateSlot(parent, name)
     timerLabel:SetFont("ZoFontGameLargeBold")
     timerLabel:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
     timerLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
-    timerLabel:SetColor(1, 0.86, 0.30, 1)
+    timerLabel:SetColor(TIMER_LABEL_COLOR.r, TIMER_LABEL_COLOR.g, TIMER_LABEL_COLOR.b, TIMER_LABEL_COLOR.a)
     timerLabel:SetMouseEnabled(false)
     timerLabel:SetHidden(true)
 
@@ -664,6 +737,7 @@ local function CreateSlot(parent, name)
         bg = bg,
         icon = icon,
         border = border,
+        flash = flash,
         timerBg = timerBg,
         timerBar = timerBar,
         timerLabel = timerLabel,
@@ -855,7 +929,8 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     local spacing = Clamp(settings.spacing, 0, 16)
     local orientation = GetOrientation(settings)
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
-    local count = #SLOT_ORDER
+    local slotOrder = GetLayoutSlotOrder(orientation)
+    local count = #slotOrder
     local width = orientation == LAYOUT_HORIZONTAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
     local height = orientation == LAYOUT_VERTICAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
 
@@ -870,7 +945,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
         entry.root:ClearAnchors()
         entry.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
 
-        for index, slotKey in ipairs(SLOT_ORDER) do
+        for index, slotKey in ipairs(slotOrder) do
             local slot = entry.slots[slotKey]
             local offset = (index - 1) * (iconSize + spacing)
             slot.root:SetDimensions(iconSize, iconSize)
@@ -891,6 +966,9 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
 
             slot.border:ClearAnchors()
             slot.border:SetAnchorFill(slot.root)
+
+            slot.flash:ClearAnchors()
+            slot.flash:SetAnchorFill(slot.root)
 
             slot.timerBg:ClearAnchors()
             slot.timerBg:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 4, -4)
@@ -965,6 +1043,8 @@ function EZO_HUD:RefreshCustomActionBars()
     local dimmedAlpha = Clamp(settings.dimmedAlpha, 0.05, 1.0)
     local showTimers = settings.showTimers == true
     local keybindMode = GetKeybindMode(settings)
+    local warningRatio = GetTimerWarningPercent(settings) / 100
+    local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
 
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
@@ -998,9 +1078,10 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
             local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
-            UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha)
+            UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha, warningRatio, timerR, timerG, timerB, timerA)
             UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
             UpdateSlotKeybind(slot, slotKey, keybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
+            UpdateSlotUseAnimation(slot)
 
             if slotKey == "weapon" and isActive then
                 slot.border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
@@ -1017,6 +1098,18 @@ function EZO_HUD:RefreshCustomActionBars()
     self:RefreshCustomActionBarsMovementState()
     self:RefreshCustomQuickslot()
     self:ApplyCustomActionBarsNativeVisibility()
+end
+
+function EZO_HUD:PlayCustomActionSlotUseAnimation(actionSlotIndex)
+    if not self.customActionBars then return end
+    local slotKey = SLOT_KEY_BY_ACTION_SLOT[actionSlotIndex]
+    if not slotKey then return end
+
+    local activeBarName = GetActiveBarName()
+    local entry = self.customActionBars.bars and self.customActionBars.bars[activeBarName]
+    local slot = entry and entry.slots and entry.slots[slotKey]
+    PlaySlotUseAnimation(slot)
+    self:RefreshCustomActionBars()
 end
 
 local function RegisterEvents()
@@ -1065,10 +1158,15 @@ local function RegisterEvents()
     if EVENT_INVENTORY_SINGLE_SLOT_UPDATE then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_INVENTORY_SINGLE_SLOT_UPDATE, refresh)
     end
+    if EVENT_ACTION_SLOT_ABILITY_USED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_ABILITY_USED, function(_, actionSlotIndex)
+            EZO_HUD:PlayCustomActionSlotUseAnimation(actionSlotIndex)
+        end)
+    end
     if EVENT_MANAGER.RegisterForUpdate then
         EVENT_MANAGER:RegisterForUpdate(namespace .. "_Timers", TIMER_UPDATE_MS, function()
             local settings = GetSettings()
-            if settings.enabled and settings.showTimers then
+            if settings.enabled then
                 EZO_HUD:RefreshCustomActionBars()
             end
         end)
@@ -1372,6 +1470,23 @@ function EZO_HUD:InitializeCustomActionBars()
                     end,
                     disabled = function() return not settings.enabled end,
                     default = EZO_HUD.defaults.customActionBars.timerBarColor,
+                    width = "half",
+                },
+                {
+                    type = "slider",
+                    reference = LAM_REFERENCE_PREFIX .. "TimerWarningPercent",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_TIMER_WARNING_PERCENT),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_TIMER_WARNING_PERCENT_TOOLTIP),
+                    min = 0,
+                    max = TIMER_WARNING_MAX_PERCENT,
+                    step = 5,
+                    getFunc = function() return GetTimerWarningPercent(settings) end,
+                    setFunc = function(value)
+                        settings.timerWarningPercent = Clamp(value, 0, TIMER_WARNING_MAX_PERCENT)
+                        EZO_HUD:RefreshCustomActionBars()
+                    end,
+                    disabled = function() return not settings.enabled end,
+                    default = EZO_HUD.defaults.customActionBars.timerWarningPercent,
                     width = "half",
                 },
                 {
