@@ -1139,8 +1139,10 @@ function EZO_HUD:RefreshCustomActionBars()
                 texture, hasAbility = GetActionSlotIcon(slotKey, bar.hotbarCategory)
             end
 
+            local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
+            local hasActiveTimer = effect ~= nil and (effect.remaining or 0) > 0
             local isDimmed = settings.dimSlots and settings.dimSlots[slotKey] == true
-            local alpha = isDimmed and dimmedAlpha or barAlpha
+            local alpha = hasActiveTimer and activeAlpha or (isDimmed and dimmedAlpha or barAlpha)
             local ultimateState = GetUltimateSlotState(slotKey, bar.hotbarCategory)
             local iconAlpha = alpha
             if slotKey == "ultimate" and ultimateState ~= nil and not ultimateState.ready then
@@ -1149,7 +1151,6 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.icon:SetTexture(texture)
             slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
-            local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha, warningRatio, timerR, timerG, timerB, timerA)
             UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
             UpdateSlotKeybind(slot, slotKey, keybindMode, settings.iconSize, shouldShow, hasAbility, alpha)

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.126 - Custom Action Bar Active Timer Visibility
+
+- Keeps custom action-bar ability slots at full opacity while they have an active native timer, even when the slot belongs to the inactive bar.
+- Preserves inactive weapon-icon hiding so only the active weapon icon remains visible.
+
 ## 0.1.125 - Custom Quickslot Cooldown Fill
 
 - Added a vertical cooldown refill to the independent Custom Action Bars quickslot icon using ESO's native quickslot cooldown data.
