@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.127 - Larger Crux Defaults
+
+- Raised the default Crux HUD size to 140 px and the default Crux bar spacing to 25 px.
+- Migrates saved Crux settings that still used the previous exact defaults so existing default-profile users see the larger indicator after updating.
+
 ## 0.1.126 - Custom Action Bar Active Timer Visibility
 
 - Keeps custom action-bar ability slots at full opacity while they have an active native timer, even when the slot belongs to the inactive bar.

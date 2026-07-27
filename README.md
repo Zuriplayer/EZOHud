@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.126`
-- AddOnVersion: `10126`
+- Addon version: `0.1.127`
+- AddOnVersion: `10127`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -54,7 +54,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Execute HUD that scans slotted execute abilities on the active bar and shows an alert when the current target is inside the detected threshold.
 - Execute thresholds for known execute abilities, with additional tooltip-based threshold detection when available.
 - Movable execute alert and execute alert size setting.
-- Arcanist Crux HUD with stack count, remaining duration bar, timer text, size setting, and bar spacing setting.
+- Arcanist Crux HUD with stack count, remaining duration bar, timer text, 140 px default size, 25 px default bar spacing, size setting, and bar spacing setting.
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
 - Experimental native widget positioning for center screen announcements and active combat tips with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls.

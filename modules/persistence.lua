@@ -4,6 +4,8 @@ local EZO_HUD = EZOhud
 local SAVED_VARIABLES_NAME = "EZOhud_Saved"
 local SAVED_VARIABLES_VERSION = 1
 local MIGRATION_MARKER = "__ezoPreferenceScopeMigrated"
+local CRUX_LEGACY_DEFAULT_SIZE = 58
+local CRUX_LEGACY_DEFAULT_BAR_GAP = 1
 
 local function DeepCopy(src)
     if type(src) ~= "table" then
@@ -43,6 +45,23 @@ local function CopySavedValues(target, source)
     end
 end
 
+local function UpgradeLegacyDefaults(savedVars, defaults)
+    if type(savedVars) ~= "table" or type(defaults) ~= "table" then
+        return
+    end
+
+    local crux = savedVars.crux
+    local cruxDefaults = defaults.crux
+    if type(crux) == "table" and type(cruxDefaults) == "table" then
+        if crux.size == CRUX_LEGACY_DEFAULT_SIZE then
+            crux.size = cruxDefaults.size
+        end
+        if crux.barGap == CRUX_LEGACY_DEFAULT_BAR_GAP then
+            crux.barGap = cruxDefaults.barGap
+        end
+    end
+end
+
 local function GetPreferenceScope()
     if EZOCore and type(EZOCore.GetPreferenceScope) == "function" then
         local ok, scope = pcall(function()
@@ -76,4 +95,5 @@ function EZO_HUD:InitializeSavedVariables()
     end
 
     ApplyDefaults(self.sv, self.defaults)
+    UpgradeLegacyDefaults(self.sv, self.defaults)
 end

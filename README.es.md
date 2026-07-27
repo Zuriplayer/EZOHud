@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.126`
-- AddOnVersion: `10126`
+- Versión del addon: `0.1.127`
+- AddOnVersion: `10127`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -54,7 +54,7 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - HUD de execute que analiza las habilidades de execute equipadas en la barra activa y muestra un aviso cuando el objetivo actual está dentro del umbral detectado.
 - Umbrales de execute para habilidades conocidas, con detección adicional basada en el tooltip cuando está disponible.
 - Aviso de execute movible y ajuste de tamaño del aviso.
-- HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, ajuste de tamaño y ajuste de separación de barra.
+- HUD de Crux del arcanista con contador de stacks, barra de duración restante, texto de tiempo, tamaño por defecto de 140 px, separación de barra por defecto de 25 px, ajuste de tamaño y ajuste de separación de barra.
 - Visibilidad del HUD de Crux limitada a personajes arcanistas.
 - Opción para ocultar el HUD de Crux cuando no hay stacks activos.
 - Posicionamiento experimental de elementos nativos como anuncios centrales y consejos de combate activos con controles para aplicar posición, mostrar un tirador cada vez, ajustar desplazamiento X/Y, escala y restablecer.
