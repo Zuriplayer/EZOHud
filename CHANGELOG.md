@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.125 - Custom Quickslot Cooldown Fill
+
+- Added a vertical cooldown refill to the independent Custom Action Bars quickslot icon using ESO's native quickslot cooldown data.
+- Shows remaining quickslot cooldown time on the icon and restores the item count once the cooldown is ready.
+
 ## 0.1.124 - Custom Action Bar Vertical Feedback
 
 - Reordered vertical Custom Action Bars so ability slots are inverted for gamepad-style reading while ultimate stays at the bottom.

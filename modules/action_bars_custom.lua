@@ -52,6 +52,7 @@ local TIMER_WARNING_LABEL_COLOR = { r = 1, g = 0.34, b = 0.24, a = 1 }
 local TIMER_WARNING_BAR_COLOR = { r = 1, g = 0.18, b = 0.12, a = 1 }
 local TIMER_BG_COLOR = { r = 0.02, g = 0.02, b = 0.025, a = 0.82 }
 local TIMER_WARNING_BG_COLOR = { r = 0.34, g = 0.02, b = 0.015, a = 0.9 }
+local QUICKSLOT_COOLDOWN_DIM_ALPHA = 0.30
 local KEYBIND_BASE_ICON_SIZE = 42
 local KEYBIND_BASE_SCALE_PERCENT = 150
 local KEYBIND_MIN_SCALE_PERCENT = 120
@@ -241,7 +242,7 @@ local function GetQuickslotState()
     if type(GetCurrentQuickslot) ~= "function"
         or type(GetSlotTexture) ~= "function"
         or HOTBAR_CATEGORY_QUICKSLOT_WHEEL == nil then
-        return WHITE_TEXTURE, false, nil
+        return WHITE_TEXTURE, false, nil, 0, 0
     end
 
     local slotIndex = GetCurrentQuickslot()
@@ -249,6 +250,8 @@ local function GetQuickslotState()
     local hasAction = slotType ~= nil and slotType ~= ACTION_TYPE_NOTHING
     local texture = GetSlotTexture(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
     local count
+    local cooldownRemainingMs = 0
+    local cooldownDurationMs = 0
 
     if hasAction
         and slotType == ACTION_TYPE_ITEM
@@ -256,7 +259,17 @@ local function GetQuickslotState()
         count = GetSlotItemCount(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
     end
 
-    return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE, hasAction, count
+    if hasAction and type(GetSlotCooldownInfo) == "function" then
+        cooldownRemainingMs, cooldownDurationMs = GetSlotCooldownInfo(slotIndex, HOTBAR_CATEGORY_QUICKSLOT_WHEEL)
+        cooldownRemainingMs = math.max(0, tonumber(cooldownRemainingMs) or 0)
+        cooldownDurationMs = math.max(0, tonumber(cooldownDurationMs) or 0)
+    end
+
+    return (texture ~= nil and texture ~= "") and texture or WHITE_TEXTURE,
+        hasAction,
+        count,
+        cooldownRemainingMs,
+        cooldownDurationMs
 end
 
 local function GetNativeActiveBarName()
@@ -499,6 +512,14 @@ local function FormatTimerSeconds(seconds)
         return tostring(math.ceil(seconds / 60)) .. "m"
     end
     return tostring(math.ceil(seconds))
+end
+
+local function FormatCooldownMilliseconds(milliseconds)
+    local seconds = math.ceil(math.max(0, tonumber(milliseconds) or 0) / 1000)
+    if seconds >= 60 then
+        return string.format("%d:%02d", zo_floor(seconds / 60), seconds % 60)
+    end
+    return tostring(seconds)
 end
 
 local function GetNowMs()
@@ -785,6 +806,10 @@ local function BuildQuickslot()
     local icon = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Icon", root, CT_TEXTURE)
     icon:SetMouseEnabled(false)
 
+    local cooldownFill = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_CooldownFill", root, CT_TEXTURE)
+    cooldownFill:SetMouseEnabled(false)
+    cooldownFill:SetHidden(true)
+
     local border = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_Border", root, CT_BACKDROP)
     border:SetCenterColor(0, 0, 0, 0)
     border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
@@ -798,12 +823,22 @@ local function BuildQuickslot()
     countLabel:SetMouseEnabled(false)
     countLabel:SetHidden(true)
 
+    local cooldownLabel = WINDOW_MANAGER:CreateControl(QUICK_SLOT_NAME .. "_CooldownLabel", root, CT_LABEL)
+    cooldownLabel:SetFont("ZoFontGameLargeBold")
+    cooldownLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    cooldownLabel:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    cooldownLabel:SetColor(1, 0.86, 0.30, 1)
+    cooldownLabel:SetMouseEnabled(false)
+    cooldownLabel:SetHidden(true)
+
     return {
         root = root,
         bg = bg,
         icon = icon,
+        cooldownFill = cooldownFill,
         border = border,
         countLabel = countLabel,
+        cooldownLabel = cooldownLabel,
     }
 end
 
@@ -909,6 +944,10 @@ function EZO_HUD:ApplyCustomQuickslotLayout()
     quickslot.icon:SetAnchor(CENTER, quickslot.root, CENTER, 0, 0)
     quickslot.icon:SetDimensions(iconSize - 4, iconSize - 4)
 
+    quickslot.cooldownFill:ClearAnchors()
+    quickslot.cooldownFill:SetAnchor(BOTTOMLEFT, quickslot.icon, BOTTOMLEFT, 0, 0)
+    quickslot.cooldownFill:SetDimensions(iconSize - 4, iconSize - 4)
+
     quickslot.border:ClearAnchors()
     quickslot.border:SetAnchorFill(quickslot.root)
 
@@ -916,6 +955,11 @@ function EZO_HUD:ApplyCustomQuickslotLayout()
     quickslot.countLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
     quickslot.countLabel:SetAnchor(BOTTOMRIGHT, quickslot.root, BOTTOMRIGHT, -5, -5)
     quickslot.countLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.45))
+
+    quickslot.cooldownLabel:ClearAnchors()
+    quickslot.cooldownLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
+    quickslot.cooldownLabel:SetAnchor(CENTER, quickslot.root, CENTER, 0, 0)
+    quickslot.cooldownLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.58))
 
     self:RefreshCustomQuickslotMovementState()
     self:RefreshCustomQuickslot()
@@ -1012,16 +1056,44 @@ function EZO_HUD:RefreshCustomQuickslot()
 
     local settings = GetSettings()
     local shouldShow = ShouldShowCustomQuickslot(settings)
-    local texture, hasAction, count = GetQuickslotState()
+    local texture, hasAction, count, cooldownRemainingMs, cooldownDurationMs = GetQuickslotState()
     local moving = self:IsMoveModeEnabled("customActionBarQuickslot")
+    local inCooldown = hasAction and cooldownRemainingMs > 0 and cooldownDurationMs > 0
+    local cooldownProgress = inCooldown and Clamp(1 - (cooldownRemainingMs / cooldownDurationMs), 0, 1) or 1
 
     quickslot.root:SetHidden(not shouldShow or (not hasAction and not moving))
     quickslot.icon:SetTexture(texture)
-    quickslot.icon:SetColor(1, 1, 1, hasAction and 1 or 0.25)
+    quickslot.icon:SetColor(1, 1, 1, hasAction and (inCooldown and QUICKSLOT_COOLDOWN_DIM_ALPHA or 1) or 0.25)
     quickslot.bg:SetAlpha(hasAction and 1 or 0.45)
     quickslot.border:SetEdgeColor(0.90, 0.62, 1.0, hasAction and 0.95 or 0.45)
 
-    if count ~= nil and count >= 0 then
+    if inCooldown then
+        local iconWidth, iconHeight = quickslot.icon:GetDimensions()
+        iconWidth = math.max(1, tonumber(iconWidth) or Clamp(settings.iconSize, 28, MAX_ICON_SIZE) - 4)
+        iconHeight = math.max(1, tonumber(iconHeight) or Clamp(settings.iconSize, 28, MAX_ICON_SIZE) - 4)
+        local fillHeight = math.max(1, zo_floor(iconHeight * cooldownProgress))
+        local textureTop = Clamp(1 - cooldownProgress, 0, 1)
+
+        quickslot.cooldownFill:SetTexture(texture)
+        quickslot.cooldownFill:ClearAnchors()
+        quickslot.cooldownFill:SetAnchor(BOTTOMLEFT, quickslot.icon, BOTTOMLEFT, 0, 0)
+        quickslot.cooldownFill:SetDimensions(iconWidth, fillHeight)
+        quickslot.cooldownFill:SetTextureCoords(0, 1, textureTop, 1)
+        quickslot.cooldownFill:SetColor(1, 1, 1, 1)
+        quickslot.cooldownFill:SetHidden(false)
+
+        quickslot.cooldownLabel:SetText(FormatCooldownMilliseconds(cooldownRemainingMs))
+        quickslot.cooldownLabel:SetHidden(false)
+        quickslot.countLabel:SetHidden(true)
+    else
+        quickslot.cooldownFill:SetHidden(true)
+        quickslot.cooldownLabel:SetHidden(true)
+        if quickslot.cooldownFill.SetTextureCoords then
+            quickslot.cooldownFill:SetTextureCoords(0, 1, 0, 1)
+        end
+    end
+
+    if not inCooldown and count ~= nil and count >= 0 then
         local formattedCount = type(ZO_AbbreviateAndLocalizeRadialMenuEntryCount) == "function"
             and ZO_AbbreviateAndLocalizeRadialMenuEntryCount(count, false)
             or tostring(count)
@@ -1162,6 +1234,9 @@ local function RegisterEvents()
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_ABILITY_USED, function(_, actionSlotIndex)
             EZO_HUD:PlayCustomActionSlotUseAnimation(actionSlotIndex)
         end)
+    end
+    if EVENT_ACTION_UPDATE_COOLDOWNS then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_UPDATE_COOLDOWNS, refresh)
     end
     if EVENT_MANAGER.RegisterForUpdate then
         EVENT_MANAGER:RegisterForUpdate(namespace .. "_Timers", TIMER_UPDATE_MS, function()
