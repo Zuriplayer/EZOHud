@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.133 - Single Key Label Row
+
+- Shows keyboard or gamepad action labels only below the lowest visible Custom Action Bars row.
+- With both parallel rows visible, labels appear only below the backup row; single-row display modes keep labels below their one visible row.
+- Reserves one shared key-label band instead of adding extra height below both rows.
+
 ## 0.1.132 - Reliable Dependent Settings Refresh
 
 - Replaced the Custom Action Bars reference-based control refresh with the shared deferred settings-panel refresh.

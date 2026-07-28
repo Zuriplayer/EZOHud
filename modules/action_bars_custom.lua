@@ -969,8 +969,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
     local count = #SLOT_ORDER
     local width = (iconSize * count) + (spacing * (count - 1))
-    local rowHeight = iconSize + keybindHeight
-    local height = (rowHeight * #BAR_ORDER) + spacing
+    local height = (iconSize * #BAR_ORDER) + (spacing * (#BAR_ORDER - 1)) + keybindHeight
     local group = self.customActionBars.root
     local guiWidth, guiHeight = GuiRoot:GetDimensions()
     local left = zo_floor((guiWidth / 2) + (settings.groupOffsetX or 0) - (width / 2))
@@ -982,10 +981,11 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
 
     for barIndex, barName in ipairs(BAR_ORDER) do
         local entry = self.customActionBars.bars[barName]
+        local isLastRow = barIndex == #BAR_ORDER
 
-        entry.root:SetDimensions(width, rowHeight)
+        entry.root:SetDimensions(width, iconSize + (isLastRow and keybindHeight or 0))
         entry.root:ClearAnchors()
-        entry.root:SetAnchor(TOPLEFT, group, TOPLEFT, 0, (barIndex - 1) * (rowHeight + spacing))
+        entry.root:SetAnchor(TOPLEFT, group, TOPLEFT, 0, (barIndex - 1) * (iconSize + spacing))
 
         for index, slotKey in ipairs(SLOT_ORDER) do
             local slot = entry.slots[slotKey]
@@ -1112,14 +1112,25 @@ function EZO_HUD:RefreshCustomActionBars()
     local warningRatio = GetTimerWarningPercent(settings) / 100
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
 
+    local visibleBars = {}
     local anyBarVisible = false
+    local keybindBarName
+    for _, barName in ipairs(BAR_ORDER) do
+        local shouldShow = ShouldShowBar(barName)
+        visibleBars[barName] = shouldShow
+        anyBarVisible = anyBarVisible or shouldShow
+        if shouldShow then
+            keybindBarName = barName
+        end
+    end
+
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
         local entry = self.customActionBars.bars[barName]
         local isActive = IsActiveBar(barName)
         local barAlpha = isActive and activeAlpha or inactiveAlpha
-        local shouldShow = ShouldShowBar(barName)
-        anyBarVisible = anyBarVisible or shouldShow
+        local shouldShow = visibleBars[barName]
+        local barKeybindMode = barName == keybindBarName and keybindMode or KEYBIND_MODE_OFF
 
         entry.root:SetHidden(not shouldShow)
 
@@ -1149,7 +1160,7 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.bg:SetAlpha(shouldShow and 1 or 0)
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha, warningRatio, timerR, timerG, timerB, timerA)
             UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
-            UpdateSlotKeybind(slot, slotKey, keybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
+            UpdateSlotKeybind(slot, slotKey, barKeybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
             UpdateSlotUseAnimation(slot)
 
             if slotKey == "weapon" and isActive then
