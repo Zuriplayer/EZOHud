@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.134 - Larger Skill Overlay Numbers
+
+- Enlarged the centered white effect-timer numbers inside Custom Action Bars skill icons.
+- Enlarged orange upper-right stack counters while preserving their corner placement.
+- Expanded both label bounds so short values remain readable across the supported icon-size range.
+
 ## 0.1.133 - Single Key Label Row
 
 - Shows keyboard or gamepad action labels only below the lowest visible Custom Action Bars row.

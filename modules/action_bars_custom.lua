@@ -1018,14 +1018,14 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
 
             slot.timerLabel:ClearAnchors()
-            slot.timerLabel:SetFont(iconSize >= 72 and "ZoFontWinH2" or iconSize >= 54 and "ZoFontWinH3" or "ZoFontWinH4")
+            slot.timerLabel:SetFont(iconSize >= 60 and "ZoFontWinH2" or iconSize >= 36 and "ZoFontWinH3" or "ZoFontWinH4")
             slot.timerLabel:SetAnchor(CENTER, slot.root, CENTER, 0, -1)
-            slot.timerLabel:SetDimensions(iconSize - 6, zo_floor(iconSize * 0.72))
+            slot.timerLabel:SetDimensions(iconSize - 4, iconSize - 4)
 
             slot.stackLabel:ClearAnchors()
-            slot.stackLabel:SetFont(iconSize >= 58 and "ZoFontWinH4" or "ZoFontGameLargeBold")
+            slot.stackLabel:SetFont(iconSize >= 58 and "ZoFontWinH3" or iconSize >= 36 and "ZoFontWinH4" or "ZoFontGameLargeBold")
             slot.stackLabel:SetAnchor(TOPRIGHT, slot.root, TOPRIGHT, -4, 2)
-            slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.46))
+            slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.62))
 
             slot.ultimateLabel:ClearAnchors()
             slot.ultimateLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
