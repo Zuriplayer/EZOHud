@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.136 - Backup Filtering and Clearer Center Values
+
+- Limited zero-effect skill hiding to the inactive backup row; the main row now always remains complete.
+- Migrates the previous inactive-row filter setting to the new backup-only behavior without losing its saved value.
+- Replaced custom ultimate current/cost text with a centered readiness percentage from 0% to 100%.
+- Increased centered timer and ultimate text sizes and switched them to ESO's bold font with a thick outline for stronger contrast.
+
 ## 0.1.135 - Inactive Skill Effect Filtering
 
 - Added an optional LAM setting that hides inactive-row ability slots 1-5 when ESO reports no remaining effect time and no active stacks.

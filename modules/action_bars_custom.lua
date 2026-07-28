@@ -148,11 +148,20 @@ local function Clamp(value, minValue, maxValue)
     return value
 end
 
+local function BuildBoldOutlinedFont(iconSize, scale, minSize, maxSize)
+    local fontSize = zo_floor(Clamp((tonumber(iconSize) or 42) * scale, minSize, maxSize) + 0.5)
+    return string.format("$(BOLD_FONT)|%d|thick-outline", fontSize)
+end
+
 local function GetSettings()
     if EZO_HUD.sv and not EZO_HUD.sv.customActionBars then
         EZO_HUD.sv.customActionBars = DeepCopyTable(EZO_HUD.defaults.customActionBars)
     end
     local settings = (EZO_HUD.sv and EZO_HUD.sv.customActionBars) or EZO_HUD.defaults.customActionBars
+    if settings.hideBackupSkillsAtZero == nil and settings.hideInactiveSkillsAtZero ~= nil then
+        settings.hideBackupSkillsAtZero = settings.hideInactiveSkillsAtZero == true
+        settings.hideInactiveSkillsAtZero = nil
+    end
     ApplyDefaults(settings, EZO_HUD.defaults.customActionBars)
     if settings.groupPositionMigrated ~= true then
         local mainX = tonumber(settings.mainOffsetX) or 0
@@ -611,7 +620,8 @@ local function UpdateSlotUltimate(slot, ultimateState, visible, alpha)
     end
 
     local labelAlpha = Clamp(alpha or 1, 0.25, 1.0)
-    slot.ultimateLabel:SetText(string.format("%d/%d", zo_floor(ultimateState.current or 0), zo_floor(ultimateState.cost or 0)))
+    local ultimatePercent = zo_floor((Clamp((ultimateState.current or 0) / ultimateState.cost, 0, 1) * 100) + 0.5)
+    slot.ultimateLabel:SetText(string.format("%d%%", ultimatePercent))
     slot.ultimateLabel:SetAlpha(labelAlpha)
     slot.ultimateLabel:SetHidden(false)
 end
@@ -1033,7 +1043,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
 
             slot.timerLabel:ClearAnchors()
-            slot.timerLabel:SetFont(iconSize >= 60 and "ZoFontWinH2" or iconSize >= 36 and "ZoFontWinH3" or "ZoFontWinH4")
+            slot.timerLabel:SetFont(BuildBoldOutlinedFont(iconSize, 0.58, 18, 46))
             slot.timerLabel:SetAnchor(CENTER, slot.root, CENTER, 0, -1)
             slot.timerLabel:SetDimensions(iconSize - 4, iconSize - 4)
 
@@ -1043,9 +1053,9 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.62))
 
             slot.ultimateLabel:ClearAnchors()
-            slot.ultimateLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
-            slot.ultimateLabel:SetAnchor(CENTER, slot.root, CENTER, 0, zo_floor(iconSize * 0.15))
-            slot.ultimateLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.46))
+            slot.ultimateLabel:SetFont(BuildBoldOutlinedFont(iconSize, 0.48, 17, 42))
+            slot.ultimateLabel:SetAnchor(CENTER, slot.root, CENTER, 0, -1)
+            slot.ultimateLabel:SetDimensions(iconSize - 4, iconSize - 4)
 
             slot.keyLabel:ClearAnchors()
             slot.keyLabel:SetFont(iconSize >= 72 and "ZoFontWinH4" or iconSize >= 54 and "ZoFontGameLargeBold" or "ZoFontGameBold")
@@ -1160,11 +1170,12 @@ function EZO_HUD:RefreshCustomActionBars()
                 texture, hasAbility = GetActionSlotIcon(slotKey, bar.hotbarCategory)
             end
 
-            local trackInactiveEffects = settings.hideInactiveSkillsAtZero == true
-            local effect = (showTimers or trackInactiveEffects) and GetActionSlotEffect(barName, slotKey) or nil
+            local trackBackupEffects = settings.hideBackupSkillsAtZero == true
+            local effect = (showTimers or trackBackupEffects) and GetActionSlotEffect(barName, slotKey) or nil
             local hasActiveEffect = hasAbility and effect ~= nil
                 and ((effect.remaining or 0) > 0 or (effect.stackCount or 0) > 0)
-            local hideInactiveSkill = trackInactiveEffects
+            local hideInactiveSkill = trackBackupEffects
+                and barName == "backup"
                 and not isActive
                 and ABILITY_SLOT_KEYS[slotKey] == true
                 and not hasActiveEffect
@@ -1495,16 +1506,16 @@ function EZO_HUD:InitializeCustomActionBars()
                 },
                 {
                     type = "checkbox",
-                    reference = LAM_REFERENCE_PREFIX .. "HideInactiveSkillsAtZero",
-                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_INACTIVE_SKILLS_AT_ZERO),
-                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_INACTIVE_SKILLS_AT_ZERO_TOOLTIP),
-                    getFunc = function() return settings.hideInactiveSkillsAtZero == true end,
+                    reference = LAM_REFERENCE_PREFIX .. "HideBackupSkillsAtZero",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_BACKUP_SKILLS_AT_ZERO),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_BACKUP_SKILLS_AT_ZERO_TOOLTIP),
+                    getFunc = function() return settings.hideBackupSkillsAtZero == true end,
                     setFunc = function(value)
-                        settings.hideInactiveSkillsAtZero = value == true
+                        settings.hideBackupSkillsAtZero = value == true
                         EZO_HUD:RefreshCustomActionBars()
                     end,
                     disabled = AreCustomActionBarsSettingsDisabled,
-                    default = EZO_HUD.defaults.customActionBars.hideInactiveSkillsAtZero,
+                    default = EZO_HUD.defaults.customActionBars.hideBackupSkillsAtZero,
                     width = "half",
                 },
                 {
