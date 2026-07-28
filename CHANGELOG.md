@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.131 - Paired Custom Action Bars
+
+- Replaced independent main/backup action-bar movement with one movable two-row horizontal block and removed the vertical orientation option.
+- Moved native effect timers to large centered white text, moved stack counts to orange text in the upper-right corner, and placed optional native key labels below each icon with layout space reserved for them.
+- Migrates the former independent bar positions to the midpoint used by the new paired block while preserving the independent quickslot indicator.
+
 ## 0.1.130 - Custom Action Bars Settings Enable Refresh
 
 - Fixed Custom Action Bars dependent settings remaining visually disabled after enabling the section, including the EZOCore-hosted Settings > EZO panel.

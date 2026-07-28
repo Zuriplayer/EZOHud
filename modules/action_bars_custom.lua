@@ -13,8 +13,6 @@ local WEAPON_ICON_BOW = "EZOhud/media/weapons/weapon_bow.dds"
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
 local QUICK_SLOT_NAME = "EZOhud_CustomActionBars_Quickslot"
 local SLOT_FIRST = 3
-local LAYOUT_HORIZONTAL = "horizontal"
-local LAYOUT_VERTICAL = "vertical"
 local DISPLAY_OFF = "off"
 local DISPLAY_MAIN = "main"
 local DISPLAY_BACKUP = "backup"
@@ -28,9 +26,7 @@ local LAM_REFERENCE_PREFIX = "EZOhud_CustomActionBars_LAM_"
 local LAM_DEPENDENT_REFERENCES = {
     LAM_REFERENCE_PREFIX .. "Display",
     LAM_REFERENCE_PREFIX .. "HideNativeActionBar",
-    LAM_REFERENCE_PREFIX .. "Orientation",
-    LAM_REFERENCE_PREFIX .. "MoveMain",
-    LAM_REFERENCE_PREFIX .. "MoveBackup",
+    LAM_REFERENCE_PREFIX .. "MoveBars",
     LAM_REFERENCE_PREFIX .. "MoveQuickslot",
     LAM_REFERENCE_PREFIX .. "IconSize",
     LAM_REFERENCE_PREFIX .. "Spacing",
@@ -47,11 +43,12 @@ local MAX_ICON_SIZE = 96
 local SLOT_USE_ANIMATION_MS = 320
 local SLOT_USE_SCALE = 1.15
 local TIMER_WARNING_MAX_PERCENT = 75
-local TIMER_LABEL_COLOR = { r = 1, g = 0.86, b = 0.30, a = 1 }
+local TIMER_LABEL_COLOR = { r = 1, g = 1, b = 1, a = 1 }
 local TIMER_WARNING_LABEL_COLOR = { r = 1, g = 0.34, b = 0.24, a = 1 }
 local TIMER_WARNING_BAR_COLOR = { r = 1, g = 0.18, b = 0.12, a = 1 }
 local TIMER_BG_COLOR = { r = 0.02, g = 0.02, b = 0.025, a = 0.82 }
 local TIMER_WARNING_BG_COLOR = { r = 0.34, g = 0.02, b = 0.015, a = 0.9 }
+local STACK_LABEL_COLOR = { r = 1, g = 0.48, b = 0.08, a = 1 }
 local QUICKSLOT_COOLDOWN_DIM_ALPHA = 0.30
 local KEYBIND_BASE_ICON_SIZE = 42
 local KEYBIND_BASE_SCALE_PERCENT = 150
@@ -64,18 +61,12 @@ local BAR_DEFS = {
     main = {
         hotbarCategory = HOTBAR_CATEGORY_PRIMARY,
         weaponPair = ACTIVE_WEAPON_PAIR_MAIN,
-        offsetXKey = "mainOffsetX",
-        offsetYKey = "mainOffsetY",
-        moveSection = "customActionBarMain",
         equipSlot = EQUIP_SLOT_MAIN_HAND,
         offSlot = EQUIP_SLOT_OFF_HAND,
     },
     backup = {
         hotbarCategory = HOTBAR_CATEGORY_BACKUP,
         weaponPair = ACTIVE_WEAPON_PAIR_BACKUP,
-        offsetXKey = "backupOffsetX",
-        offsetYKey = "backupOffsetY",
-        moveSection = "customActionBarBackup",
         equipSlot = EQUIP_SLOT_BACKUP_MAIN,
         offSlot = EQUIP_SLOT_BACKUP_OFF,
     },
@@ -83,7 +74,6 @@ local BAR_DEFS = {
 
 local BAR_ORDER = { "main", "backup" }
 local SLOT_ORDER = { "weapon", "slot1", "slot2", "slot3", "slot4", "slot5", "ultimate" }
-local VERTICAL_SLOT_ORDER = { "slot5", "slot4", "slot3", "slot2", "slot1", "weapon", "ultimate" }
 local ACTION_SLOT_BY_KEY = {
     slot1 = SLOT_FIRST,
     slot2 = SLOT_FIRST + 1,
@@ -171,6 +161,15 @@ local function GetSettings()
     end
     local settings = (EZO_HUD.sv and EZO_HUD.sv.customActionBars) or EZO_HUD.defaults.customActionBars
     ApplyDefaults(settings, EZO_HUD.defaults.customActionBars)
+    if settings.groupPositionMigrated ~= true then
+        local mainX = tonumber(settings.mainOffsetX) or 0
+        local backupX = tonumber(settings.backupOffsetX) or mainX
+        local mainY = tonumber(settings.mainOffsetY) or 320
+        local backupY = tonumber(settings.backupOffsetY) or mainY
+        settings.groupOffsetX = zo_floor((mainX + backupX) / 2)
+        settings.groupOffsetY = zo_floor((mainY + backupY) / 2)
+        settings.groupPositionMigrated = true
+    end
     return settings
 end
 
@@ -188,14 +187,6 @@ local function GetDisplayMode(settings)
         return mode
     end
     return DISPLAY_BOTH
-end
-
-local function GetOrientation(settings)
-    return settings.orientation == LAYOUT_VERTICAL and LAYOUT_VERTICAL or LAYOUT_HORIZONTAL
-end
-
-local function GetLayoutSlotOrder(orientation)
-    return orientation == LAYOUT_VERTICAL and VERTICAL_SLOT_ORDER or SLOT_ORDER
 end
 
 local function GetKeybindMode(settings)
@@ -360,7 +351,7 @@ local function ShouldShowBar(barName)
     local settings = GetSettings()
     local bar = BAR_DEFS[barName]
     if not bar then return false end
-    if EZO_HUD:IsMoveModeEnabled(bar.moveSection) then return true end
+    if EZO_HUD:IsMoveModeEnabled("customActionBars") then return true end
     if EZO_HUD.IsHudSceneVisible and not EZO_HUD:IsHudSceneVisible() then return false end
     if not settings.enabled then return false end
 
@@ -735,17 +726,17 @@ local function CreateSlot(parent, name)
 
     local timerLabel = WINDOW_MANAGER:CreateControl(name .. "_TimerLabel", root, CT_LABEL)
     timerLabel:SetFont("ZoFontGameLargeBold")
-    timerLabel:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
-    timerLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
+    timerLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    timerLabel:SetVerticalAlignment(TEXT_ALIGN_CENTER)
     timerLabel:SetColor(TIMER_LABEL_COLOR.r, TIMER_LABEL_COLOR.g, TIMER_LABEL_COLOR.b, TIMER_LABEL_COLOR.a)
     timerLabel:SetMouseEnabled(false)
     timerLabel:SetHidden(true)
 
     local stackLabel = WINDOW_MANAGER:CreateControl(name .. "_StackLabel", root, CT_LABEL)
     stackLabel:SetFont("ZoFontGameLargeBold")
-    stackLabel:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
-    stackLabel:SetVerticalAlignment(TEXT_ALIGN_BOTTOM)
-    stackLabel:SetColor(1, 1, 1, 1)
+    stackLabel:SetHorizontalAlignment(TEXT_ALIGN_RIGHT)
+    stackLabel:SetVerticalAlignment(TEXT_ALIGN_TOP)
+    stackLabel:SetColor(STACK_LABEL_COLOR.r, STACK_LABEL_COLOR.g, STACK_LABEL_COLOR.b, STACK_LABEL_COLOR.a)
     stackLabel:SetMouseEnabled(false)
     stackLabel:SetHidden(true)
 
@@ -780,14 +771,21 @@ local function CreateSlot(parent, name)
     }
 end
 
-local function BuildActionBar(barName)
-    local root = WINDOW_MANAGER:CreateTopLevelWindow(ACTION_BARS_NAME .. "_" .. barName)
+local function BuildActionBarsGroup()
+    local root = WINDOW_MANAGER:CreateTopLevelWindow(ACTION_BARS_NAME)
     root:SetClampedToScreen(true)
     root:SetMovable(false)
     root:SetMouseEnabled(false)
     root:SetDrawLayer(DL_OVERLAY)
     root:SetDrawTier(DT_HIGH)
     root:SetHidden(true)
+    return root
+end
+
+local function BuildActionBar(parent, barName)
+    local root = WINDOW_MANAGER:CreateControl(ACTION_BARS_NAME .. "_" .. barName, parent, CT_CONTROL)
+    root:SetMouseEnabled(false)
+    root:SetHidden(false)
 
     local slots = {}
     for _, slotKey in ipairs(SLOT_ORDER) do
@@ -855,19 +853,16 @@ local function BuildQuickslot()
 end
 
 function EZO_HUD:RefreshCustomActionBarsMovementState()
-    if not self.customActionBars then return end
+    local group = self.customActionBars and self.customActionBars.root
+    if not group then return end
 
-    for _, barName in ipairs(BAR_ORDER) do
-        local bar = BAR_DEFS[barName]
-        local entry = self.customActionBars.bars[barName]
-        local movable = self:IsMoveModeEnabled(bar.moveSection)
-        if self.customActionBarsDragActive[barName] and not movable then
-            entry.root:StopMovingOrResizing()
-            self.customActionBarsDragActive[barName] = false
-        end
-        entry.root:SetMovable(movable and self.customActionBarsDragActive[barName] == true)
-        entry.root:SetMouseEnabled(movable)
+    local movable = self:IsMoveModeEnabled("customActionBars")
+    if self.customActionBarsDragActive and not movable then
+        group:StopMovingOrResizing()
+        self.customActionBarsDragActive = false
     end
+    group:SetMovable(movable and self.customActionBarsDragActive == true)
+    group:SetMouseEnabled(movable)
 end
 
 function EZO_HUD:RefreshCustomQuickslotMovementState()
@@ -883,21 +878,21 @@ function EZO_HUD:RefreshCustomQuickslotMovementState()
     quickslot.root:SetMouseEnabled(movable)
 end
 
-function EZO_HUD:SaveCustomActionBarPosition(barName)
-    local entry = self.customActionBars and self.customActionBars.bars and self.customActionBars.bars[barName]
+function EZO_HUD:SaveCustomActionBarPosition()
+    local group = self.customActionBars and self.customActionBars.root
     local settings = self.sv and self.sv.customActionBars
-    local bar = BAR_DEFS[barName]
-    if not (entry and settings and bar) then return end
+    if not (group and settings) then return end
 
-    local left = entry.root:GetLeft()
-    local top = entry.root:GetTop()
-    local width = entry.root:GetWidth()
-    local height = entry.root:GetHeight()
+    local left = group:GetLeft()
+    local top = group:GetTop()
+    local width = group:GetWidth()
+    local height = group:GetHeight()
     local guiWidth, guiHeight = GuiRoot:GetDimensions()
     if not (left and top and width and height) then return end
 
-    settings[bar.offsetXKey] = zo_floor((left + (width / 2)) - (guiWidth / 2))
-    settings[bar.offsetYKey] = zo_floor((top + (height / 2)) - (guiHeight / 2))
+    settings.groupOffsetX = zo_floor((left + (width / 2)) - (guiWidth / 2))
+    settings.groupOffsetY = zo_floor((top + (height / 2)) - (guiHeight / 2))
+    settings.groupPositionMigrated = true
     self:ApplyCustomActionBarsLayout()
 end
 
@@ -983,34 +978,35 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
     local settings = GetSettings()
     local iconSize = Clamp(settings.iconSize, 28, MAX_ICON_SIZE)
     local spacing = Clamp(settings.spacing, 0, 16)
-    local orientation = GetOrientation(settings)
+    local keybindMode = GetKeybindMode(settings)
+    local keybindHeight = keybindMode == KEYBIND_MODE_OFF and 0 or math.max(18, zo_floor(iconSize * 0.42))
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
-    local slotOrder = GetLayoutSlotOrder(orientation)
-    local count = #slotOrder
-    local width = orientation == LAYOUT_HORIZONTAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
-    local height = orientation == LAYOUT_VERTICAL and ((iconSize * count) + (spacing * (count - 1))) or iconSize
+    local count = #SLOT_ORDER
+    local width = (iconSize * count) + (spacing * (count - 1))
+    local rowHeight = iconSize + keybindHeight
+    local height = (rowHeight * #BAR_ORDER) + spacing
+    local group = self.customActionBars.root
+    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+    local left = zo_floor((guiWidth / 2) + (settings.groupOffsetX or 0) - (width / 2))
+    local top = zo_floor((guiHeight / 2) + (settings.groupOffsetY or 0) - (height / 2))
 
-    for _, barName in ipairs(BAR_ORDER) do
-        local bar = BAR_DEFS[barName]
+    group:SetDimensions(width, height)
+    group:ClearAnchors()
+    group:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
+
+    for barIndex, barName in ipairs(BAR_ORDER) do
         local entry = self.customActionBars.bars[barName]
-        local guiWidth, guiHeight = GuiRoot:GetDimensions()
-        local left = zo_floor((guiWidth / 2) + (settings[bar.offsetXKey] or 0) - (width / 2))
-        local top = zo_floor((guiHeight / 2) + (settings[bar.offsetYKey] or 0) - (height / 2))
 
-        entry.root:SetDimensions(width, height)
+        entry.root:SetDimensions(width, rowHeight)
         entry.root:ClearAnchors()
-        entry.root:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
+        entry.root:SetAnchor(TOPLEFT, group, TOPLEFT, 0, (barIndex - 1) * (rowHeight + spacing))
 
-        for index, slotKey in ipairs(slotOrder) do
+        for index, slotKey in ipairs(SLOT_ORDER) do
             local slot = entry.slots[slotKey]
             local offset = (index - 1) * (iconSize + spacing)
             slot.root:SetDimensions(iconSize, iconSize)
             slot.root:ClearAnchors()
-            if orientation == LAYOUT_VERTICAL then
-                slot.root:SetAnchor(TOPLEFT, entry.root, TOPLEFT, 0, offset)
-            else
-                slot.root:SetAnchor(TOPLEFT, entry.root, TOPLEFT, offset, 0)
-            end
+            slot.root:SetAnchor(TOPLEFT, entry.root, TOPLEFT, offset, 0)
 
             slot.bg:ClearAnchors()
             slot.bg:SetAnchorFill(slot.root)
@@ -1036,14 +1032,14 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
 
             slot.timerLabel:ClearAnchors()
-            slot.timerLabel:SetFont(iconSize >= 58 and "ZoFontWinH4" or "ZoFontGameLargeBold")
-            slot.timerLabel:SetAnchor(BOTTOMRIGHT, slot.root, BOTTOMRIGHT, -5, -8)
-            slot.timerLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.60))
+            slot.timerLabel:SetFont(iconSize >= 72 and "ZoFontWinH2" or iconSize >= 54 and "ZoFontWinH3" or "ZoFontWinH4")
+            slot.timerLabel:SetAnchor(CENTER, slot.root, CENTER, 0, -1)
+            slot.timerLabel:SetDimensions(iconSize - 6, zo_floor(iconSize * 0.72))
 
             slot.stackLabel:ClearAnchors()
             slot.stackLabel:SetFont(iconSize >= 58 and "ZoFontWinH4" or "ZoFontGameLargeBold")
-            slot.stackLabel:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 5, -8)
-            slot.stackLabel:SetDimensions(iconSize - 10, zo_floor(iconSize * 0.60))
+            slot.stackLabel:SetAnchor(TOPRIGHT, slot.root, TOPRIGHT, -4, 2)
+            slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.46))
 
             slot.ultimateLabel:ClearAnchors()
             slot.ultimateLabel:SetFont(iconSize >= 58 and "ZoFontGameLargeBold" or "ZoFontGameShadow")
@@ -1052,8 +1048,8 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
 
             slot.keyLabel:ClearAnchors()
             slot.keyLabel:SetFont(iconSize >= 72 and "ZoFontWinH4" or iconSize >= 54 and "ZoFontGameLargeBold" or "ZoFontGameBold")
-            slot.keyLabel:SetAnchor(TOP, slot.root, TOP, 0, 2)
-            slot.keyLabel:SetDimensions(iconSize - 4, zo_floor(iconSize * 0.42))
+            slot.keyLabel:SetAnchor(TOP, slot.root, BOTTOM, 0, 0)
+            slot.keyLabel:SetDimensions(iconSize, keybindHeight)
         end
     end
 
@@ -1130,12 +1126,14 @@ function EZO_HUD:RefreshCustomActionBars()
     local warningRatio = GetTimerWarningPercent(settings) / 100
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
 
+    local anyBarVisible = false
     for _, barName in ipairs(BAR_ORDER) do
         local bar = BAR_DEFS[barName]
         local entry = self.customActionBars.bars[barName]
         local isActive = IsActiveBar(barName)
         local barAlpha = isActive and activeAlpha or inactiveAlpha
         local shouldShow = ShouldShowBar(barName)
+        anyBarVisible = anyBarVisible or shouldShow
 
         entry.root:SetHidden(not shouldShow)
 
@@ -1180,6 +1178,7 @@ function EZO_HUD:RefreshCustomActionBars()
         end
     end
 
+    self.customActionBars.root:SetHidden(not anyBarVisible)
     self:RefreshCustomActionBarsMovementState()
     self:RefreshCustomQuickslot()
     self:ApplyCustomActionBarsNativeVisibility()
@@ -1271,13 +1270,6 @@ local function BuildDisplayChoices()
     }
 end
 
-local function BuildOrientationChoices()
-    return {
-        GetString(EZO_HUD_CUSTOM_ACTION_BARS_ORIENTATION_HORIZONTAL),
-        GetString(EZO_HUD_CUSTOM_ACTION_BARS_ORIENTATION_VERTICAL),
-    }
-end
-
 local function BuildKeybindModeChoices()
     return {
         GetString(EZO_HUD_CUSTOM_ACTION_BARS_KEYBIND_MODE_OFF),
@@ -1322,37 +1314,38 @@ function EZO_HUD:InitializeCustomActionBars()
     if self.customActionBars then return end
 
     GetSettings()
-    self.customActionBars = { bars = {} }
-    self.customActionBarsDragActive = {}
+    local actionBarsRoot = BuildActionBarsGroup()
+    self.customActionBars = { root = actionBarsRoot, bars = {} }
+    self.customActionBarsDragActive = false
     self.customActionBarsQuickslotDragActive = false
 
     for _, barName in ipairs(BAR_ORDER) do
-        local bar = BAR_DEFS[barName]
-        local entry = BuildActionBar(barName)
-        entry.root:SetHandler("OnMouseDown", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled(bar.moveSection) then
-                self.customActionBarsDragActive[barName] = true
-                control:SetMovable(true)
-                control:StartMoving()
-            end
-        end)
-        entry.root:SetHandler("OnMouseUp", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled(bar.moveSection) then
-                control:StopMovingOrResizing()
-                self.customActionBarsDragActive[barName] = false
-                control:SetMovable(false)
-                self:SaveCustomActionBarPosition(barName)
-            end
-        end)
-        entry.root:SetHandler("OnMoveStop", function()
-            self.customActionBarsDragActive[barName] = false
-            entry.root:SetMovable(false)
-            self:SaveCustomActionBarPosition(barName)
-        end)
-        if self.RegisterHudSceneControl then
-            self:RegisterHudSceneControl(entry.root)
-        end
+        local entry = BuildActionBar(actionBarsRoot, barName)
         self.customActionBars.bars[barName] = entry
+    end
+
+    actionBarsRoot:SetHandler("OnMouseDown", function(control, button)
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBars") then
+            self.customActionBarsDragActive = true
+            control:SetMovable(true)
+            control:StartMoving()
+        end
+    end)
+    actionBarsRoot:SetHandler("OnMouseUp", function(control, button)
+        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBars") then
+            control:StopMovingOrResizing()
+            self.customActionBarsDragActive = false
+            control:SetMovable(false)
+            self:SaveCustomActionBarPosition()
+        end
+    end)
+    actionBarsRoot:SetHandler("OnMoveStop", function()
+        self.customActionBarsDragActive = false
+        actionBarsRoot:SetMovable(false)
+        self:SaveCustomActionBarPosition()
+    end)
+    if self.RegisterHudSceneControl then
+        self:RegisterHudSceneControl(actionBarsRoot)
     end
 
     local quickslot = BuildQuickslot()
@@ -1436,44 +1429,13 @@ function EZO_HUD:InitializeCustomActionBars()
                     width = "half",
                 },
                 {
-                    type = "dropdown",
-                    reference = LAM_REFERENCE_PREFIX .. "Orientation",
-                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION),
-                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ORIENTATION_TOOLTIP),
-                    choices = BuildOrientationChoices(),
-                    choicesValues = { LAYOUT_HORIZONTAL, LAYOUT_VERTICAL },
-                    getFunc = function() return GetOrientation(settings) end,
-                    setFunc = function(value)
-                        settings.orientation = GetOrientation({ orientation = value })
-                        EZO_HUD:ApplyCustomActionBarsLayout()
-                    end,
-                    disabled = AreCustomActionBarsSettingsDisabled,
-                    default = EZO_HUD.defaults.customActionBars.orientation,
-                    width = "half",
-                },
-                {
                     type = "checkbox",
-                    reference = LAM_REFERENCE_PREFIX .. "MoveMain",
-                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN),
-                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN_TOOLTIP),
-                    getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBarMain") end,
+                    reference = LAM_REFERENCE_PREFIX .. "MoveBars",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_TOOLTIP),
+                    getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBars") end,
                     setFunc = function(value)
-                        EZO_HUD:SetMoveModeEnabled("customActionBarMain", value)
-                        EZO_HUD:RefreshCustomActionBarsMovementState()
-                        EZO_HUD:RefreshCustomActionBars()
-                    end,
-                    disabled = AreCustomActionBarsSettingsDisabled,
-                    default = false,
-                    width = "half",
-                },
-                {
-                    type = "checkbox",
-                    reference = LAM_REFERENCE_PREFIX .. "MoveBackup",
-                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP),
-                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP_TOOLTIP),
-                    getFunc = function() return EZO_HUD:IsMoveModeEnabled("customActionBarBackup") end,
-                    setFunc = function(value)
-                        EZO_HUD:SetMoveModeEnabled("customActionBarBackup", value)
+                        EZO_HUD:SetMoveModeEnabled("customActionBars", value)
                         EZO_HUD:RefreshCustomActionBarsMovementState()
                         EZO_HUD:RefreshCustomActionBars()
                     end,
@@ -1592,7 +1554,7 @@ function EZO_HUD:InitializeCustomActionBars()
                     getFunc = function() return GetKeybindMode(settings) end,
                     setFunc = function(value)
                         settings.keybindMode = GetKeybindMode({ keybindMode = value })
-                        EZO_HUD:RefreshCustomActionBars()
+                        EZO_HUD:ApplyCustomActionBarsLayout()
                     end,
                     disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.keybindMode,

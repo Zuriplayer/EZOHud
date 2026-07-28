@@ -2,14 +2,14 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBarMain", "customActionBarBackup", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.130"
+EZO_HUD.ADDON_VERSION = "0.1.131"
 EZO_HUD.ADDON_VERSION_NUM = 10130
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
@@ -70,6 +70,9 @@ EZO_HUD.defaults = {
         keybindMode = "off",
         inactiveAlpha = 0.55,
         dimmedAlpha = 0.28,
+        groupOffsetX = 0,
+        groupOffsetY = 345,
+        groupPositionMigrated = false,
         mainOffsetX = 0,
         mainOffsetY = 320,
         backupOffsetX = 0,
@@ -314,7 +317,7 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "ultimate" then
         self:RefreshUltimateMovementState()
         self:RefreshUltimateVisibility()
-    elseif (sectionName == "customActionBarMain" or sectionName == "customActionBarBackup")
+    elseif sectionName == "customActionBars"
         and self.RefreshCustomActionBarsMovementState then
         self:RefreshCustomActionBarsMovementState()
         self:RefreshCustomActionBars()
@@ -365,8 +368,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
     local definitions = {
         { id = "ezohud.attributes", section = "overlay", order = 10, name = EZO_HUD_OPTION_MOVE_HUD, tooltip = EZO_HUD_OPTION_MOVE_HUD_TOOLTIP },
         { id = "ezohud.ultimate", section = "ultimate", order = 20, name = EZO_HUD_OPTION_ULTIMATE_MOVE, tooltip = EZO_HUD_OPTION_ULTIMATE_MOVE_TOOLTIP },
-        { id = "ezohud.customActionBarMain", section = "customActionBarMain", order = 25, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_MAIN_TOOLTIP },
-        { id = "ezohud.customActionBarBackup", section = "customActionBarBackup", order = 26, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_BACKUP_TOOLTIP },
+        { id = "ezohud.customActionBars", section = "customActionBars", order = 25, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_TOOLTIP },
         { id = "ezohud.customActionBarQuickslot", section = "customActionBarQuickslot", order = 27, name = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT, tooltip = EZO_HUD_OPTION_CUSTOM_ACTION_BARS_MOVE_QUICKSLOT_TOOLTIP },
         { id = "ezohud.execute", section = "execute", order = 30, name = EZO_HUD_OPTION_EXECUTE_MOVE, tooltip = EZO_HUD_OPTION_EXECUTE_MOVE_TOOLTIP },
         { id = "ezohud.crux", section = "crux", order = 40, name = EZO_HUD_OPTION_CRUX_MOVE, tooltip = EZO_HUD_OPTION_CRUX_MOVE_TOOLTIP },
@@ -447,10 +449,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
     elseif sectionName == "ultimate" and self.ultimate and self.SaveUltimatePosition then
         self:SaveUltimatePosition("main")
         self:SaveUltimatePosition("backup")
-    elseif sectionName == "customActionBarMain" and self.SaveCustomActionBarPosition then
-        self:SaveCustomActionBarPosition("main")
-    elseif sectionName == "customActionBarBackup" and self.SaveCustomActionBarPosition then
-        self:SaveCustomActionBarPosition("backup")
+    elseif sectionName == "customActionBars" and self.SaveCustomActionBarPosition then
+        self:SaveCustomActionBarPosition()
     elseif sectionName == "customActionBarQuickslot" and self.SaveCustomQuickslotPosition then
         self:SaveCustomQuickslotPosition()
     elseif sectionName == "execute" and self.SaveExecutePosition then
