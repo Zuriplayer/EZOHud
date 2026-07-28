@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.132 - Reliable Dependent Settings Refresh
+
+- Replaced the Custom Action Bars reference-based control refresh with the shared deferred settings-panel refresh.
+- Requests a forced rebuild from the EZOCore settings host after master toggles, so dependent controls are recreated from current SavedVariables after the active LAM callback completes.
+- Applies the same reliable host refresh path to every EZOhud section already using the shared master-toggle helper.
+
 ## 0.1.131 - Paired Custom Action Bars
 
 - Replaced independent main/backup action-bar movement with one movable two-row horizontal block and removed the vertical orientation option.

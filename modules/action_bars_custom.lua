@@ -23,20 +23,6 @@ local KEYBIND_MODE_AUTO = "auto"
 local KEYBIND_MODE_KEYBOARD = "keyboard"
 local KEYBIND_MODE_GAMEPAD = "gamepad"
 local LAM_REFERENCE_PREFIX = "EZOhud_CustomActionBars_LAM_"
-local LAM_DEPENDENT_REFERENCES = {
-    LAM_REFERENCE_PREFIX .. "Display",
-    LAM_REFERENCE_PREFIX .. "HideNativeActionBar",
-    LAM_REFERENCE_PREFIX .. "MoveBars",
-    LAM_REFERENCE_PREFIX .. "MoveQuickslot",
-    LAM_REFERENCE_PREFIX .. "IconSize",
-    LAM_REFERENCE_PREFIX .. "Spacing",
-    LAM_REFERENCE_PREFIX .. "ShowTimers",
-    LAM_REFERENCE_PREFIX .. "TimerBarColor",
-    LAM_REFERENCE_PREFIX .. "TimerWarningPercent",
-    LAM_REFERENCE_PREFIX .. "KeybindMode",
-    LAM_REFERENCE_PREFIX .. "InactiveAlpha",
-    LAM_REFERENCE_PREFIX .. "DimmedAlpha",
-}
 local TIMER_UPDATE_MS = 250
 local MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS = 1000
 local MAX_ICON_SIZE = 96
@@ -1279,37 +1265,6 @@ local function BuildKeybindModeChoices()
     }
 end
 
-local function RefreshLamControl(reference)
-    local control = _G[reference]
-    if not control then return end
-
-    if control.UpdateValue then
-        control:UpdateValue(false)
-    end
-    if control.UpdateDisabled then
-        control:UpdateDisabled()
-    end
-end
-
-function EZO_HUD.RefreshCustomActionBarsLamControls()
-    local function refresh()
-        for _, reference in ipairs(LAM_DEPENDENT_REFERENCES) do
-            RefreshLamControl(reference)
-        end
-        for _, slotKey in ipairs(SLOT_ORDER) do
-            RefreshLamControl(LAM_REFERENCE_PREFIX .. "Dim_" .. slotKey)
-        end
-        if EZO_HUD.RequestSettingsPanelRefresh then
-            EZO_HUD:RequestSettingsPanelRefresh()
-        end
-    end
-
-    refresh()
-    if zo_callLater then
-        zo_callLater(refresh, 1)
-    end
-end
-
 function EZO_HUD:InitializeCustomActionBars()
     if self.customActionBars then return end
 
@@ -1394,7 +1349,7 @@ function EZO_HUD:InitializeCustomActionBars()
                         settings = GetSettings()
                         settings.enabled = value == true
                         EZO_HUD:RefreshCustomActionBars()
-                        EZO_HUD.RefreshCustomActionBarsLamControls()
+                        EZO_HUD:RequestSettingsPanelRefresh(true)
                     end,
                     default = EZO_HUD.defaults.customActionBars.enabled,
                 },

@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.131`
-- AddOnVersion: `10131`
+- Addon version: `0.1.132`
+- AddOnVersion: `10132`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -75,6 +75,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
 
 When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Custom Action Bars, Execute, Crux, custom Quest Tracker, custom Synergy, custom Group Search, and custom Loot History surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel. Native UI Tweaks are settings-driven only and are not shared layout-mode surfaces.
+
+Master enable controls defer their settings refresh until the current LAM callback finishes. In the EZOCore-hosted panel this requests a forced rebuild, so dependent controls immediately recalculate their enabled state instead of remaining visually greyed out.
 
 With EZOCore active, EZOhud follows the EZO family preference storage policy: ordinary HUD settings use the selected account-wide or per-character scope. When the scope is per character, the first load copies existing account-wide EZOhud settings into that character profile. Without EZOCore, EZOhud keeps its historical account-wide storage.
 

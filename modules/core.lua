@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.131"
-EZO_HUD.ADDON_VERSION_NUM = 10130
+EZO_HUD.ADDON_VERSION = "0.1.132"
+EZO_HUD.ADDON_VERSION_NUM = 10132
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -426,20 +426,29 @@ function EZO_HUD:IsMoveModeEnabled(sectionName)
         and self.runtime.moveMode[sectionName] == true
 end
 
-function EZO_HUD:RequestSettingsPanelRefresh()
-    if self.ezoSettingsRegistered
-        and EZOCore
-        and type(EZOCore.RefreshSettingsPanel) == "function" then
-        EZOCore:RefreshSettingsPanel()
-        return
+function EZO_HUD:RequestSettingsPanelRefresh(forceRebuild)
+    local rebuild = forceRebuild ~= false
+    local function refresh()
+        if self.ezoSettingsRegistered
+            and EZOCore
+            and type(EZOCore.RefreshSettingsPanel) == "function" then
+            EZOCore:RefreshSettingsPanel(rebuild)
+            return
+        end
+
+        local lam = _G.LibAddonMenu2 or LibAddonMenu2
+        if lam
+            and lam.util
+            and type(lam.util.RequestRefreshIfNeeded) == "function"
+            and self._lamPanel then
+            lam.util.RequestRefreshIfNeeded(self._lamPanel)
+        end
     end
 
-    local lam = _G.LibAddonMenu2 or LibAddonMenu2
-    if lam
-        and lam.util
-        and type(lam.util.RequestRefreshIfNeeded) == "function"
-        and self._lamPanel then
-        lam.util.RequestRefreshIfNeeded(self._lamPanel)
+    if zo_callLater then
+        zo_callLater(refresh, 1)
+    else
+        refresh()
     end
 end
 

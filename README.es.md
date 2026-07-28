@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.131`
-- AddOnVersion: `10131`
+- Versión del addon: `0.1.132`
+- AddOnVersion: `10132`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -75,6 +75,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 EZOhud sigue el estilo de configuración de la familia EZO: cada sección de ajustes usa un icono informativo morado de 26 px en su cabecera. Pasa el cursor sobre la cabecera para ver el propósito y alcance general de la sección, y sobre cada campo individual para ver la ayuda específica de ese ajuste.
 
 Cuando EZOCore está activo, el panel completo se dibuja dentro de `Ajustes > EZO` y no se duplica en la lista estándar de ajustes de Addons. Las superficies de Atributos, Ultimate, Barras de Habilidades Personalizadas, Execute, Crux, Tracker de Misiones personalizado, Sinergia personalizada, Búsqueda de Grupo personalizada e Historial de Botín personalizado se registran por separado en el modo compartido de disposición de interfaz. Sin EZOCore, las mismas opciones y controles locales temporales de movimiento siguen disponibles mediante el panel normal de LibAddonMenu. Los Ajustes de Interfaz Nativa solo se controlan desde ajustes y no son superficies del modo compartido de disposición.
+
+Los controles maestros de activación aplazan el refresco de ajustes hasta que termina el callback actual de LAM. En el panel alojado por EZOCore esto solicita una reconstrucción forzada para que los controles dependientes recalculen inmediatamente su estado y no permanezcan visualmente en gris.
 
 Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
 
