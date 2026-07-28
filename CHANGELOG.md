@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.135 - Inactive Skill Effect Filtering
+
+- Added an optional LAM setting that hides inactive-row ability slots 1-5 when ESO reports no remaining effect time and no active stacks.
+- Keeps affected slots visible while either native effect time or stacks remain, independently of whether timer numbers are displayed.
+- Leaves the active row, weapon icon, and ultimate visibility unchanged.
+
 ## 0.1.134 - Larger Skill Overlay Numbers
 
 - Enlarged the centered white effect-timer numbers inside Custom Action Bars skill icons.

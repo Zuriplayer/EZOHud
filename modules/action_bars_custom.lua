@@ -68,6 +68,13 @@ local ACTION_SLOT_BY_KEY = {
     slot5 = SLOT_FIRST + 4,
     ultimate = ACTION_BAR_ULTIMATE_SLOT_INDEX + 1,
 }
+local ABILITY_SLOT_KEYS = {
+    slot1 = true,
+    slot2 = true,
+    slot3 = true,
+    slot4 = true,
+    slot5 = true,
+}
 local SLOT_KEY_BY_ACTION_SLOT = {}
 for slotKey, actionSlotIndex in pairs(ACTION_SLOT_BY_KEY) do
     SLOT_KEY_BY_ACTION_SLOT[actionSlotIndex] = slotKey
@@ -443,7 +450,11 @@ end
 
 local function ReadActionSlotEffect(slotIndex, hotbarCategory)
     local remainingMs = GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0
-    if remainingMs <= MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS then return nil end
+    local stackCount = 0
+    if type(GetActionSlotEffectStackCount) == "function" then
+        stackCount = GetActionSlotEffectStackCount(slotIndex, hotbarCategory) or 0
+    end
+    if remainingMs <= 0 and stackCount <= 0 then return nil end
 
     local durationMs = remainingMs
     if type(GetActionSlotEffectDuration) == "function" then
@@ -453,15 +464,11 @@ local function ReadActionSlotEffect(slotIndex, hotbarCategory)
         durationMs = remainingMs
     end
 
-    local stackCount = 0
-    if type(GetActionSlotEffectStackCount) == "function" then
-        stackCount = GetActionSlotEffectStackCount(slotIndex, hotbarCategory) or 0
-    end
-
     return {
         remaining = remainingMs / 1000,
         duration = durationMs / 1000,
         stackCount = stackCount,
+        displayTimer = remainingMs > MINIMUM_ACTION_BAR_TIMER_DISPLAYED_TIME_MS,
     }
 end
 
@@ -546,7 +553,10 @@ end
 
 local function UpdateSlotTimer(slot, effect, visible, alpha, warningRatio, timerR, timerG, timerB, timerA)
     if not (slot and slot.timerLabel and slot.timerBg and slot.timerBar and slot.stackLabel) then return end
-    if not visible or effect == nil or (effect.remaining or 0) <= 0 then
+    local remaining = effect and math.max(0, effect.remaining or 0) or 0
+    local hasTimer = effect ~= nil and effect.displayTimer ~= false and remaining > 0
+    local hasStack = effect ~= nil and (effect.stackCount or 0) > 0
+    if not visible or effect == nil or (not hasTimer and not hasStack) then
         slot.timerLabel:SetHidden(true)
         slot.timerBg:SetHidden(true)
         slot.timerBar:SetHidden(true)
@@ -554,32 +564,37 @@ local function UpdateSlotTimer(slot, effect, visible, alpha, warningRatio, timer
         return
     end
 
-    local remaining = math.max(0, effect.remaining or 0)
     local duration = math.max(0, effect.duration or 0)
     local ratio = duration > 0 and Clamp(remaining / duration, 0, 1) or 1
     local timerAlpha = Clamp(alpha or 1, 0.18, 1.0)
     local warningEnabled = (warningRatio or 0) > 0
     local isWarning = warningEnabled and duration > 0 and ratio <= warningRatio
 
-    slot.timerLabel:SetText(FormatTimerSeconds(remaining))
-    if isWarning then
-        slot.timerLabel:SetColor(TIMER_WARNING_LABEL_COLOR.r, TIMER_WARNING_LABEL_COLOR.g, TIMER_WARNING_LABEL_COLOR.b, TIMER_WARNING_LABEL_COLOR.a)
-        slot.timerBg:SetColor(TIMER_WARNING_BG_COLOR.r, TIMER_WARNING_BG_COLOR.g, TIMER_WARNING_BG_COLOR.b, TIMER_WARNING_BG_COLOR.a)
-        slot.timerBar:SetColor(TIMER_WARNING_BAR_COLOR.r, TIMER_WARNING_BAR_COLOR.g, TIMER_WARNING_BAR_COLOR.b, TIMER_WARNING_BAR_COLOR.a)
+    if hasTimer then
+        slot.timerLabel:SetText(FormatTimerSeconds(remaining))
+        if isWarning then
+            slot.timerLabel:SetColor(TIMER_WARNING_LABEL_COLOR.r, TIMER_WARNING_LABEL_COLOR.g, TIMER_WARNING_LABEL_COLOR.b, TIMER_WARNING_LABEL_COLOR.a)
+            slot.timerBg:SetColor(TIMER_WARNING_BG_COLOR.r, TIMER_WARNING_BG_COLOR.g, TIMER_WARNING_BG_COLOR.b, TIMER_WARNING_BG_COLOR.a)
+            slot.timerBar:SetColor(TIMER_WARNING_BAR_COLOR.r, TIMER_WARNING_BAR_COLOR.g, TIMER_WARNING_BAR_COLOR.b, TIMER_WARNING_BAR_COLOR.a)
+        else
+            slot.timerLabel:SetColor(TIMER_LABEL_COLOR.r, TIMER_LABEL_COLOR.g, TIMER_LABEL_COLOR.b, TIMER_LABEL_COLOR.a)
+            slot.timerBg:SetColor(TIMER_BG_COLOR.r, TIMER_BG_COLOR.g, TIMER_BG_COLOR.b, TIMER_BG_COLOR.a)
+            slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
+        end
+        slot.timerLabel:SetAlpha(timerAlpha)
+        slot.timerLabel:SetHidden(false)
+        slot.timerBg:SetAlpha(timerAlpha)
+        slot.timerBg:SetHidden(false)
+        slot.timerBar:SetValue(ratio)
+        slot.timerBar:SetAlpha(timerAlpha)
+        slot.timerBar:SetHidden(false)
     else
-        slot.timerLabel:SetColor(TIMER_LABEL_COLOR.r, TIMER_LABEL_COLOR.g, TIMER_LABEL_COLOR.b, TIMER_LABEL_COLOR.a)
-        slot.timerBg:SetColor(TIMER_BG_COLOR.r, TIMER_BG_COLOR.g, TIMER_BG_COLOR.b, TIMER_BG_COLOR.a)
-        slot.timerBar:SetColor(timerR, timerG, timerB, timerA)
+        slot.timerLabel:SetHidden(true)
+        slot.timerBg:SetHidden(true)
+        slot.timerBar:SetHidden(true)
     end
-    slot.timerLabel:SetAlpha(timerAlpha)
-    slot.timerLabel:SetHidden(false)
-    slot.timerBg:SetAlpha(timerAlpha)
-    slot.timerBg:SetHidden(false)
-    slot.timerBar:SetValue(ratio)
-    slot.timerBar:SetAlpha(timerAlpha)
-    slot.timerBar:SetHidden(false)
 
-    if (effect.stackCount or 0) > 0 then
+    if hasStack then
         slot.stackLabel:SetText(tostring(effect.stackCount))
         slot.stackLabel:SetAlpha(timerAlpha)
         slot.stackLabel:SetHidden(false)
@@ -1137,7 +1152,6 @@ function EZO_HUD:RefreshCustomActionBars()
         for _, slotKey in ipairs(SLOT_ORDER) do
             local slot = entry.slots[slotKey]
             local hideInactiveWeapon = slotKey == "weapon" and not isActive
-            slot.root:SetHidden(hideInactiveWeapon)
             local texture
             local hasAbility = true
             if slotKey == "weapon" then
@@ -1146,10 +1160,17 @@ function EZO_HUD:RefreshCustomActionBars()
                 texture, hasAbility = GetActionSlotIcon(slotKey, bar.hotbarCategory)
             end
 
-            local effect = showTimers and GetActionSlotEffect(barName, slotKey) or nil
-            local hasActiveTimer = effect ~= nil and (effect.remaining or 0) > 0
+            local trackInactiveEffects = settings.hideInactiveSkillsAtZero == true
+            local effect = (showTimers or trackInactiveEffects) and GetActionSlotEffect(barName, slotKey) or nil
+            local hasActiveEffect = hasAbility and effect ~= nil
+                and ((effect.remaining or 0) > 0 or (effect.stackCount or 0) > 0)
+            local hideInactiveSkill = trackInactiveEffects
+                and not isActive
+                and ABILITY_SLOT_KEYS[slotKey] == true
+                and not hasActiveEffect
+            slot.root:SetHidden(hideInactiveWeapon or hideInactiveSkill)
             local isDimmed = settings.dimSlots and settings.dimSlots[slotKey] == true
-            local alpha = hasActiveTimer and activeAlpha or (isDimmed and dimmedAlpha or barAlpha)
+            local alpha = hasActiveEffect and activeAlpha or (isDimmed and dimmedAlpha or barAlpha)
             local ultimateState = GetUltimateSlotState(slotKey, bar.hotbarCategory)
             local iconAlpha = alpha
             if slotKey == "ultimate" and ultimateState ~= nil and not ultimateState.ready then
@@ -1158,7 +1179,7 @@ function EZO_HUD:RefreshCustomActionBars()
             slot.icon:SetTexture(texture)
             slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
             slot.bg:SetAlpha(shouldShow and 1 or 0)
-            UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility, alpha, warningRatio, timerR, timerG, timerB, timerA)
+            UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility and not hideInactiveSkill, alpha, warningRatio, timerR, timerG, timerB, timerA)
             UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
             UpdateSlotKeybind(slot, slotKey, barKeybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
             UpdateSlotUseAnimation(slot)
@@ -1470,6 +1491,20 @@ function EZO_HUD:InitializeCustomActionBars()
                     end,
                     disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.showTimers,
+                    width = "half",
+                },
+                {
+                    type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "HideInactiveSkillsAtZero",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_INACTIVE_SKILLS_AT_ZERO),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_HIDE_INACTIVE_SKILLS_AT_ZERO_TOOLTIP),
+                    getFunc = function() return settings.hideInactiveSkillsAtZero == true end,
+                    setFunc = function(value)
+                        settings.hideInactiveSkillsAtZero = value == true
+                        EZO_HUD:RefreshCustomActionBars()
+                    end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
+                    default = EZO_HUD.defaults.customActionBars.hideInactiveSkillsAtZero,
                     width = "half",
                 },
                 {
