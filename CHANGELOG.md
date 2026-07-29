@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.139 - Equal Attribute Bar Sizes
+
+- Added an optional shared Size lock for Health, Magicka, and Stamina in both Attribute HUD layouts.
+- Synchronizes all three Size sliders immediately when the lock is enabled.
+- Keeps all three bar bases at the same exact width regardless of their maximum resource values while preserving percentage-based fill.
+
 ## 0.1.138 - Two-Line Ultimate Values
 
 - Reduced and independently centered the ultimate readiness percentage, including its `%` symbol.

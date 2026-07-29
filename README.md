@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.138`
-- AddOnVersion: `10138`
+- Addon version: `0.1.139`
+- AddOnVersion: `10139`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -39,10 +39,11 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Attribute HUD movement mode that lets the three resource bars move as a group.
 - Attribute HUD layout selector with the classic split model and a tighter left-aligned vertical stack for Health, Stamina, and Magicka.
 - Resource bar width settings for Health, Magicka, and Stamina, with a maximum size of 750.
+- Optional equal-size lock for both Attribute HUD layouts. It gives all three bars the same exact maximum width regardless of resource maximums, and changing any Size slider updates the other two immediately.
 - Resource color pickers constrained to each resource color family.
 - Per-resource warning thresholds that change the resource numbers and consumed background to a soft alarm tint.
 - Out-of-combat alpha for the custom attribute HUD.
-- Resource bar scaling based on each resource maximum, so the dominant maximum resource can appear larger.
+- Resource bar scaling based on each resource maximum, so the dominant maximum resource can appear larger when the equal-size lock is disabled.
 - Ultimate HUD indicators for main and backup ultimate slots.
 - Ultimate display modes: main, backup, both, or inactive bar only.
 - Movable ultimate indicators, with main and backup positions handled independently.
@@ -81,7 +82,7 @@ Master enable controls defer their settings refresh until the current LAM callba
 With EZOCore active, EZOhud follows the EZO family preference storage policy: ordinary HUD settings use the selected account-wide or per-character scope. When the scope is per character, the first load copies existing account-wide EZOhud settings into that character profile. Without EZOCore, EZOhud keeps its historical account-wide storage.
 
 - General: inherit the shared EZOCore language or select Automatic, English, or Spanish locally.
-- Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, enable HUD movement, set out-of-combat alpha, and adjust per-resource size up to 750, color, and warning threshold.
+- Attribute HUD: enable custom bars, automatically hide vanilla bars when enabling the HUD, choose the bar layout, optionally lock all three bars to the same Size and exact maximum width, enable HUD movement, set out-of-combat alpha, and adjust per-resource size up to 750, color, and warning threshold.
 - Ultimate HUD: enable indicators, enable movement, choose displayed bar slots, and set icon size.
 - Custom Action Bars: enable visual copies of ability bars, optionally hide ESO's native HUD action bar, choose visible rows, move the paired action-bar block and active quickslot indicator independently, adjust icon size/spacing/alpha, optionally hide backup-row abilities when that row is inactive and their native effect time and stacks are both zero while keeping the main row complete, toggle larger bold outlined native action-slot effect timers and orange upper-right stack counts, replace the active ultimate icon and values with a charge bar until it reaches 100%, choose the shared timer-bar color and proportional warning threshold, choose key labels off/auto/keyboard/gamepad below only the lowest visible row, and choose globally dimmed logical slots. Ultimate otherwise shows a centered percentage with `%` and a smaller current/cost reading underneath; the active quickslot icon mirrors ESO's cooldown data with a vertical refill and remaining-time label.
 - Execute HUD: enable alert, enable movement, and set alert size.
@@ -118,6 +119,7 @@ Recommended beta checks:
 - Test Custom Group Search while queued for a dungeon or other Activity Finder activity, during ready check, and after queue completion to confirm the native tracker hides, the native-style category/status text updates, the selected activity is not mislabeled as the final instance, final/current instance data appears only when ESO exposes it, the left-aligned search-duration and visible group-role lines display, role counts update when group members or roles change, the label can be dragged in move mode, and it disappears outside HUD scenes.
 - Test combat and out-of-combat alpha behavior.
 - Test that enabling the EZOhud Attribute HUD automatically hides vanilla ESO bars, and that the manual vanilla-bar toggle still applies afterward.
+- Test the equal attribute-size lock in both layouts with different Health, Magicka, and Stamina maximums. Confirm all three bases keep the same width, their fills still show each resource percentage, and changing any Size slider immediately updates the other two in both Settings > EZO and the standalone LAM panel without requiring `/reloadui`.
 - Test each ultimate display mode and active/inactive bar state.
 - Test Custom Action Bars with main, backup, both, and active-only modes. Confirm the master enable toggle immediately enables dependent settings in both Settings > EZO and the standalone LAM panel without leaving them visually greyed out; both rows stay parallel and move together as one block; weapon icons update after weapon swap; only the active weapon icon remains visible with the purple frame; active-row highlighting follows bar swaps; used slots flash when activated; dimmed slot choices apply to both rows except when a native timer is currently active; native timers use larger centered white bold thick-outline numbers and remain readable at the default 42 px icon size; enlarged stack counts appear in orange at the upper-right; enabling backup-at-zero hiding removes only backup ability slots 1-5 while that row is inactive and both native remaining time and stacks are zero, while the main row always remains complete; the shared timer-bar color and warning threshold apply; key-label Off keeps the compact layout while Auto/Keyboard/Gamepad show one label set below the backup row when both rows are visible, or below the single visible row in the other display modes; the active quickslot icon still moves independently, shows item count when ready, switches to remaining time during potion/drink cooldown, and refills vertically; ultimate normally shows a smaller independently centered bold outlined readiness percentage with `%` and a smaller current/cost reading underneath; enabling the active-ultimate 100% option replaces the not-ready active icon and both text rows with a purple charge bar, restores them at 100%, and leaves the inactive row unchanged; and the native action bar hides/restores with its toggle.
 - Test execute alert behavior with known execute abilities on the active bar.

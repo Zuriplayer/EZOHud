@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.138`
-- AddOnVersion: `10138`
+- Versión del addon: `0.1.139`
+- AddOnVersion: `10139`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -39,10 +39,11 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 - Modo de movimiento del HUD de atributos que permite mover las tres barras de recursos como un grupo.
 - Selector de modelo del HUD de atributos con el diseño clásico dividido y una pila vertical más compacta alineada a la izquierda para Salud, Estamina y Magia.
 - Ajustes de anchura de barra para Salud, Magia y Estamina, con tamaño máximo de 750.
+- Bloqueo opcional de tamaño común para ambos modelos del HUD de atributos. Da a las tres barras exactamente la misma anchura máxima independientemente de los máximos de recurso y cambiar cualquier deslizador de Tamaño actualiza inmediatamente los otros dos.
 - Selectores de color de recurso limitados a la familia de color de cada recurso.
 - Umbrales de aviso por recurso que cambian los números del recurso y el fondo consumido a un tinte de alarma suave.
 - Alpha fuera de combate para el HUD de atributos personalizado.
-- Escalado de barras basado en el valor máximo de cada recurso, para que el recurso máximo dominante pueda verse más grande.
+- Escalado de barras basado en el valor máximo de cada recurso, para que el recurso máximo dominante pueda verse más grande cuando el bloqueo de tamaño común está desactivado.
 - Indicadores de HUD de ultimate para los slots de ultimate principal y secundaria.
 - Modos de visualización de ultimate: principal, secundaria, ambas o solo barra no activa.
 - Indicadores de ultimate movibles, con posiciones independientes para principal y secundaria.
@@ -81,7 +82,7 @@ Los controles maestros de activación aplazan el refresco de ajustes hasta que t
 Con EZOCore activo, EZOhud sigue la política familiar de guardado de preferencias EZO: los ajustes ordinarios del HUD usan el alcance seleccionado por cuenta o por personaje. Cuando el alcance es por personaje, la primera carga copia los ajustes existentes de cuenta de EZOhud al perfil de ese personaje. Sin EZOCore, EZOhud conserva su guardado histórico por cuenta.
 
 - General: heredar el idioma compartido de EZOCore o seleccionar Automático, Inglés o Español localmente.
-- HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño hasta 750, color y umbral de aviso por recurso.
+- HUD de atributos: activar barras personalizadas, ocultar automáticamente las barras vanilla al activar el HUD, elegir el modelo de barras, bloquear opcionalmente las tres barras al mismo Tamaño y anchura máxima exacta, habilitar movimiento del HUD, definir alpha fuera de combate y ajustar tamaño hasta 750, color y umbral de aviso por recurso.
 - HUD de ultimate: activar indicadores, habilitar movimiento, elegir los slots visibles y definir el tamaño del icono.
 - Barras de Habilidades Personalizadas: activar copias visuales de las barras de habilidades, ocultar opcionalmente la barra de habilidades nativa del HUD de ESO, elegir filas visibles, mover por separado el bloque unido de barras y el icono de slot rápido activo, ajustar tamaño/separación/alpha de iconos, ocultar opcionalmente las habilidades de la fila secundaria cuando esa fila no está activa y su tiempo de efecto nativo y sus acumulaciones estén a cero manteniendo completa la principal, activar temporizadores nativos más grandes con fuente negrita y contorno y acumulaciones naranjas en la esquina superior derecha, sustituir el icono y los valores de ultimate activo por una barra de carga hasta que llegue al 100%, elegir el color compartido de la barra de temporizador y el umbral proporcional de aviso, elegir etiquetas de tecla desactivadas/automáticas/teclado/mando solo debajo de la fila visible más baja y elegir slots lógicos opacados globalmente. Ultimate muestra de otro modo un porcentaje centrado con `%` y una lectura menor actual/coste debajo; el icono del slot rápido activo refleja el cooldown nativo de ESO con relleno vertical y etiqueta de tiempo restante.
 - HUD de execute: activar aviso, habilitar movimiento y definir el tamaño del aviso.
@@ -118,6 +119,7 @@ Comprobaciones recomendadas para la beta:
 - Probar Búsqueda de Grupo Personalizada mientras estás en cola para una mazmorra u otra actividad del Buscador de actividades, durante ready check y al completarse la cola para confirmar que el tracker nativo se oculta, el texto de categoría/estado con estilo nativo se actualiza, la actividad seleccionada no se etiqueta como instancia final, la instancia final/actual aparece solo cuando ESO la expone, aparecen las líneas alineadas a la izquierda de duración y roles visibles del grupo, los conteos de roles cambian al entrar/salir miembros o cambiar roles, la etiqueta se puede arrastrar en modo movimiento y desaparece fuera de escenas HUD.
 - Probar el comportamiento en combate y el alpha fuera de combate.
 - Probar que al activar el HUD de atributos de EZOhud se ocultan automáticamente las barras vanilla de ESO, y que el ajuste manual de barras vanilla sigue aplicándose después.
+- Probar el bloqueo de tamaño común de atributos en ambos modelos con máximos distintos de Salud, Magia y Estamina. Confirmar que las tres bases mantienen la misma anchura, que sus rellenos siguen mostrando el porcentaje de cada recurso y que cambiar cualquier deslizador de Tamaño actualiza inmediatamente los otros dos tanto en Ajustes > EZO como en el panel LAM independiente sin necesitar `/reloadui`.
 - Probar cada modo de visualización de ultimate y el estado de barra activa/inactiva.
 - Probar Barras de Habilidades Personalizadas con modos principal, secundaria, ambas y solo activa. Confirmar que el toggle maestro activa inmediatamente los ajustes dependientes tanto en Ajustes > EZO como en el panel LAM independiente sin dejarlos visualmente en gris; ambas filas permanecen paralelas y se mueven juntas como un bloque; los iconos de arma cambian al cambiar de arma; solo el icono de arma activa queda visible con marco violeta; el resaltado de fila activa sigue los cambios de barra; los slots usados parpadean al activarse; los slots opacados se aplican a ambas filas salvo cuando un temporizador nativo está activo; los temporizadores usan números blancos centrados más grandes, en negrita y con contorno grueso y siguen siendo legibles con el tamaño de icono predeterminado de 42 px; las acumulaciones ampliadas aparecen en naranja arriba a la derecha; activar la ocultación a cero elimina solo los slots de habilidades 1-5 de la secundaria mientras esa fila está inactiva y tanto el tiempo nativo restante como las acumulaciones están a cero, mientras la fila principal permanece siempre completa; se aplican el color compartido y el umbral de aviso; Desactivadas mantiene el diseño compacto y Automático/Teclado/Mando muestra un solo juego de etiquetas bajo la fila secundaria cuando se ven ambas, o bajo la única fila visible en los demás modos; el icono de slot rápido sigue moviéndose de forma independiente, muestra objetos cuando está listo, cambia a tiempo restante durante el cooldown de poción/bebida y se rellena verticalmente; ultimate muestra normalmente un porcentaje más pequeño, centrado independientemente, con `%`, fuente negrita y contorno y una lectura actual/coste menor debajo; al activar la opción de ultimate activo al 100% el icono activo sin cargar y ambas líneas se sustituyen por una barra morada, reaparecen al 100% y la fila inactiva no cambia; y la barra nativa se oculta/restaura con su ajuste.
 - Probar el aviso de execute con habilidades de execute conocidas en la barra activa.

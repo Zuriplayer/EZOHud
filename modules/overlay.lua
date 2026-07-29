@@ -58,6 +58,14 @@ local RESOURCE_META = {
         barHeight = 24,
     },
 }
+local RESOURCE_SIZE_MIN = 90
+local RESOURCE_SIZE_MAX = 750
+local RESOURCE_SIZE_STEP = 5
+local COMMON_RESOURCE_MINIMUM_WIDTH = math.max(
+    RESOURCE_META.health.minimumWidth,
+    RESOURCE_META.stamina.minimumWidth,
+    RESOURCE_META.magicka.minimumWidth
+)
 
 local VANILLA_CONTROL_NAMES = {
     "ZO_PlayerAttributeHealth",
@@ -257,6 +265,23 @@ local function GetResourceSettings(settings, resourceName)
     }
 end
 
+local function GetLargestResourceSize(settings)
+    local largestSize = RESOURCE_SIZE_MIN
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        local meta = RESOURCE_META[resourceName]
+        largestSize = math.max(largestSize, tonumber(settings[meta.sizeKey]) or RESOURCE_SIZE_MIN)
+    end
+    return Clamp(largestSize, RESOURCE_SIZE_MIN, RESOURCE_SIZE_MAX)
+end
+
+local function SetAllResourceSizes(settings, value)
+    local sharedSize = Clamp(tonumber(value) or RESOURCE_SIZE_MIN, RESOURCE_SIZE_MIN, RESOURCE_SIZE_MAX)
+    for _, resourceName in ipairs(RESOURCE_ORDER) do
+        settings[RESOURCE_META[resourceName].sizeKey] = sharedSize
+    end
+    return sharedSize
+end
+
 local function GetResourceMaximum(resourceName)
     local meta = RESOURCE_META[resourceName]
     if not meta then
@@ -286,9 +311,9 @@ local function GetDominanceScaledSize(baseSize, resourceName, dominantMaximum)
     return zo_floor(baseSize * scale)
 end
 
-local function GetCleanBarDimensions(resource, scaledSize)
+local function GetCleanBarDimensions(resource, scaledSize, minimumWidth)
     local meta = resource.meta
-    local width = math.max(meta.minimumWidth, zo_floor(scaledSize))
+    local width = math.max(minimumWidth or meta.minimumWidth, zo_floor(scaledSize))
     return width, meta.barHeight
 end
 
@@ -524,13 +549,17 @@ function EZO_HUD:ApplyOverlayLayout()
     end
 
     local settings = (self.sv and self.sv.overlay) or self.defaults.overlay
-    local dominantMaximum = GetDominantMaximum()
+    local useEqualSizes = settings.equalAttributeSizes == true
+    local sharedSize = useEqualSizes and GetLargestResourceSize(settings) or nil
+    local dominantMaximum = useEqualSizes and 0 or GetDominantMaximum()
     local layout = {}
     for _, resourceName in ipairs(RESOURCE_ORDER) do
         local resource = self.overlay.resources[resourceName]
         local resourceSettings = GetResourceSettings(settings, resourceName)
-        local scaledSize = GetDominanceScaledSize(resourceSettings.size, resourceName, dominantMaximum)
-        local width, height = GetCleanBarDimensions(resource, scaledSize)
+        local scaledSize = sharedSize
+            or GetDominanceScaledSize(resourceSettings.size, resourceName, dominantMaximum)
+        local minimumWidth = useEqualSizes and COMMON_RESOURCE_MINIMUM_WIDTH or nil
+        local width, height = GetCleanBarDimensions(resource, scaledSize, minimumWidth)
 
         ApplyResourceBarStyle(resource, width, height)
 
@@ -731,14 +760,19 @@ function EZO_HUD:InitializeSettings()
                 type = "slider",
                 name = GetString(EZO_HUD_OPTION_SIZE),
                 tooltip = GetString(EZO_HUD_OPTION_SIZE_TOOLTIP),
-                min = 90,
-                max = 750,
-                step = 5,
+                min = RESOURCE_SIZE_MIN,
+                max = RESOURCE_SIZE_MAX,
+                step = RESOURCE_SIZE_STEP,
                 getFunc = function()
                     return self.sv.overlay[meta.sizeKey]
                 end,
                 setFunc = function(value)
-                    self.sv.overlay[meta.sizeKey] = value
+                    if self.sv.overlay.equalAttributeSizes == true then
+                        SetAllResourceSizes(self.sv.overlay, value)
+                        self:RequestSettingsPanelRefresh(true)
+                    else
+                        self.sv.overlay[meta.sizeKey] = value
+                    end
                     self:ApplyOverlayLayout()
                 end,
                 default = self.defaults.overlay[meta.sizeKey],
@@ -882,6 +916,24 @@ function EZO_HUD:InitializeSettings()
                     self:ApplyOverlayLayout()
                 end,
                 default = self.defaults.overlay.layoutMode,
+                width = "half",
+            },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_EQUAL_ATTRIBUTE_SIZES),
+                tooltip = GetString(EZO_HUD_OPTION_EQUAL_ATTRIBUTE_SIZES_TOOLTIP),
+                getFunc = function()
+                    return self.sv.overlay.equalAttributeSizes == true
+                end,
+                setFunc = function(value)
+                    self.sv.overlay.equalAttributeSizes = value
+                    if value == true then
+                        SetAllResourceSizes(self.sv.overlay, GetLargestResourceSize(self.sv.overlay))
+                    end
+                    self:ApplyOverlayLayout()
+                    self:RequestSettingsPanelRefresh(true)
+                end,
+                default = self.defaults.overlay.equalAttributeSizes,
                 width = "half",
             },
             {
