@@ -230,11 +230,24 @@ local function ShouldUseCustomActionBars(settings)
     return settings.enabled == true and GetDisplayMode(settings) ~= DISPLAY_OFF
 end
 
+local function IsNormalPlayerHotbarActive()
+    if type(GetActiveHotbarCategory) ~= "function"
+        or HOTBAR_CATEGORY_PRIMARY == nil
+        or HOTBAR_CATEGORY_BACKUP == nil then
+        return false
+    end
+
+    local activeHotbarCategory = GetActiveHotbarCategory()
+    return activeHotbarCategory == HOTBAR_CATEGORY_PRIMARY
+        or activeHotbarCategory == HOTBAR_CATEGORY_BACKUP
+end
+
 local function ShouldHideNativeActionBar(settings)
     if not (settings.hideNativeActionBar == true and ShouldUseCustomActionBars(settings)) then
         return false
     end
-    return EZO_HUD.IsHudSceneVisible == nil or EZO_HUD:IsHudSceneVisible()
+    local hudVisible = EZO_HUD.IsHudSceneVisible == nil or EZO_HUD:IsHudSceneVisible()
+    return hudVisible and IsNormalPlayerHotbarActive()
 end
 
 local function ShouldShowCustomQuickslot(settings)
@@ -990,9 +1003,7 @@ function EZO_HUD:ApplyCustomActionBarsNativeVisibility()
     if ShouldHideNativeActionBar(settings) then
         self.customActionBarsNativeHidden = true
         actionBar:SetHidden(true)
-    elseif self.customActionBarsNativeHidden
-        and hudVisible
-        and (settings.hideNativeActionBar ~= true or not ShouldUseCustomActionBars(settings)) then
+    elseif self.customActionBarsNativeHidden and hudVisible then
         actionBar:SetHidden(false)
         self.customActionBarsNativeHidden = false
     end

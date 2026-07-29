@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.140 - Preserve Mechanic Action Bars
+
+- Limited native action-bar hiding to normal primary and backup weapon hotbars.
+- Restores ESO's native action bar immediately when a temporary or mechanic-specific hotbar becomes active.
+- Reapplies native hiding when the player returns to a normal weapon hotbar.
+
 ## 0.1.139 - Equal Attribute Bar Sizes
 
 - Added an optional shared Size lock for Health, Magicka, and Stamina in both Attribute HUD layouts.
