@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.138 - Two-Line Ultimate Values
+
+- Reduced and independently centered the ultimate readiness percentage, including its `%` symbol.
+- Added a smaller current/cost `x/y` reading below the percentage.
+- Hides and restores both text rows together when the optional active-ultimate charge bar replaces the not-ready icon.
+
+## 0.1.137 - Active Ultimate Ready-Only Display
+
+- Added a Custom Action Bars option that shows the active ultimate icon only when it reaches 100%.
+- Replaces the not-ready active ultimate icon and percentage with a purple charge bar styled like the Ultimate HUD.
+- Leaves the inactive ultimate row and the existing default behavior unchanged.
+
 ## 0.1.136 - Backup Filtering and Clearer Center Values
 
 - Limited zero-effect skill hiding to the inactive backup row; the main row now always remains complete.

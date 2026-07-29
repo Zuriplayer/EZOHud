@@ -542,8 +542,16 @@ local function PlaySlotUseAnimation(slot)
     slot.useFlashExpiresMs = GetNowMs() + SLOT_USE_ANIMATION_MS
 end
 
-local function UpdateSlotUseAnimation(slot)
+local function UpdateSlotUseAnimation(slot, suppressed)
     if not (slot and slot.flash and slot.icon) then return end
+
+    if suppressed == true then
+        slot.useFlashExpiresMs = nil
+        slot.flash:SetHidden(true)
+        slot.flash:SetAlpha(0)
+        slot.icon:SetScale(1)
+        return
+    end
 
     local remainingMs = (slot.useFlashExpiresMs or 0) - GetNowMs()
     if remainingMs <= 0 then
@@ -612,18 +620,42 @@ local function UpdateSlotTimer(slot, effect, visible, alpha, warningRatio, timer
     end
 end
 
-local function UpdateSlotUltimate(slot, ultimateState, visible, alpha)
-    if not (slot and slot.ultimateLabel) then return end
+local function UpdateSlotUltimate(slot, ultimateState, visible, alpha, progressOnly)
+    if not (slot and slot.ultimateLabel and slot.ultimateDetailLabel and slot.ultimateProgressBg and slot.ultimateProgress) then return end
     if not visible or ultimateState == nil or (ultimateState.cost or 0) <= 0 then
         slot.ultimateLabel:SetHidden(true)
+        slot.ultimateDetailLabel:SetHidden(true)
+        slot.ultimateProgressBg:SetHidden(true)
+        slot.ultimateProgress:SetHidden(true)
         return
     end
 
     local labelAlpha = Clamp(alpha or 1, 0.25, 1.0)
-    local ultimatePercent = zo_floor((Clamp((ultimateState.current or 0) / ultimateState.cost, 0, 1) * 100) + 0.5)
+    local ratio = Clamp((ultimateState.current or 0) / ultimateState.cost, 0, 1)
+    slot.ultimateProgress:SetMinMax(0, 1)
+    slot.ultimateProgress:SetValue(ratio)
+    slot.ultimateProgressBg:SetAlpha(labelAlpha)
+    slot.ultimateProgress:SetAlpha(labelAlpha)
+    slot.ultimateProgressBg:SetHidden(progressOnly ~= true)
+    slot.ultimateProgress:SetHidden(progressOnly ~= true)
+
+    if progressOnly == true then
+        slot.ultimateLabel:SetHidden(true)
+        slot.ultimateDetailLabel:SetHidden(true)
+        return
+    end
+
+    local ultimatePercent = zo_floor((ratio * 100) + 0.5)
     slot.ultimateLabel:SetText(string.format("%d%%", ultimatePercent))
     slot.ultimateLabel:SetAlpha(labelAlpha)
     slot.ultimateLabel:SetHidden(false)
+    slot.ultimateDetailLabel:SetText(string.format(
+        "%d/%d",
+        zo_floor(ultimateState.current or 0),
+        zo_floor(ultimateState.cost or 0)
+    ))
+    slot.ultimateDetailLabel:SetAlpha(labelAlpha)
+    slot.ultimateDetailLabel:SetHidden(false)
 end
 
 local function GetSlotKeybindActionNames(slotKey)
@@ -759,6 +791,28 @@ local function CreateSlot(parent, name)
     ultimateLabel:SetMouseEnabled(false)
     ultimateLabel:SetHidden(true)
 
+    local ultimateDetailLabel = WINDOW_MANAGER:CreateControl(name .. "_UltimateDetailLabel", root, CT_LABEL)
+    ultimateDetailLabel:SetFont("ZoFontGameSmall")
+    ultimateDetailLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
+    ultimateDetailLabel:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+    ultimateDetailLabel:SetColor(1, 0.94, 0.72, 1)
+    ultimateDetailLabel:SetMouseEnabled(false)
+    ultimateDetailLabel:SetHidden(true)
+
+    local ultimateProgressBg = WINDOW_MANAGER:CreateControl(name .. "_UltimateProgressBg", root, CT_TEXTURE)
+    ultimateProgressBg:SetTexture(WHITE_TEXTURE)
+    ultimateProgressBg:SetColor(0.04, 0.05, 0.06, 0.82)
+    ultimateProgressBg:SetMouseEnabled(false)
+    ultimateProgressBg:SetHidden(true)
+
+    local ultimateProgress = WINDOW_MANAGER:CreateControl(name .. "_UltimateProgress", root, CT_STATUSBAR)
+    ultimateProgress:SetTexture(WHITE_TEXTURE)
+    ultimateProgress:SetColor(0.78, 0.44, 1.0, 0.95)
+    ultimateProgress:SetOrientation(ORIENTATION_HORIZONTAL)
+    ultimateProgress:SetMinMax(0, 1)
+    ultimateProgress:SetMouseEnabled(false)
+    ultimateProgress:SetHidden(true)
+
     local keyLabel = WINDOW_MANAGER:CreateControl(name .. "_KeyLabel", root, CT_LABEL)
     keyLabel:SetFont("ZoFontGameSmall")
     keyLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
@@ -778,6 +832,9 @@ local function CreateSlot(parent, name)
         timerLabel = timerLabel,
         stackLabel = stackLabel,
         ultimateLabel = ultimateLabel,
+        ultimateDetailLabel = ultimateDetailLabel,
+        ultimateProgressBg = ultimateProgressBg,
+        ultimateProgress = ultimateProgress,
         keyLabel = keyLabel,
     }
 end
@@ -1053,9 +1110,22 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.stackLabel:SetDimensions(iconSize - 8, zo_floor(iconSize * 0.62))
 
             slot.ultimateLabel:ClearAnchors()
-            slot.ultimateLabel:SetFont(BuildBoldOutlinedFont(iconSize, 0.48, 17, 42))
-            slot.ultimateLabel:SetAnchor(CENTER, slot.root, CENTER, 0, -1)
-            slot.ultimateLabel:SetDimensions(iconSize - 4, iconSize - 4)
+            slot.ultimateLabel:SetFont(BuildBoldOutlinedFont(iconSize, 0.42, 14, 34))
+            slot.ultimateLabel:SetAnchor(TOPLEFT, slot.root, TOPLEFT, 0, 1)
+            slot.ultimateLabel:SetDimensions(iconSize, zo_floor(iconSize * 0.60))
+
+            slot.ultimateDetailLabel:ClearAnchors()
+            slot.ultimateDetailLabel:SetFont(BuildBoldOutlinedFont(iconSize, 0.29, 10, 22))
+            slot.ultimateDetailLabel:SetAnchor(BOTTOMLEFT, slot.root, BOTTOMLEFT, 0, -1)
+            slot.ultimateDetailLabel:SetDimensions(iconSize, zo_floor(iconSize * 0.40))
+
+            slot.ultimateProgressBg:ClearAnchors()
+            slot.ultimateProgressBg:SetAnchor(LEFT, slot.root, LEFT, 4, 0)
+            slot.ultimateProgressBg:SetAnchor(RIGHT, slot.root, RIGHT, -4, 0)
+            slot.ultimateProgressBg:SetHeight(math.max(5, zo_floor(iconSize * 0.10)))
+
+            slot.ultimateProgress:ClearAnchors()
+            slot.ultimateProgress:SetAnchorFill(slot.ultimateProgressBg)
 
             slot.keyLabel:ClearAnchors()
             slot.keyLabel:SetFont(iconSize >= 72 and "ZoFontWinH4" or iconSize >= 54 and "ZoFontGameLargeBold" or "ZoFontGameBold")
@@ -1183,19 +1253,34 @@ function EZO_HUD:RefreshCustomActionBars()
             local isDimmed = settings.dimSlots and settings.dimSlots[slotKey] == true
             local alpha = hasActiveEffect and activeAlpha or (isDimmed and dimmedAlpha or barAlpha)
             local ultimateState = GetUltimateSlotState(slotKey, bar.hotbarCategory)
+            local ultimateProgressOnly = settings.activeUltimateReadyOnly == true
+                and slotKey == "ultimate"
+                and isActive
+                and ultimateState ~= nil
+                and (ultimateState.cost or 0) > 0
+                and not ultimateState.ready
             local iconAlpha = alpha
             if slotKey == "ultimate" and ultimateState ~= nil and not ultimateState.ready then
                 iconAlpha = math.min(iconAlpha, 0.38)
             end
             slot.icon:SetTexture(texture)
+            slot.icon:SetHidden(ultimateProgressOnly)
             slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
-            slot.bg:SetAlpha(shouldShow and 1 or 0)
+            slot.bg:SetAlpha(shouldShow and not ultimateProgressOnly and 1 or 0)
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility and not hideInactiveSkill, alpha, warningRatio, timerR, timerG, timerB, timerA)
-            UpdateSlotUltimate(slot, ultimateState, shouldShow and hasAbility, iconAlpha)
+            UpdateSlotUltimate(
+                slot,
+                ultimateState,
+                shouldShow and hasAbility,
+                ultimateProgressOnly and alpha or iconAlpha,
+                ultimateProgressOnly
+            )
             UpdateSlotKeybind(slot, slotKey, barKeybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
-            UpdateSlotUseAnimation(slot)
+            UpdateSlotUseAnimation(slot, ultimateProgressOnly)
 
-            if slotKey == "weapon" and isActive then
+            if ultimateProgressOnly then
+                slot.border:SetEdgeColor(0, 0, 0, 0)
+            elseif slotKey == "weapon" and isActive then
                 slot.border:SetEdgeColor(0.90, 0.62, 1.0, 0.95)
             elseif slotKey == "weapon" then
                 slot.border:SetEdgeColor(0.28, 0.18, 0.36, 0.62)
@@ -1516,6 +1601,20 @@ function EZO_HUD:InitializeCustomActionBars()
                     end,
                     disabled = AreCustomActionBarsSettingsDisabled,
                     default = EZO_HUD.defaults.customActionBars.hideBackupSkillsAtZero,
+                    width = "half",
+                },
+                {
+                    type = "checkbox",
+                    reference = LAM_REFERENCE_PREFIX .. "ActiveUltimateReadyOnly",
+                    name = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ACTIVE_ULTIMATE_READY_ONLY),
+                    tooltip = GetString(EZO_HUD_OPTION_CUSTOM_ACTION_BARS_ACTIVE_ULTIMATE_READY_ONLY_TOOLTIP),
+                    getFunc = function() return settings.activeUltimateReadyOnly == true end,
+                    setFunc = function(value)
+                        settings.activeUltimateReadyOnly = value == true
+                        EZO_HUD:RefreshCustomActionBars()
+                    end,
+                    disabled = AreCustomActionBarsSettingsDisabled,
+                    default = EZO_HUD.defaults.customActionBars.activeUltimateReadyOnly,
                     width = "half",
                 },
                 {
