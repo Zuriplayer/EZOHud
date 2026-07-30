@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.145 - Absolute Death Prompt Position Saving
+
+- Save the death and resurrection preview from its absolute screen bounds, converting both axes to the native bottom anchor instead of relying on relative move deltas.
+
 ## 0.1.144 - Two-Axis Death Prompt Handle
 
 - Made the native move handle use EZOhud's explicit mouse-down and mouse-up drag lifecycle so its X and Y position are saved reliably.

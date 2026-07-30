@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.144`
-- AddOnVersion: `10144`
+- Addon version: `0.1.145`
+- AddOnVersion: `10145`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -127,7 +127,7 @@ Recommended beta checks:
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it. Toggle each master enable setting from off to on and confirm dependent controls immediately become available without closing or reopening the panel.
 - Test different resolutions and UI scale values.
 - Test `/reloadui` after moving HUD elements.
-- Test native widget positioning with keyboard and gamepad UI for center screen announcements, active combat tips, and the complete death and resurrection prompt. Use Show move handle while alive to confirm its independent green preview appears above the settings panel and screen guides and can move on both axes. With Custom Action Bars enabled, die and accept a group resurrection request; confirm the prompt stays above the bars, its native buttons work, and disabling custom positioning restores the default anchor.
+- Test native widget positioning with keyboard and gamepad UI for center screen announcements, active combat tips, and the complete death and resurrection prompt. Use Show move handle while alive to confirm its independent green preview appears above the settings panel and screen guides and saves movement on both axes. With Custom Action Bars enabled, die and accept a group resurrection request; confirm the prompt stays above the bars, its native buttons work, and disabling custom positioning restores the default anchor.
 
 When reporting layout or behavior issues, include the addon version, ESO API version, character class, language mode, active settings, and a screenshot.
 

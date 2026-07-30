@@ -27,13 +27,13 @@ local function AnchorPreviewBackdrop(backdrop, control, widget)
     if widget.previewAnchorToGuiRoot and widget.fallbackAnchor then
         local defaults = (EZO_HUD.defaults and EZO_HUD.defaults[widget.id]) or {}
         local settings = (EZO_HUD.sv and EZO_HUD.sv[widget.id]) or defaults
-        backdrop:SetAnchor(
-            widget.fallbackAnchor[1],
-            widget.fallbackAnchor[2],
-            widget.fallbackAnchor[3],
-            tonumber(settings.offsetX) or defaults.offsetX or 0,
-            tonumber(settings.offsetY) or defaults.offsetY or 0
-        )
+        local guiWidth, guiHeight = GuiRoot:GetDimensions()
+        local width, height = backdrop:GetDimensions()
+        local offsetX = tonumber(settings.offsetX) or defaults.offsetX or 0
+        local offsetY = tonumber(settings.offsetY) or defaults.offsetY or 0
+        local left = zo_floor((guiWidth / 2) + offsetX - (width / 2))
+        local top = zo_floor(guiHeight + offsetY - height)
+        backdrop:SetAnchor(TOPLEFT, GuiRoot, TOPLEFT, left, top)
     else
         backdrop:SetAnchor(CENTER, control or GuiRoot, CENTER, 0, 0)
     end
@@ -104,8 +104,19 @@ local function GetOrCreatePreviewBackdrop(control, widget)
 
             local settings = EZO_HUD.sv[widget.id]
             if settings then
-                settings.offsetX = (settings.offsetX or 0) + diffX
-                settings.offsetY = (settings.offsetY or 0) + diffY
+                if widget.previewAnchorToGuiRoot then
+                    local left = self:GetLeft()
+                    local top = self:GetTop()
+                    local width, height = self:GetDimensions()
+                    local guiWidth, guiHeight = GuiRoot:GetDimensions()
+                    if left and top and width and height then
+                        settings.offsetX = zo_floor((left + (width / 2)) - (guiWidth / 2))
+                        settings.offsetY = zo_floor((top + height) - guiHeight)
+                    end
+                else
+                    settings.offsetX = (settings.offsetX or 0) + diffX
+                    settings.offsetY = (settings.offsetY or 0) + diffY
+                end
                 if EZO_HUD.ApplyNativeWidgetLayout then
                     EZO_HUD:ApplyNativeWidgetLayout(widget.id)
                 end
