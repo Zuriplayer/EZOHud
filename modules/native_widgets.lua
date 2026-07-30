@@ -27,9 +27,11 @@ local function GetOrCreatePreviewBackdrop(control, widget)
     local backdropName = control:GetName() .. "_EZOhudPreview"
     local backdrop = _G[backdropName]
     if not backdrop then
-        backdrop = WINDOW_MANAGER:CreateControl(backdropName, control, CT_BACKDROP)
+        local previewParent = widget.previewParent or control
+        backdrop = WINDOW_MANAGER:CreateControl(backdropName, previewParent, CT_BACKDROP)
         backdrop:SetAnchor(CENTER, control, CENTER, 0, 0)
-        backdrop:SetDimensions(300, 100)
+        local previewDimensions = widget.previewDimensions or { width = 300, height = 100 }
+        backdrop:SetDimensions(previewDimensions.width, previewDimensions.height)
         backdrop:SetCenterColor(0, 1, 0, 0.5)
         backdrop:SetEdgeColor(0, 1, 0, 1)
         backdrop:SetEdgeTexture("", 1, 1, 2, 0)
@@ -154,6 +156,41 @@ local WIDGETS = {
             scaleTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_SCALE_TOOLTIP",
             reset = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET",
             resetTooltip = "EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP",
+        }
+    },
+    {
+        id = "nativeDeathPrompt",
+        controlName = "ZO_Death",
+        fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -16 },
+        minScale = 0.5,
+        maxScale = 1.5,
+        previewParent = GuiRoot,
+        previewDimensions = { width = 800, height = 116 },
+        onPreviewOpen = function(self, control)
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(false) end
+            end
+        end,
+        onPreviewClose = function(self, control)
+            if control then
+                local backdrop = GetOrCreatePreviewBackdrop(control, self)
+                if backdrop then backdrop:SetHidden(true) end
+            end
+        end,
+        stringIds = {
+            header = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT",
+            headerTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_HEADER_TOOLTIP",
+            enable = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE",
+            enableTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE_TOOLTIP",
+            offsetX = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X",
+            offsetXTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X_TOOLTIP",
+            offsetY = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y",
+            offsetYTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y_TOOLTIP",
+            scale = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE",
+            scaleTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE_TOOLTIP",
+            reset = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET",
+            resetTooltip = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET_TOOLTIP",
         }
     }
 }
@@ -338,6 +375,25 @@ function EZO_HUD:InitializeNativeWidgets()
             end
         end
     )
+
+    local deathPromptEvents = {
+        EVENT_PLAYER_DEAD,
+        EVENT_PLAYER_ALIVE,
+        EVENT_RESURRECT_REQUEST,
+        EVENT_RESURRECT_REQUEST_REMOVED,
+        EVENT_PLAYER_DEATH_INFO_UPDATE,
+    }
+    for _, eventCode in pairs(deathPromptEvents) do
+        if eventCode then
+            EVENT_MANAGER:RegisterForEvent(
+                self.ADDON_NAME .. "_NativeDeathPrompt",
+                eventCode,
+                function()
+                    self:ApplyNativeWidgetLayout("nativeDeathPrompt")
+                end
+            )
+        end
+    end
 
     local sharedInformationArea = SHARED_INFORMATION_AREA
     if not EZO_HUD.synergyAbilityHooked and sharedInformationArea and sharedInformationArea.SetHidden then

@@ -265,4 +265,17 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Reset",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restores original anchor.",
 
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT = "Death and Resurrection Prompt",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_HEADER_TOOLTIP = "Controls ESO's complete death prompt, including resurrection requests, revive or release choices, countdowns, and death recap. It reanchors the native parent without changing its actions.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE = "Keep death prompt above action bars",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE_TOOLTIP = "Applies the saved X/Y position and scale to ESO's native death prompt. Enabled by default to keep resurrection requests clear of EZOhud Custom Action Bars. Turning this off restores ESO's original runtime anchor.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X = "X offset",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X_TOOLTIP = "Horizontal offset.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y = "Y offset",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y_TOOLTIP = "Vertical offset.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE = "Scale",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE_TOOLTIP = "Scales the complete death prompt.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET = "Reset",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET_TOOLTIP = "Restores the default position above the Custom Action Bars.",
+
 }

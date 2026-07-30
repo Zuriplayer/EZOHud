@@ -262,4 +262,17 @@ EZOHUD_STRINGS_ES = {
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET = "Restablecer",
     EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_RESET_TOOLTIP = "Restaura el anclaje original.",
 
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT = "Aviso de muerte y resurreccion",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_HEADER_TOOLTIP = "Controla el aviso completo de muerte de ESO, incluidas las solicitudes de resurreccion, las opciones de revivir o liberar, las cuentas atras y el resumen de muerte. Reancla el panel nativo sin cambiar sus acciones.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE = "Mantener el aviso de muerte sobre las barras de habilidades",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_ENABLE_TOOLTIP = "Aplica la posicion X/Y y escala guardadas al aviso de muerte nativo de ESO. Se activa por defecto para que las solicitudes de resurreccion no queden tras las Barras de Habilidades Personalizadas de EZOhud. Al desactivarlo se restaura el anclaje original de ESO.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X = "Desplazamiento X",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_X_TOOLTIP = "Desplazamiento horizontal.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y = "Desplazamiento Y",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_OFFSET_Y_TOOLTIP = "Desplazamiento vertical.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE = "Escala",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_SCALE_TOOLTIP = "Escala el aviso completo de muerte.",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET = "Restablecer",
+    EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_RESET_TOOLTIP = "Restaura la posicion predeterminada sobre las Barras de Habilidades Personalizadas.",
+
 }

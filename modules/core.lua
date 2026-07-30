@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.140"
-EZO_HUD.ADDON_VERSION_NUM = 10140
+EZO_HUD.ADDON_VERSION = "0.1.141"
+EZO_HUD.ADDON_VERSION_NUM = 10141
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -119,6 +119,12 @@ EZO_HUD.defaults = {
         enabled = false,
         offsetX = 0,
         offsetY = -150,
+        scale = 1.0,
+    },
+    nativeDeathPrompt = {
+        enabled = true,
+        offsetX = 0,
+        offsetY = 470,
         scale = 1.0,
     },
     customQuestTracker = {

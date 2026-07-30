@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.141 - Movable Death and Resurrection Prompt
+
+- Added a Native UI Tweaks widget for ESO's complete `ZO_Death` prompt, preserving native resurrection requests, revive or release choices, countdowns, and death recap.
+- Enabled its custom placement by default above the default Custom Action Bars position, with independent X/Y, scale, move handle, and reset controls.
+- Reapply the layout after death and resurrection events without changing ESO's native actions.
+
 ## 0.1.140 - Preserve Mechanic Action Bars
 
 - Limited native action-bar hiding to normal primary and backup weapon hotbars.

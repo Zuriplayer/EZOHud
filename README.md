@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.140`
-- AddOnVersion: `10140`
+- Addon version: `0.1.141`
+- AddOnVersion: `10141`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -58,7 +58,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Arcanist Crux HUD with stack count, remaining duration bar, timer text, 140 px default size, 25 px default bar spacing, size setting, and bar spacing setting.
 - Crux HUD visibility limited to Arcanist characters.
 - Optional hiding of the Crux HUD when no Crux stacks are active.
-- Experimental native widget positioning for center screen announcements and active combat tips with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls.
+- Experimental native widget positioning for center screen announcements, active combat tips, and the complete death and resurrection prompt with apply-position, one-at-a-time move handle, X/Y offset, scale, and reset controls. The death prompt is enabled by default above the default Custom Action Bars position.
 - Custom Quest Tracker that can hide ESO's native focused quest tracker on the HUD and show a movable, scalable native-style panel with the focused quest, current objective, right-aligned optional hints, optional combat hiding, ESO's native Cycle Focused Quest keybind display, and a full quest-detail tooltip on mouse hover.
 - Custom Synergy UI that hides ESO's native synergy prompt and uses an independent movable overlay.
 - Custom Group Search label that hides ESO's native on-screen Activity Finder status tracker, keeps a compact native-style category/status format, and adds smaller left-aligned selected-activity or instance, search-duration, and visible group-role lines.
@@ -87,7 +87,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Custom Action Bars: enable visual copies of ability bars, optionally hide ESO's native HUD action bar only for normal primary/backup weapon bars while keeping temporary or mechanic-specific native bars visible, choose visible rows, move the paired action-bar block and active quickslot indicator independently, adjust icon size/spacing/alpha, optionally hide backup-row abilities when that row is inactive and their native effect time and stacks are both zero while keeping the main row complete, toggle larger bold outlined native action-slot effect timers and orange upper-right stack counts, replace the active ultimate icon and values with a charge bar until it reaches 100%, choose the shared timer-bar color and proportional warning threshold, choose key labels off/auto/keyboard/gamepad below only the lowest visible row, and choose globally dimmed logical slots. Ultimate otherwise shows a centered percentage with `%` and a smaller current/cost reading underneath; the active quickslot icon mirrors ESO's cooldown data with a vertical refill and remaining-time label.
 - Execute HUD: enable alert, enable movement, and set alert size.
 - Crux HUD: enable indicator, enable movement, hide without Crux, set indicator size, and adjust bar spacing.
-- Native UI Tweaks: apply custom positioning for ESO's native center screen announcements and active combat tips (Break Free, Interrupt, Dodge). Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
+- Native UI Tweaks: apply custom positioning for ESO's native center screen announcements, active combat tips (Break Free, Interrupt, Dodge), and complete death and resurrection prompt. The death prompt keeps ESO's resurrection requests, revive or release choices, countdowns, and death recap above the default Custom Action Bars position. Tune X/Y offsets, adjust scale, show one green drag handle at a time, and reset the values. Turning off a custom-position toggle restores that native element's original runtime anchor.
 - Custom Quest Tracker: enable the custom focused-quest panel, choose whether it hides in combat, allow movement, adjust scale, and choose whether optional hints are shown. The panel mirrors ESO's focused quest, shows hints as separate right-aligned lines, raises the full quest-detail tooltip above the tracker on mouse hover, and leaves keyboard/gamepad quest cycling on the native `ASSIST_NEXT_TRACKED_QUEST` binding.
 - Custom Synergy UI: enable the custom synergy prompt, allow movement, and adjust scale.
 - Custom Group Search: enable the custom Activity Finder status label, allow movement, and adjust scale. The label replaces only the small HUD status tracker, not the full finder window, and shows left-aligned selected-activity or current-instance, search-duration, and visible group-role lines. While queued it labels the requested activity as `Selection`; it labels a final/current activity as `Instance` only when ESO exposes that LFG activity id, otherwise it keeps the instance pending instead of reusing a potentially misleading queue request. For role-based dungeon searches it reports visible group composition as `T 0/1 H 1/1 DD 1/2` so missing roles are visible without claiming to know hidden matchmaking roles.
@@ -127,7 +127,7 @@ Recommended beta checks:
 - Test the `Settings > EZO` route with EZOCore and the standard Addons fallback without it. Toggle each master enable setting from off to on and confirm dependent controls immediately become available without closing or reopening the panel.
 - Test different resolutions and UI scale values.
 - Test `/reloadui` after moving HUD elements.
-- Test native widget positioning with keyboard and gamepad UI for center screen announcements and active combat tips.
+- Test native widget positioning with keyboard and gamepad UI for center screen announcements, active combat tips, and the complete death and resurrection prompt. With Custom Action Bars enabled, die and accept a group resurrection request; confirm the prompt stays above the bars, its native buttons work, and disabling custom positioning restores the default anchor.
 
 When reporting layout or behavior issues, include the addon version, ESO API version, character class, language mode, active settings, and a screenshot.
 
