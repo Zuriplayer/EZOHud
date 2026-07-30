@@ -22,14 +22,31 @@ local function DeepCopyTable(source)
     return copy
 end
 
+local function AnchorPreviewBackdrop(backdrop, control, widget)
+    backdrop:ClearAnchors()
+    if widget.previewAnchorToGuiRoot and widget.fallbackAnchor then
+        local defaults = (EZO_HUD.defaults and EZO_HUD.defaults[widget.id]) or {}
+        local settings = (EZO_HUD.sv and EZO_HUD.sv[widget.id]) or defaults
+        backdrop:SetAnchor(
+            widget.fallbackAnchor[1],
+            widget.fallbackAnchor[2],
+            widget.fallbackAnchor[3],
+            tonumber(settings.offsetX) or defaults.offsetX or 0,
+            tonumber(settings.offsetY) or defaults.offsetY or 0
+        )
+    else
+        backdrop:SetAnchor(CENTER, control or GuiRoot, CENTER, 0, 0)
+    end
+end
+
 local function GetOrCreatePreviewBackdrop(control, widget)
-    if not control or not WINDOW_MANAGER or not widget then return nil end
-    local backdropName = control:GetName() .. "_EZOhudPreview"
+    if not WINDOW_MANAGER or not widget then return nil end
+    local controlName = control and control:GetName() or ("EZOhud_" .. widget.id)
+    local backdropName = controlName .. "_EZOhudPreview"
     local backdrop = _G[backdropName]
     if not backdrop then
-        local previewParent = widget.previewParent or control
+        local previewParent = widget.previewParent or control or GuiRoot
         backdrop = WINDOW_MANAGER:CreateControl(backdropName, previewParent, CT_BACKDROP)
-        backdrop:SetAnchor(CENTER, control, CENTER, 0, 0)
         local previewDimensions = widget.previewDimensions or { width = 300, height = 100 }
         backdrop:SetDimensions(previewDimensions.width, previewDimensions.height)
         backdrop:SetCenterColor(0, 1, 0, 0.5)
@@ -50,9 +67,21 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
 
+        backdrop:SetHandler("OnMoveStart", function(self)
+            self.ezohudStartCenterX, self.ezohudStartCenterY = self:GetCenter()
+        end)
+
         backdrop:SetHandler("OnMoveStop", function(self)
             local newCx, newCy = self:GetCenter()
-            local oldCx, oldCy = control:GetCenter()
+            local oldCx = self.ezohudStartCenterX
+            local oldCy = self.ezohudStartCenterY
+            if not oldCx or not oldCy then
+                if control then
+                    oldCx, oldCy = control:GetCenter()
+                else
+                    oldCx, oldCy = newCx, newCy
+                end
+            end
 
             local diffX = newCx - oldCx
             local diffY = newCy - oldCy
@@ -66,8 +95,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
                 end
             end
 
-            self:ClearAnchors()
-            self:SetAnchor(CENTER, control, CENTER, 0, 0)
+            AnchorPreviewBackdrop(self, control, widget)
 
             local refX = _G["EZOhud_" .. widget.id .. "_LAM_OffsetX"]
             if refX and refX.UpdateValue then refX:UpdateValue() end
@@ -80,6 +108,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
     if label then
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
     end
+    AnchorPreviewBackdrop(backdrop, control, widget)
     return backdrop
 end
 
@@ -166,17 +195,15 @@ local WIDGETS = {
         maxScale = 1.5,
         previewParent = GuiRoot,
         previewDimensions = { width = 800, height = 116 },
+        previewAnchorToGuiRoot = true,
+        allowPreviewWithoutControl = true,
         onPreviewOpen = function(self, control)
-            if control then
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(false) end
-            end
+            local backdrop = GetOrCreatePreviewBackdrop(control, self)
+            if backdrop then backdrop:SetHidden(false) end
         end,
         onPreviewClose = function(self, control)
-            if control then
-                local backdrop = GetOrCreatePreviewBackdrop(control, self)
-                if backdrop then backdrop:SetHidden(true) end
-            end
+            local backdrop = GetOrCreatePreviewBackdrop(control, self)
+            if backdrop then backdrop:SetHidden(true) end
         end,
         stringIds = {
             header = "EZO_HUD_OPTION_NATIVE_DEATH_PROMPT",
@@ -227,6 +254,9 @@ end
 local function RunOnWidgetControls(widget, func)
     if not func then return end
     local controls = GetWidgetControls(widget)
+    if #controls == 0 and widget.allowPreviewWithoutControl then
+        func(widget, nil)
+    end
     for _, wc in ipairs(controls) do
         func(widget, wc.control)
     end

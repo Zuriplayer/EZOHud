@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.142 - Death Prompt Preview Fix
+
+- Made the death and resurrection move handle independent from the hidden `ZO_Death` control so it is visible and movable while the character is alive.
+- Allows the preview to be shown before ESO creates the native death control, while saving the same X/Y position used by the live prompt.
+
 ## 0.1.141 - Movable Death and Resurrection Prompt
 
 - Added a Native UI Tweaks widget for ESO's complete `ZO_Death` prompt, preserving native resurrection requests, revive or release choices, countdowns, and death recap.
