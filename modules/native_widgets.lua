@@ -51,7 +51,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         previewRoot:SetDrawTier(DT_HIGH)
         previewRoot:SetDrawLevel(1000)
         previewRoot:SetMouseEnabled(true)
-        previewRoot:SetMovable(true)
+        previewRoot:SetMovable(false)
 
         local previewDimensions = widget.previewDimensions or { width = 300, height = 100 }
         previewRoot:SetDimensions(previewDimensions.width, previewDimensions.height)
@@ -69,10 +69,22 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         label:SetColor(1, 1, 1, 1)
         label:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
         label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+        label:SetMouseEnabled(false)
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
 
-        previewRoot:SetHandler("OnMoveStart", function(self)
-            self.ezohudStartCenterX, self.ezohudStartCenterY = self:GetCenter()
+        previewRoot:SetHandler("OnMouseDown", function(self, button)
+            if button == MOUSE_BUTTON_INDEX_LEFT then
+                self.ezohudStartCenterX, self.ezohudStartCenterY = self:GetCenter()
+                self:SetMovable(true)
+                self:StartMoving()
+            end
+        end)
+
+        previewRoot:SetHandler("OnMouseUp", function(self, button)
+            if button == MOUSE_BUTTON_INDEX_LEFT then
+                self:StopMovingOrResizing()
+                self:SetMovable(false)
+            end
         end)
 
         previewRoot:SetHandler("OnMoveStop", function(self)
@@ -100,6 +112,8 @@ local function GetOrCreatePreviewBackdrop(control, widget)
             end
 
             AnchorPreviewBackdrop(self, control, widget)
+            self:SetMovable(false)
+            self.ezohudStartCenterX, self.ezohudStartCenterY = nil, nil
 
             local refX = _G["EZOhud_" .. widget.id .. "_LAM_OffsetX"]
             if refX and refX.UpdateValue then refX:UpdateValue() end

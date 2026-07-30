@@ -11,8 +11,8 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.143`
-- AddOnVersion: `10143`
+- Versión del addon: `0.1.144`
+- AddOnVersion: `10144`
 - APIVersion: `101049 101050`
 - Estado: beta pública
 
@@ -127,7 +127,7 @@ Comprobaciones recomendadas para la beta:
 - Probar la ruta `Ajustes > EZO` con EZOCore y el fallback estándar de Addons sin él. Cambiar cada ajuste maestro de desactivado a activado y confirmar que sus controles dependientes quedan disponibles inmediatamente sin cerrar ni reabrir el panel.
 - Probar distintas resoluciones y valores de escala de UI.
 - Probar `/reloadui` después de mover elementos del HUD.
-- Probar el posicionamiento de elementos nativos con UI de teclado y gamepad para anuncios centrales, consejos de combate activos y el aviso completo de muerte y resurrección. Usa Mostrar tirador de movimiento mientras estás vivo para confirmar que aparece su previsualización verde independiente sobre el panel de ajustes y las guías de pantalla. Con las Barras de Habilidades Personalizadas activas, muere y acepta una solicitud de resurrección de grupo; confirma que el aviso queda sobre las barras, sus botones nativos funcionan y desactivar el posicionamiento personalizado restaura el anclaje predeterminado.
+- Probar el posicionamiento de elementos nativos con UI de teclado y gamepad para anuncios centrales, consejos de combate activos y el aviso completo de muerte y resurrección. Usa Mostrar tirador de movimiento mientras estás vivo para confirmar que aparece su previsualización verde independiente sobre el panel de ajustes y las guías de pantalla y se puede mover en ambos ejes. Con las Barras de Habilidades Personalizadas activas, muere y acepta una solicitud de resurrección de grupo; confirma que el aviso queda sobre las barras, sus botones nativos funcionan y desactivar el posicionamiento personalizado restaura el anclaje predeterminado.
 
 Al informar de problemas de diseño o comportamiento, incluye la versión del addon, versión de API de ESO, clase del personaje, modo de idioma, ajustes activos y una captura de pantalla.
 

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.144 - Two-Axis Death Prompt Handle
+
+- Made the native move handle use EZOhud's explicit mouse-down and mouse-up drag lifecycle so its X and Y position are saved reliably.
+
 ## 0.1.143 - Top-Level Death Prompt Preview
 
 - Promoted native move handles to high-priority top-level windows so the death and resurrection preview remains visible above the settings panel and screen guides.
