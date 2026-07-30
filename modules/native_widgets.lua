@@ -43,23 +43,27 @@ local function GetOrCreatePreviewBackdrop(control, widget)
     if not WINDOW_MANAGER or not widget then return nil end
     local controlName = control and control:GetName() or ("EZOhud_" .. widget.id)
     local backdropName = controlName .. "_EZOhudPreview"
-    local backdrop = _G[backdropName]
-    if not backdrop then
-        local previewParent = widget.previewParent or control or GuiRoot
-        backdrop = WINDOW_MANAGER:CreateControl(backdropName, previewParent, CT_BACKDROP)
+    local previewRoot = _G[backdropName .. "_Root"]
+    if not previewRoot then
+        previewRoot = WINDOW_MANAGER:CreateTopLevelWindow(backdropName .. "_Root")
+        previewRoot:SetClampedToScreen(true)
+        previewRoot:SetDrawLayer(DL_OVERLAY)
+        previewRoot:SetDrawTier(DT_HIGH)
+        previewRoot:SetDrawLevel(1000)
+        previewRoot:SetMouseEnabled(true)
+        previewRoot:SetMovable(true)
+
         local previewDimensions = widget.previewDimensions or { width = 300, height = 100 }
-        backdrop:SetDimensions(previewDimensions.width, previewDimensions.height)
+        previewRoot:SetDimensions(previewDimensions.width, previewDimensions.height)
+
+        local backdrop = WINDOW_MANAGER:CreateControl(backdropName, previewRoot, CT_BACKDROP)
+        backdrop:SetAnchorFill()
         backdrop:SetCenterColor(0, 1, 0, 0.5)
         backdrop:SetEdgeColor(0, 1, 0, 1)
         backdrop:SetEdgeTexture("", 1, 1, 2, 0)
-        backdrop:SetDrawLayer(DL_OVERLAY)
-        backdrop:SetDrawTier(DT_HIGH)
-        backdrop:SetDrawLevel(100)
+        backdrop:SetMouseEnabled(false)
 
-        backdrop:SetMouseEnabled(true)
-        backdrop:SetMovable(true)
-
-        local label = WINDOW_MANAGER:CreateControl(backdropName .. "_Label", backdrop, CT_LABEL)
+        local label = WINDOW_MANAGER:CreateControl(backdropName .. "_Label", previewRoot, CT_LABEL)
         label:SetAnchorFill()
         label:SetFont("ZoFontWinH3")
         label:SetColor(1, 1, 1, 1)
@@ -67,11 +71,11 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         label:SetVerticalAlignment(TEXT_ALIGN_CENTER)
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
 
-        backdrop:SetHandler("OnMoveStart", function(self)
+        previewRoot:SetHandler("OnMoveStart", function(self)
             self.ezohudStartCenterX, self.ezohudStartCenterY = self:GetCenter()
         end)
 
-        backdrop:SetHandler("OnMoveStop", function(self)
+        previewRoot:SetHandler("OnMoveStop", function(self)
             local newCx, newCy = self:GetCenter()
             local oldCx = self.ezohudStartCenterX
             local oldCy = self.ezohudStartCenterY
@@ -108,8 +112,8 @@ local function GetOrCreatePreviewBackdrop(control, widget)
     if label then
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
     end
-    AnchorPreviewBackdrop(backdrop, control, widget)
-    return backdrop
+    AnchorPreviewBackdrop(previewRoot, control, widget)
+    return previewRoot
 end
 
 
@@ -193,7 +197,6 @@ local WIDGETS = {
         fallbackAnchor = { BOTTOM, GuiRoot, BOTTOM, 0, -16 },
         minScale = 0.5,
         maxScale = 1.5,
-        previewParent = GuiRoot,
         previewDimensions = { width = 800, height = 116 },
         previewAnchorToGuiRoot = true,
         allowPreviewWithoutControl = true,

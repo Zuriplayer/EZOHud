@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.143 - Top-Level Death Prompt Preview
+
+- Promoted native move handles to high-priority top-level windows so the death and resurrection preview remains visible above the settings panel and screen guides.
+
 ## 0.1.142 - Death Prompt Preview Fix
 
 - Made the death and resurrection move handle independent from the hidden `ZO_Death` control so it is visible and movable while the character is alive.
