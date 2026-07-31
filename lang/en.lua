@@ -151,8 +151,8 @@ EZOHUD_STRINGS_EN = {
     EZO_HUD_OPTION_NATIVE_TWEAKS = "Native UI Tweaks",
     EZO_HUD_OPTION_NATIVE_TWEAKS_HEADER_TOOLTIP = "Experimental positioning for native ESO controls. Reanchors and scales native elements without replacing them.",
     EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE = "Drag handle",
-    EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE = "Show move handle",
-    EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE_TOOLTIP = "Shows only this native element's green drag handle. Keep the custom position toggle enabled to preserve the saved position; turning that toggle off restores ESO's original anchor.",
+    EZO_HUD_OPTION_NATIVE_WIDGET_MOVE_HANDLE = "Enable move handle",
+    EZO_HUD_OPTION_NATIVE_WIDGET_MOVE_HANDLE_TOOLTIP = "Keeps this native element's green drag handle visible until turned off. Only one native move handle can be active at a time. The same editing mode is available from EZOCore's shared layout controls.",
     EZO_HUD_PREVIEW_CSA = "EZOhud Preview Announcement",
 
     EZO_HUD_OPTION_NATIVE_CSA = "Center Screen Announcements",

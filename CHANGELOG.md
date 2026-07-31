@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.146 - Native UI Tweaks Move Modes
+
+- Changed Native UI Tweaks previews to close automatically after three seconds when applying or adjusting a position.
+- Replaced the move-handle button with a one-at-a-time Enable move handle checkbox.
+- Registered native UI tweak move modes with EZOCore's shared `family.layout` service.
+
 ## 0.1.145 - Absolute Death Prompt Position Saving
 
 - Save the death and resurrection preview from its absolute screen bounds, converting both axes to the native bottom anchor instead of relying on relative move deltas.

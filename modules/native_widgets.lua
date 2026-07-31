@@ -250,6 +250,18 @@ local WIDGETS = {
     }
 }
 
+local NATIVE_WIDGET_PREVIEW_DURATION_MS = 3000
+local nativePreviewToken = 0
+
+local function FindWidget(widgetId)
+    for _, widget in ipairs(WIDGETS) do
+        if widget.id == widgetId then
+            return widget
+        end
+    end
+    return nil
+end
+
 local function GetWidgetSettings(widgetId)
     if EZO_HUD.sv and not EZO_HUD.sv[widgetId] then
         EZO_HUD.sv[widgetId] = DeepCopyTable(EZO_HUD.defaults[widgetId])
@@ -294,6 +306,79 @@ local function CloseAllNativeWidgetPreviews()
     for _, widget in ipairs(WIDGETS) do
         RunOnWidgetControls(widget, widget.onPreviewClose)
     end
+end
+
+local function CloseTransientNativeWidgetPreviews()
+    for _, widget in ipairs(WIDGETS) do
+        if not EZO_HUD:IsMoveModeEnabled(widget.id) then
+            RunOnWidgetControls(widget, widget.onPreviewClose)
+        end
+    end
+end
+
+function EZO_HUD:IsNativeWidget(widgetId)
+    return FindWidget(widgetId) ~= nil
+end
+
+function EZO_HUD:RefreshNativeWidgetMovementState(widgetId)
+    local widget = FindWidget(widgetId)
+    if not widget then return false end
+
+    local settings = GetWidgetSettings(widget.id)
+    if self:IsMoveModeEnabled(widget.id) and settings.enabled == true then
+        CloseAllNativeWidgetPreviews()
+        RunOnWidgetControls(widget, widget.onPreviewOpen)
+        return true
+    end
+
+    RunOnWidgetControls(widget, widget.onPreviewClose)
+    return false
+end
+
+function EZO_HUD:SetNativeWidgetMoveMode(widgetId, enabled)
+    local widget = FindWidget(widgetId)
+    if not widget then return false end
+
+    if enabled == true then
+        for _, candidate in ipairs(WIDGETS) do
+            if candidate.id ~= widget.id and self:IsMoveModeEnabled(candidate.id) then
+                self:SetMoveModeEnabled(candidate.id, false)
+                RunOnWidgetControls(candidate, candidate.onPreviewClose)
+            end
+        end
+    end
+
+    local settings = GetWidgetSettings(widget.id)
+    local shouldEnable = enabled == true and settings.enabled == true
+    self:SetMoveModeEnabled(widget.id, shouldEnable)
+    self:RefreshNativeWidgetMovementState(widget.id)
+    return shouldEnable
+end
+
+function EZO_HUD:ShowNativeWidgetPreview(widgetId)
+    local widget = FindWidget(widgetId)
+    if not widget then return false end
+
+    local settings = GetWidgetSettings(widget.id)
+    if settings.enabled ~= true then return false end
+
+    self:ApplyNativeWidgetLayout(widget.id)
+    if self:IsMoveModeEnabled(widget.id) then
+        return self:RefreshNativeWidgetMovementState(widget.id)
+    end
+
+    CloseAllNativeWidgetPreviews()
+    RunOnWidgetControls(widget, widget.onPreviewOpen)
+    nativePreviewToken = nativePreviewToken + 1
+    local token = nativePreviewToken
+    if zo_callLater then
+        zo_callLater(function()
+            if token == nativePreviewToken and not EZO_HUD:IsMoveModeEnabled(widget.id) then
+                RunOnWidgetControls(widget, widget.onPreviewClose)
+            end
+        end, NATIVE_WIDGET_PREVIEW_DURATION_MS)
+    end
+    return true
 end
 
 local function CaptureOriginalState(widget)
@@ -503,7 +588,7 @@ function EZO_HUD:InitializeNativeWidgets()
         CALLBACK_MANAGER:RegisterCallback("LAM-PanelClosed", function()
             if isPanelVisible then
                 isPanelVisible = false
-                CloseAllNativeWidgetPreviews()
+                CloseTransientNativeWidgetPreviews()
             end
         end)
     end
@@ -545,10 +630,9 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).enabled = value == true
                         self:ApplyNativeWidgetLayout(widget.id)
                         if value == true then
-                            CloseAllNativeWidgetPreviews()
-                            RunOnWidgetControls(widget, widget.onPreviewOpen)
+                            self:ShowNativeWidgetPreview(widget.id)
                         else
-                            RunOnWidgetControls(widget, widget.onPreviewClose)
+                            self:SetNativeWidgetMoveMode(widget.id, false)
                         end
                         self:RequestSettingsPanelRefresh()
                     end,
@@ -556,14 +640,16 @@ function EZO_HUD:InitializeNativeWidgets()
                     width = "full",
                 })
                 table.insert(options, {
-                    type = "button",
-                    name = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE"] or 0),
-                    tooltip = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_SHOW_HANDLE_TOOLTIP"] or 0),
-                    func = function()
-                        if GetWidgetSettings(widget.id).enabled ~= true then return end
-                        CloseAllNativeWidgetPreviews()
-                        self:ApplyNativeWidgetLayout(widget.id)
-                        RunOnWidgetControls(widget, widget.onPreviewOpen)
+                    type = "checkbox",
+                    name = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_MOVE_HANDLE"] or 0),
+                    tooltip = GetString(_G["EZO_HUD_OPTION_NATIVE_WIDGET_MOVE_HANDLE_TOOLTIP"] or 0),
+                    reference = BuildRef("MoveHandle"),
+                    getFunc = function()
+                        return self:IsMoveModeEnabled(widget.id)
+                    end,
+                    setFunc = function(value)
+                        self:SetNativeWidgetMoveMode(widget.id, value)
+                        self:RequestSettingsPanelRefresh()
                     end,
                     disabled = function()
                         return GetWidgetSettings(widget.id).enabled ~= true
@@ -585,8 +671,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetX = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            CloseAllNativeWidgetPreviews()
-                            RunOnWidgetControls(widget, widget.onPreviewOpen)
+                            self:ShowNativeWidgetPreview(widget.id)
                         end
                     end,
                     default = self.defaults[widget.id].offsetX,
@@ -607,8 +692,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).offsetY = value
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            CloseAllNativeWidgetPreviews()
-                            RunOnWidgetControls(widget, widget.onPreviewOpen)
+                            self:ShowNativeWidgetPreview(widget.id)
                         end
                     end,
                     default = self.defaults[widget.id].offsetY,
@@ -629,8 +713,7 @@ function EZO_HUD:InitializeNativeWidgets()
                         GetWidgetSettings(widget.id).scale = value / 100
                         self:ApplyNativeWidgetLayout(widget.id)
                         if GetWidgetSettings(widget.id).enabled then
-                            CloseAllNativeWidgetPreviews()
-                            RunOnWidgetControls(widget, widget.onPreviewOpen)
+                            self:ShowNativeWidgetPreview(widget.id)
                         end
                     end,
                     default = math.floor(self.defaults[widget.id].scale * 100),
@@ -642,14 +725,15 @@ function EZO_HUD:InitializeNativeWidgets()
                     tooltip = GetString(_G[widget.stringIds.resetTooltip] or 0),
                     func = function()
                         self:ResetNativeWidgetDefaults(widget.id)
-                        local refs = { "Enable", "OffsetX", "OffsetY", "Scale" }
+                        self:SetNativeWidgetMoveMode(widget.id, false)
+                        local refs = { "Enable", "MoveHandle", "OffsetX", "OffsetY", "Scale" }
                         for _, ref in ipairs(refs) do
                             local control = _G[BuildRef(ref)]
                             if control and control.UpdateValue then
                                 control:UpdateValue()
                             end
                         end
-                        RunOnWidgetControls(widget, widget.onPreviewClose)
+                        self:ShowNativeWidgetPreview(widget.id)
                     end,
                     width = "half",
                 })

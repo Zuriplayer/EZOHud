@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot", "nativeCenterScreen", "nativeCombatTips", "nativeDeathPrompt" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.145"
-EZO_HUD.ADDON_VERSION_NUM = 10145
+EZO_HUD.ADDON_VERSION = "0.1.146"
+EZO_HUD.ADDON_VERSION_NUM = 10146
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -354,10 +354,19 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
         if self.ApplyCustomLootLayout then
             self:ApplyCustomLootLayout()
         end
+    elseif type(self.IsNativeWidget) == "function"
+        and self:IsNativeWidget(sectionName)
+        and self.RefreshNativeWidgetMovementState then
+        self:RefreshNativeWidgetMovementState(sectionName)
     end
 end
 
 function EZO_HUD:SetLayoutEditMode(sectionName, enabled)
+    if type(self.IsNativeWidget) == "function"
+        and self:IsNativeWidget(sectionName)
+        and self.SetNativeWidgetMoveMode then
+        return self:SetNativeWidgetMoveMode(sectionName, enabled)
+    end
     self:SetMoveModeEnabled(sectionName, enabled)
     self:RefreshMoveModeSection(sectionName)
     return self:IsMoveModeEnabled(sectionName)
@@ -385,6 +394,9 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.customSynergy", section = "customSynergy", order = 60, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
         { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 70, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
         { id = "ezohud.customLoot", section = "customLoot", order = 80, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
+        { id = "ezohud.nativeCenterScreen", section = "nativeCenterScreen", order = 90, name = EZO_HUD_OPTION_NATIVE_CSA, tooltip = EZO_HUD_OPTION_NATIVE_CSA_HEADER_TOOLTIP },
+        { id = "ezohud.nativeCombatTips", section = "nativeCombatTips", order = 91, name = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS, tooltip = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP },
+        { id = "ezohud.nativeDeathPrompt", section = "nativeDeathPrompt", order = 92, name = EZO_HUD_OPTION_NATIVE_DEATH_PROMPT, tooltip = EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_HEADER_TOOLTIP },
     }
 
     for _, definition in ipairs(definitions) do
