@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customLoot", "nativeCenterScreen", "nativeCombatTips", "nativeDeathPrompt" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customCompanion", "customLoot", "nativeCenterScreen", "nativeCombatTips", "nativeDeathPrompt" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.146"
-EZO_HUD.ADDON_VERSION_NUM = 10146
+EZO_HUD.ADDON_VERSION = "0.1.147"
+EZO_HUD.ADDON_VERSION_NUM = 10147
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -149,6 +149,18 @@ EZO_HUD.defaults = {
         offsetX = 360,
         offsetY = -120,
         scale = 1.0,
+    },
+    customCompanion = {
+        enabled = false,
+        movable = false,
+        hideNative = true,
+        visibility = "always",
+        healthTextMode = "both",
+        offsetX = -500,
+        offsetY = -260,
+        scale = 1.0,
+        alpha = 1.0,
+        width = 288,
     },
     customLoot = {
         enabled = true,
@@ -349,6 +361,9 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
     elseif sectionName == "customGroupSearch" then
         self:RefreshCustomGroupSearchMovementState()
         self:RefreshCustomGroupSearch()
+    elseif sectionName == "customCompanion" then
+        self:RefreshCustomCompanionMovementState()
+        self:RefreshCustomCompanion()
     elseif sectionName == "customLoot" then
         self:RefreshCustomLootMovementState()
         if self.ApplyCustomLootLayout then
@@ -393,6 +408,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.customQuestTracker", section = "customQuestTracker", order = 50, name = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_QUEST_TRACKER_MOVE_TOOLTIP },
         { id = "ezohud.customSynergy", section = "customSynergy", order = 60, name = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_SYNERGY_MOVE_TOOLTIP },
         { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 70, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
+        { id = "ezohud.customCompanion", section = "customCompanion", order = 75, name = EZO_HUD_OPTION_CUSTOM_COMPANION_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_COMPANION_MOVE_TOOLTIP },
         { id = "ezohud.customLoot", section = "customLoot", order = 80, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
         { id = "ezohud.nativeCenterScreen", section = "nativeCenterScreen", order = 90, name = EZO_HUD_OPTION_NATIVE_CSA, tooltip = EZO_HUD_OPTION_NATIVE_CSA_HEADER_TOOLTIP },
         { id = "ezohud.nativeCombatTips", section = "nativeCombatTips", order = 91, name = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS, tooltip = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP },
@@ -493,6 +509,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveCustomSynergyPosition()
     elseif sectionName == "customGroupSearch" and self.SaveCustomGroupSearchPosition then
         self:SaveCustomGroupSearchPosition()
+    elseif sectionName == "customCompanion" and self.SaveCustomCompanionPosition then
+        self:SaveCustomCompanionPosition()
     elseif sectionName == "customLoot" and self.SaveCustomLootPosition then
         self:SaveCustomLootPosition()
     end
@@ -577,6 +595,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCustomGroupSearch ~= nil then
         self:InitializeCustomGroupSearch()
+    end
+
+    if self.InitializeCustomCompanion ~= nil then
+        self:InitializeCustomCompanion()
     end
 
     if self.InitializeCustomLoot ~= nil then

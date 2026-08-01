@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.147 - Custom Companion Frame
+
+- Added a disabled-by-default movable Custom Companion Frame for the local active companion with name, native-inspired health display, death state, and selectable numeric health formats.
+- Added solo/group visibility, scale, width, opacity, saved position, EZOCore shared layout integration, and immediate LAM dependent-control refresh.
+- Added an optional reversible hide for ESO's local solo companion frame without hiding or replacing native group and raid companion rows.
+
 ## 0.1.146 - Native UI Tweaks Move Modes
 
 - Changed Native UI Tweaks previews to close automatically after three seconds when applying or adjusting a position.

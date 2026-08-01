@@ -76,6 +76,9 @@ function EZO_HUD:RefreshHudContextVisibility()
     if self.RefreshCustomGroupSearch then
         self:RefreshCustomGroupSearch()
     end
+    if self.RefreshCustomCompanion then
+        self:RefreshCustomCompanion()
+    end
     if self.RefreshCustomLootVisibility then
         self:RefreshCustomLootVisibility()
     end
