@@ -63,3 +63,7 @@ loothistory_*.lua
 loothistory_*.xml
 synergy.xml
 zo_fadingstationarycontrolbuffer.lua
+
+# Keep shared AI project instructions versioned.
+!AGENTS.md
+!CLAUDE.md

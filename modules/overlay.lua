@@ -11,6 +11,10 @@ local WARNING_CONSUMED_BAR_COLOR = { 0.38, 0.30, 0.16, 0.88 }
 local FILL_SHEEN_COLOR = { 1.0, 1.0, 1.0, 0.12 }
 local INNER_SHADE_COLOR = { 0, 0, 0, 0.16 }
 local WARNING_TEXT_COLOR = { 1.0, 0.72, 0.18, 0.96 }
+local HEALTH_SHIELD_COLOR = { 0.48, 0.58, 1.0, 0.62 }
+local HEALTH_TRAUMA_COLOR = { 0.67, 0.20, 0.47, 0.72 }
+local HEALTH_NO_HEALING_COLOR = { 0.78, 0.16, 0.16, 0.62 }
+local NO_HEALING_TEXTURE = "EsoUI/Art/UnitAttributeVisualizer/attributeBar_dynamic_noHealing_outer_fill.dds"
 local DOMINANCE_MIN_SCALE = 0.82
 local TEXT_INSET = 12
 local SIDE_GAP = 6
@@ -215,6 +219,22 @@ local function CreateFlatTexture(name, parent, color)
     return texture
 end
 
+local function CreateHealthStateTexture(name, parent, color, textureFile)
+    local texture = WINDOW_MANAGER:CreateControl(name, parent, CT_TEXTURE)
+    texture:SetMouseEnabled(false)
+    texture:SetTexture(textureFile or WHITE_TEXTURE)
+    texture:SetColor(unpack(color))
+    texture:SetDrawLevel(20)
+    texture:SetHidden(true)
+    return texture
+end
+
+local function SetControlDrawLevel(control, level)
+    if control and type(control.SetDrawLevel) == "function" then
+        control:SetDrawLevel(level)
+    end
+end
+
 local function CreateBarCap(name, parent, mirrored)
     local texture = WINDOW_MANAGER:CreateControl(name, parent, CT_TEXTURE)
     texture:SetMouseEnabled(false)
@@ -239,21 +259,48 @@ local function CreateResourceBar(parent, resourceName)
     root:SetMouseEnabled(false)
     HideLegacyResourceLayers(root:GetName())
 
-    return {
+    local resource = {
         root = root,
         consumed = CreateStatusBar(root:GetName() .. "_Consumed", root),
         fill = CreateStatusBar(root:GetName() .. "_Fill", root),
-        sheen = CreateSheenBar(root:GetName() .. "_Sheen", root),
-        shade = CreateFlatTexture(root:GetName() .. "_Shade", root, INNER_SHADE_COLOR),
-        consumedLeftCap = CreateBarCap(root:GetName() .. "_ConsumedLeftCap", root, true),
-        consumedRightCap = CreateBarCap(root:GetName() .. "_ConsumedRightCap", root, false),
-        fillLeftCap = CreateBarCap(root:GetName() .. "_FillLeftCap", root, true),
-        fillRightCap = CreateBarCap(root:GetName() .. "_FillRightCap", root, false),
-        caption = CreateLabel(root:GetName() .. "_Caption", root),
-        value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold"),
-        percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold"),
         meta = RESOURCE_META[resourceName],
     }
+
+    if resourceName == "health" then
+        resource.healthStates = {
+            shield = CreateHealthStateTexture(root:GetName() .. "_Shield", root, HEALTH_SHIELD_COLOR),
+            trauma = CreateHealthStateTexture(root:GetName() .. "_Trauma", root, HEALTH_TRAUMA_COLOR),
+            noHealing = CreateHealthStateTexture(root:GetName() .. "_NoHealing", root, HEALTH_NO_HEALING_COLOR, NO_HEALING_TEXTURE),
+        }
+    end
+
+    resource.sheen = CreateSheenBar(root:GetName() .. "_Sheen", root)
+    resource.shade = CreateFlatTexture(root:GetName() .. "_Shade", root, INNER_SHADE_COLOR)
+    resource.consumedLeftCap = CreateBarCap(root:GetName() .. "_ConsumedLeftCap", root, true)
+    resource.consumedRightCap = CreateBarCap(root:GetName() .. "_ConsumedRightCap", root, false)
+    resource.fillLeftCap = CreateBarCap(root:GetName() .. "_FillLeftCap", root, true)
+    resource.fillRightCap = CreateBarCap(root:GetName() .. "_FillRightCap", root, false)
+    resource.caption = CreateLabel(root:GetName() .. "_Caption", root)
+    resource.value = CreateLabel(root:GetName() .. "_Value", root, "ZoFontGameBold")
+    resource.percent = CreateLabel(root:GetName() .. "_Percent", root, "ZoFontGameBold")
+
+    SetControlDrawLevel(resource.consumed, 1)
+    SetControlDrawLevel(resource.fill, 10)
+    if resource.healthStates then
+        SetControlDrawLevel(resource.healthStates.noHealing, 20)
+        SetControlDrawLevel(resource.healthStates.shield, 21)
+        SetControlDrawLevel(resource.healthStates.trauma, 22)
+    end
+    SetControlDrawLevel(resource.sheen, 30)
+    SetControlDrawLevel(resource.shade, 31)
+    SetControlDrawLevel(resource.consumedLeftCap, 40)
+    SetControlDrawLevel(resource.consumedRightCap, 40)
+    SetControlDrawLevel(resource.fillLeftCap, 41)
+    SetControlDrawLevel(resource.fillRightCap, 41)
+    SetControlDrawLevel(resource.caption, 50)
+    SetControlDrawLevel(resource.value, 50)
+    SetControlDrawLevel(resource.percent, 50)
+    return resource
 end
 
 local function GetResourceSettings(settings, resourceName)
@@ -333,6 +380,12 @@ local function ApplyResourceBarStyle(resource, width, height)
     resource.fill:SetAnchor(LEFT, resource.root, LEFT, zo_floor(capSize / 2), 0)
     resource.fill:SetDimensions(innerWidth, height)
 
+    if resource.healthStates then
+        for _, control in pairs(resource.healthStates) do
+            control:SetHeight(math.max(1, height - 2))
+        end
+    end
+
     resource.sheen:ClearAnchors()
     resource.sheen:SetAnchor(LEFT, resource.root, LEFT, zo_floor(capSize / 2), 0)
     resource.sheen:SetDimensions(innerWidth, math.max(4, zo_floor(height * 0.42)))
@@ -372,6 +425,66 @@ local function ApplyResourceBarStyle(resource, width, height)
     resource.value:SetScale(1.05)
     resource.value:SetHorizontalAlignment(TEXT_ALIGN_LEFT)
     resource.value:SetVerticalAlignment(TEXT_ALIGN_CENTER)
+end
+
+local function SetHealthStateSegment(control, resource, startValue, endValue, maximum, alphaScale)
+    if not control or maximum <= 0 or endValue <= startValue then
+        if control then
+            control:SetHidden(true)
+        end
+        return
+    end
+
+    local startRatio = Clamp(startValue / maximum, 0, 1)
+    local endRatio = Clamp(endValue / maximum, 0, 1)
+    if endRatio <= startRatio then
+        control:SetHidden(true)
+        return
+    end
+
+    local innerWidth = resource.innerWidth or 1
+    local leftInset = zo_floor((resource.capSize or 0) / 2)
+    local startX = leftInset + zo_floor(innerWidth * startRatio)
+    local endX = leftInset + zo_floor(innerWidth * endRatio)
+    control:ClearAnchors()
+    control:SetAnchor(TOPLEFT, resource.root, TOPLEFT, startX, 1)
+    control:SetDimensions(math.max(1, endX - startX), math.max(1, resource.root:GetHeight() - 2))
+    control:SetAlpha(alphaScale or 1)
+    control:SetHidden(false)
+end
+
+local function HideHealthStateOverlays(resource)
+    if not resource or not resource.healthStates then
+        return
+    end
+    for _, control in pairs(resource.healthStates) do
+        control:SetHidden(true)
+    end
+end
+
+local function UpdateHealthStateOverlays(resource, current, maximum, alphaScale)
+    local settings = (EZO_HUD.sv and EZO_HUD.sv.overlay) or EZO_HUD.defaults.overlay
+    local visuals = EZO_HUD.overlay and EZO_HUD.overlay.healthVisuals
+    if not resource.healthStates or settings.showHealthStateOverlays == false or not visuals then
+        HideHealthStateOverlays(resource)
+        return
+    end
+
+    local shield = math.max(0, tonumber(visuals.shield) or 0)
+    local trauma = math.max(0, tonumber(visuals.trauma) or 0)
+    local noHealing = math.max(0, tonumber(visuals.noHealing) or 0)
+    local shieldEnd = math.min(maximum, current + shield)
+    local shieldOverflow = math.max(0, current + shield - maximum)
+    local traumaEnd = math.max(0, current - shieldOverflow)
+    local traumaStart = math.max(0, traumaEnd - trauma)
+
+    SetHealthStateSegment(resource.healthStates.shield, resource, traumaEnd, shieldEnd, maximum, alphaScale)
+    SetHealthStateSegment(resource.healthStates.trauma, resource, traumaStart, traumaEnd, maximum, alphaScale)
+    if noHealing > 0 then
+        SetHealthStateSegment(resource.healthStates.noHealing, resource, 0, math.min(current, maximum), maximum, alphaScale)
+    else
+        resource.healthStates.noHealing:SetHidden(true)
+    end
 end
 
 local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alphaScale, warningActive)
@@ -419,6 +532,148 @@ local function UpdateResourceBarValue(resource, current, maximum, r, g, b, alpha
     else
         resource.value:SetColor(1, 1, 1, 0.92 * alphaScale)
         resource.percent:SetColor(1, 1, 1, 0.92 * alphaScale)
+    end
+
+    if resource.meta == RESOURCE_META.health then
+        UpdateHealthStateOverlays(resource, current, maximum, alphaScale)
+    end
+end
+
+local function GetHealthVisualKey(visualType)
+    if visualType == ATTRIBUTE_VISUAL_POWER_SHIELDING then
+        return "shield"
+    elseif visualType == ATTRIBUTE_VISUAL_TRAUMA then
+        return "trauma"
+    elseif visualType == ATTRIBUTE_VISUAL_NO_HEALING then
+        return "noHealing"
+    end
+end
+
+local function ReadHealthVisualState(visualType)
+    if type(GetUnitAttributeVisualizerEffectInfo) ~= "function" then
+        return nil, nil
+    end
+    local value, _, sequenceId = GetUnitAttributeVisualizerEffectInfo(
+        "player",
+        visualType,
+        STAT_MITIGATION,
+        ATTRIBUTE_HEALTH,
+        COMBAT_MECHANIC_FLAGS_HEALTH
+    )
+    if value == nil then
+        return nil, nil
+    end
+    return math.max(0, tonumber(value) or 0), sequenceId
+end
+
+function EZO_HUD:RefreshHealthAttributeVisuals()
+    if not self.overlay then
+        return
+    end
+    self.overlay.healthVisuals = self.overlay.healthVisuals or {}
+    self.overlay.healthVisualSequences = self.overlay.healthVisualSequences or {}
+    for _, visualType in ipairs({
+        ATTRIBUTE_VISUAL_POWER_SHIELDING,
+        ATTRIBUTE_VISUAL_TRAUMA,
+        ATTRIBUTE_VISUAL_NO_HEALING,
+    }) do
+        local key = GetHealthVisualKey(visualType)
+        local value, sequenceId = ReadHealthVisualState(visualType)
+        self.overlay.healthVisuals[key] = value or 0
+        self.overlay.healthVisualSequences[key] = sequenceId
+    end
+    self:UpdateResourceDisplay("health")
+end
+
+local function IsRelevantHealthVisual(unitTag, visualType, attribute)
+    return unitTag == "player"
+        and GetHealthVisualKey(visualType) ~= nil
+        and attribute == ATTRIBUTE_HEALTH
+end
+
+function EZO_HUD:ApplyHealthAttributeVisualDelta(visualType, delta, sequenceId, clearSequence)
+    if not self.overlay then
+        return
+    end
+    local key = GetHealthVisualKey(visualType)
+    if not key then
+        return
+    end
+    local visuals = self.overlay.healthVisuals
+    local sequences = self.overlay.healthVisualSequences
+    visuals[key] = math.max(0, (tonumber(visuals[key]) or 0) + (tonumber(delta) or 0))
+    sequences[key] = clearSequence and nil or sequenceId
+    if self.DebugInfo then
+        self.DebugInfo(string.format(
+            "%s value=%.0f delta=%.0f sequence=%s",
+            key,
+            visuals[key],
+            tonumber(delta) or 0,
+            tostring(sequenceId)
+        ), "HealthStates")
+    end
+    self:UpdateResourceDisplay("health")
+end
+
+function EZO_HUD:OnHealthAttributeVisualAdded(_, unitTag, visualType, _, attribute, _, value, _, sequenceId)
+    if not IsRelevantHealthVisual(unitTag, visualType, attribute) then
+        return
+    end
+    local key = GetHealthVisualKey(visualType)
+    if self.overlay.healthVisualSequences[key] == nil then
+        self:ApplyHealthAttributeVisualDelta(visualType, value, sequenceId, false)
+    end
+end
+
+function EZO_HUD:OnHealthAttributeVisualUpdated(_, unitTag, visualType, _, attribute, _, oldValue, newValue, _, _, sequenceId)
+    if not IsRelevantHealthVisual(unitTag, visualType, attribute) then
+        return
+    end
+    local key = GetHealthVisualKey(visualType)
+    local mostRecent = self.overlay.healthVisualSequences[key]
+    if mostRecent ~= nil and sequenceId ~= nil and sequenceId > mostRecent then
+        self:ApplyHealthAttributeVisualDelta(visualType, (newValue or 0) - (oldValue or 0), sequenceId, false)
+    end
+end
+
+function EZO_HUD:OnHealthAttributeVisualRemoved(_, unitTag, visualType, _, attribute, _, value, _, sequenceId)
+    if not IsRelevantHealthVisual(unitTag, visualType, attribute) then
+        return
+    end
+    local key = GetHealthVisualKey(visualType)
+    local mostRecent = self.overlay.healthVisualSequences[key]
+    if mostRecent ~= nil and sequenceId ~= nil and sequenceId > mostRecent then
+        self:ApplyHealthAttributeVisualDelta(visualType, -(value or 0), sequenceId, true)
+    end
+end
+
+function EZO_HUD:PreviewHealthStateOverlays()
+    if not self.overlay then
+        return
+    end
+    local _, maximum = GetUnitPower("player", POWERTYPE_HEALTH)
+    maximum = math.max(1, tonumber(maximum) or 1)
+    self.overlay.healthVisualPreviewToken = (self.overlay.healthVisualPreviewToken or 0) + 1
+    local token = self.overlay.healthVisualPreviewToken
+    self.overlay.healthVisualPreviewActive = true
+    self.overlay.root:SetDrawLayer(DL_OVERLAY)
+    self.overlay.root:SetDrawTier(DT_HIGH)
+    self.overlay.healthVisuals.shield = maximum * 0.22
+    self.overlay.healthVisuals.trauma = maximum * 0.18
+    self.overlay.healthVisuals.noHealing = 1
+    self:RefreshOverlayVisibility()
+    self:UpdateResourceDisplay("health")
+
+    if type(zo_callLater) == "function" then
+        zo_callLater(function()
+            if self.overlay and self.overlay.healthVisualPreviewToken == token then
+                self.overlay.healthVisualPreviewActive = false
+                self.overlay.root:SetDrawLayer(DL_BACKGROUND)
+                self.overlay.root:SetDrawTier(DT_LOW)
+                self:RefreshHealthAttributeVisuals()
+                self:RefreshOverlayVisibility()
+            end
+        end, 5000)
     end
 end
 
@@ -633,9 +888,11 @@ function EZO_HUD:RefreshOverlayVisibility()
         return
     end
 
+    local previewActive = self.overlay.healthVisualPreviewActive == true
     local enabled = (self.sv and self.sv.overlay and self.sv.overlay.enabled)
         or self:IsMoveModeEnabled("overlay")
-    local hudVisible = self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
+        or previewActive
+    local hudVisible = previewActive or self.IsHudSceneVisible == nil or self:IsHudSceneVisible()
     self.overlay.root:SetHidden(not enabled or not hudVisible)
     self:RefreshMovementState()
     self:ApplyVanillaVisibility()
@@ -664,6 +921,14 @@ function EZO_HUD:InitializeOverlay()
     self.overlay = {
         root = root,
         resources = {},
+        healthVisuals = {
+            shield = 0,
+            trauma = 0,
+            noHealing = 0,
+        },
+        healthVisualSequences = {},
+        healthVisualPreviewToken = 0,
+        healthVisualPreviewActive = false,
     }
 
     root:SetHandler("OnMouseDown", function(control, button)
@@ -711,10 +976,25 @@ function EZO_HUD:InitializeOverlay()
         self.ADDON_NAME .. "_OverlayActivated",
         EVENT_PLAYER_ACTIVATED,
         function()
+            self:RefreshHealthAttributeVisuals()
             self:ApplyOverlayLayout()
             self:RefreshOverlayVisibility()
         end
     )
+
+    local attributeVisualEvents = {
+        { EVENT_UNIT_ATTRIBUTE_VISUAL_ADDED, "Added" },
+        { EVENT_UNIT_ATTRIBUTE_VISUAL_UPDATED, "Updated" },
+        { EVENT_UNIT_ATTRIBUTE_VISUAL_REMOVED, "Removed" },
+    }
+    for index, eventInfo in ipairs(attributeVisualEvents) do
+        local eventCode, handlerSuffix = unpack(eventInfo)
+        local namespace = self.ADDON_NAME .. "_OverlayHealthVisual" .. tostring(index)
+        EVENT_MANAGER:RegisterForEvent(namespace, eventCode, function(...)
+            self["OnHealthAttributeVisual" .. handlerSuffix](self, ...)
+        end)
+        EVENT_MANAGER:AddFilterForEvent(namespace, eventCode, REGISTER_FILTER_UNIT_TAG, "player")
+    end
 
     EVENT_MANAGER:RegisterForEvent(
         self.ADDON_NAME .. "_OverlayCombat",
@@ -934,6 +1214,34 @@ function EZO_HUD:InitializeSettings()
                     self:RequestSettingsPanelRefresh(true)
                 end,
                 default = self.defaults.overlay.equalAttributeSizes,
+                width = "half",
+            },
+            {
+                type = "checkbox",
+                name = GetString(EZO_HUD_OPTION_HEALTH_STATE_OVERLAYS),
+                tooltip = GetString(EZO_HUD_OPTION_HEALTH_STATE_OVERLAYS_TOOLTIP),
+                getFunc = function()
+                    return self.sv.overlay.showHealthStateOverlays ~= false
+                end,
+                setFunc = function(value)
+                    self.sv.overlay.showHealthStateOverlays = value
+                    self:UpdateResourceDisplay("health")
+                    self:RequestSettingsPanelRefresh(true)
+                end,
+                default = self.defaults.overlay.showHealthStateOverlays,
+                width = "half",
+            },
+            {
+                type = "button",
+                name = GetString(EZO_HUD_OPTION_PREVIEW_HEALTH_STATES),
+                tooltip = GetString(EZO_HUD_OPTION_PREVIEW_HEALTH_STATES_TOOLTIP),
+                func = function()
+                    self:PreviewHealthStateOverlays()
+                end,
+                disabled = function()
+                    return self.sv.overlay.enabled ~= true
+                        or self.sv.overlay.showHealthStateOverlays == false
+                end,
                 width = "half",
             },
             {

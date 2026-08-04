@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.147"
-EZO_HUD.ADDON_VERSION_NUM = 10147
+EZO_HUD.ADDON_VERSION = "0.1.148"
+EZO_HUD.ADDON_VERSION_NUM = 10148
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -38,6 +38,7 @@ EZO_HUD.defaults = {
         healthWarningPercent = 35,
         staminaWarningPercent = 20,
         magickaWarningPercent = 20,
+        showHealthStateOverlays = true,
         healthColor = { r = 0.82, g = 0.18, b = 0.22, a = 1.0 },
         staminaColor = { r = 0.21, g = 0.67, b = 0.29, a = 1.0 },
         magickaColor = { r = 0.22, g = 0.46, b = 0.88, a = 1.0 },
