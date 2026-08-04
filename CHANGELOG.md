@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.148 - Health-State Overlays and Preview
+
+- Added health-state overlays for active damage shields, trauma, and blocked healing.
+- Added the `Preview Health states` control to preview those overlays without waiting for live combat conditions.
+
 ## 0.1.147 - Custom Companion Frame
 
 - Added a disabled-by-default movable Custom Companion Frame for the local active companion with name, native-inspired health display, death state, and selectable numeric health formats.
