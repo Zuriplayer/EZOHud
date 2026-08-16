@@ -42,6 +42,12 @@ local KEYBIND_MIN_SCALE_PERCENT = 120
 local KEYBIND_MAX_SCALE_PERCENT = 320
 local GAMEPAD_KEYBIND_SCALE_MULTIPLIER = 0.82
 local GAMEPAD_KEYBIND_MIN_SCALE_PERCENT = 100
+-- The two relevant morphs use delayed two-hit cycles: 6 seconds for
+-- Subterranean Assault and 9 seconds for Deep Fissure.
+local SHALK_ABILITY_DURATION_MS = {
+    [86019] = 6000,
+    [93778] = 9000,
+}
 
 local BAR_DEFS = {
     main = {
@@ -548,6 +554,48 @@ local function GetNowMs()
         return GetGameTimeMilliseconds()
     end
     return 0
+end
+
+local function GetShalkFallbackEffect(self, barName, slotKey)
+    local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
+    local bar = BAR_DEFS[barName]
+    if not slotIndex or not bar or type(GetSlotBoundId) ~= "function" then return nil end
+
+    local abilityId = GetSlotBoundId(slotIndex, bar.hotbarCategory)
+    local timer = self.customActionBars
+        and self.customActionBars.shalkTimers
+        and self.customActionBars.shalkTimers[abilityId]
+    if not timer then return nil end
+
+    local remainingMs = timer.expiresMs - GetNowMs()
+    if remainingMs <= 0 then
+        self.customActionBars.shalkTimers[abilityId] = nil
+        return nil
+    end
+
+    return {
+        remaining = remainingMs / 1000,
+        duration = timer.durationMs / 1000,
+        stackCount = 0,
+        displayTimer = true,
+        predicted = true,
+    }
+end
+
+local function StartShalkTimer(self, abilityId)
+    local durationMs = SHALK_ABILITY_DURATION_MS[abilityId]
+    if not durationMs or not self.customActionBars then return false end
+
+    local timers = self.customActionBars.shalkTimers
+    local nowMs = GetNowMs()
+    local current = timers[abilityId]
+    if current and current.expiresMs > nowMs then return true end
+
+    timers[abilityId] = {
+        durationMs = durationMs,
+        expiresMs = nowMs + durationMs,
+    }
+    return true
 end
 
 local function PlaySlotUseAnimation(slot)
@@ -1252,7 +1300,11 @@ function EZO_HUD:RefreshCustomActionBars()
             end
 
             local trackBackupEffects = settings.hideBackupSkillsAtZero == true
-            local effect = (showTimers or trackBackupEffects) and GetActionSlotEffect(barName, slotKey) or nil
+            local effect
+            if showTimers or trackBackupEffects then
+                local shalkEffect = GetShalkFallbackEffect(self, barName, slotKey)
+                effect = shalkEffect or GetActionSlotEffect(barName, slotKey)
+            end
             local hasActiveEffect = hasAbility and effect ~= nil
                 and ((effect.remaining or 0) > 0 or (effect.stackCount or 0) > 0)
             local hideInactiveSkill = trackBackupEffects
@@ -1369,8 +1421,29 @@ local function RegisterEvents()
     end
     if EVENT_ACTION_SLOT_ABILITY_USED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_SLOT_ABILITY_USED, function(_, actionSlotIndex)
+            if type(GetSlotBoundId) == "function" then
+                local hotbarCategory = type(GetActiveHotbarCategory) == "function"
+                    and GetActiveHotbarCategory()
+                    or nil
+                local abilityId = GetSlotBoundId(actionSlotIndex, hotbarCategory)
+                if abilityId == nil or abilityId == 0 then
+                    abilityId = GetSlotBoundId(actionSlotIndex)
+                end
+                StartShalkTimer(EZO_HUD, abilityId)
+            end
             EZO_HUD:PlayCustomActionSlotUseAnimation(actionSlotIndex)
         end)
+    end
+    if EVENT_EFFECT_CHANGED then
+        EVENT_MANAGER:RegisterForEvent(namespace, EVENT_EFFECT_CHANGED, function(
+            _, changeType, _, _, unitTag, _, _, _, _, _, _, _, _, _, _, abilityId
+        )
+            if unitTag ~= "player" or changeType == (EFFECT_RESULT_FADED or 2) then return end
+            StartShalkTimer(EZO_HUD, abilityId)
+        end)
+        if REGISTER_FILTER_UNIT_TAG then
+            EVENT_MANAGER:AddFilterForEvent(namespace, EVENT_EFFECT_CHANGED, REGISTER_FILTER_UNIT_TAG, "player")
+        end
     end
     if EVENT_ACTION_UPDATE_COOLDOWNS then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_ACTION_UPDATE_COOLDOWNS, refresh)
@@ -1409,7 +1482,7 @@ function EZO_HUD:InitializeCustomActionBars()
 
     GetSettings()
     local actionBarsRoot = BuildActionBarsGroup()
-    self.customActionBars = { root = actionBarsRoot, bars = {} }
+    self.customActionBars = { root = actionBarsRoot, bars = {}, shalkTimers = {} }
     self.customActionBarsDragActive = false
     self.customActionBarsQuickslotDragActive = false
 
