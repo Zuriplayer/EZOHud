@@ -734,18 +734,18 @@ local function RegisterSlotKeybindLabel(slot, slotKey, mode, iconSize)
     end
 end
 
-local function UpdateSlotKeybind(slot, slotKey, mode, iconSize, visible, hasAbility, alpha)
+local function UpdateSlotKeybind(slot, slotKey, mode, iconSize, visible, hasAbility)
     RegisterSlotKeybindLabel(slot, slotKey, mode, iconSize)
     if not (slot and slot.keyLabel) then return end
 
     local shouldShow = visible and hasAbility and mode ~= KEYBIND_MODE_OFF and slotKey ~= "weapon"
     slot.keyLabel:SetHidden(not shouldShow)
     if shouldShow then
-        slot.keyLabel:SetAlpha(Clamp(alpha or 1, 0.25, 1.0))
+        slot.keyLabel:SetAlpha(1.0)
     end
 end
 
-local function CreateSlot(parent, name)
+local function CreateSlot(parent, name, keyLabelParent)
     local root = WINDOW_MANAGER:CreateControl(name, parent, CT_CONTROL)
     root:SetMouseEnabled(false)
 
@@ -826,7 +826,7 @@ local function CreateSlot(parent, name)
     ultimateProgress:SetMouseEnabled(false)
     ultimateProgress:SetHidden(true)
 
-    local keyLabel = WINDOW_MANAGER:CreateControl(name .. "_KeyLabel", root, CT_LABEL)
+    local keyLabel = WINDOW_MANAGER:CreateControl(name .. "_KeyLabel", keyLabelParent or root, CT_LABEL)
     keyLabel:SetFont("ZoFontGameSmall")
     keyLabel:SetHorizontalAlignment(TEXT_ALIGN_CENTER)
     keyLabel:SetVerticalAlignment(TEXT_ALIGN_TOP)
@@ -870,7 +870,7 @@ local function BuildActionBar(parent, barName)
 
     local slots = {}
     for _, slotKey in ipairs(SLOT_ORDER) do
-        slots[slotKey] = CreateSlot(root, root:GetName() .. "_" .. slotKey)
+        slots[slotKey] = CreateSlot(root, root:GetName() .. "_" .. slotKey, root)
     end
 
     return {
@@ -1286,7 +1286,7 @@ function EZO_HUD:RefreshCustomActionBars()
                 ultimateProgressOnly and alpha or iconAlpha,
                 ultimateProgressOnly
             )
-            UpdateSlotKeybind(slot, slotKey, barKeybindMode, settings.iconSize, shouldShow, hasAbility, alpha)
+            UpdateSlotKeybind(slot, slotKey, barKeybindMode, settings.iconSize, shouldShow, hasAbility)
             UpdateSlotUseAnimation(slot, ultimateProgressOnly)
 
             if ultimateProgressOnly then
