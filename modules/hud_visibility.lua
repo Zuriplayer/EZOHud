@@ -82,6 +82,9 @@ function EZO_HUD:RefreshHudContextVisibility()
     if self.RefreshCustomLootVisibility then
         self:RefreshCustomLootVisibility()
     end
+    if self.RefreshCurrencyPanelVisibility then
+        self:RefreshCurrencyPanelVisibility()
+    end
 end
 
 function EZO_HUD:InitializeHudVisibility()

@@ -2,15 +2,15 @@ EZOhud = EZOhud or {}
 local EZO_HUD = EZOhud
 local LANGUAGE_INHERIT = "inherit"
 local LANGUAGE_AUTO = "auto"
-local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "customQuestTracker", "customSynergy", "customGroupSearch", "customCompanion", "customLoot", "nativeCenterScreen", "nativeCombatTips", "nativeDeathPrompt" }
+local MOVE_MODE_SECTIONS = { "overlay", "ultimate", "customActionBars", "customActionBarQuickslot", "execute", "crux", "currencyPanel", "customQuestTracker", "customSynergy", "customGroupSearch", "customCompanion", "customLoot", "nativeCenterScreen", "nativeCombatTips", "nativeDeathPrompt" }
 local languageCallbackRegistered = false
 local ezocoreRegistered = false
 local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.154"
-EZO_HUD.ADDON_VERSION_NUM = 10154
+EZO_HUD.ADDON_VERSION = "0.1.159"
+EZO_HUD.ADDON_VERSION_NUM = 10159
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -171,6 +171,31 @@ EZO_HUD.defaults = {
         scale = 1.0,
         fadeTime = 5,
         font = "ZoFontWinH3",
+    },
+    currencyPanel = {
+        enabled = false,
+        hideInCombat = false,
+        balanceMode = "player",
+        movable = false,
+        orientation = "horizontal",
+        displayMode = "both",
+        scale = 1.0,
+        spacing = 4,
+        offsetX = 0,
+        offsetY = -260,
+        items = {
+            gold = { enabled = true },
+            alliancePoints = { enabled = false },
+            archivalFortunes = { enabled = false },
+            imperialFragments = { enabled = false },
+            telvarStones = { enabled = false },
+            tomePoints = { enabled = false },
+            tradeBars = { enabled = false },
+            transmuteCrystals = { enabled = false },
+            undauntedKeys = { enabled = false },
+            writVouchers = { enabled = false },
+            crowns = { enabled = false },
+        },
     },
 }
 
@@ -370,6 +395,9 @@ function EZO_HUD:RefreshMoveModeSection(sectionName)
         if self.ApplyCustomLootLayout then
             self:ApplyCustomLootLayout()
         end
+    elseif sectionName == "currencyPanel" then
+        self:RefreshCurrencyPanelMovementState()
+        self:ApplyCurrencyPanelLayout()
     elseif type(self.IsNativeWidget) == "function"
         and self:IsNativeWidget(sectionName)
         and self.RefreshNativeWidgetMovementState then
@@ -411,6 +439,7 @@ function EZO_HUD:RegisterLayoutWithEZOCore()
         { id = "ezohud.customGroupSearch", section = "customGroupSearch", order = 70, name = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_GROUP_SEARCH_MOVE_TOOLTIP },
         { id = "ezohud.customCompanion", section = "customCompanion", order = 75, name = EZO_HUD_OPTION_CUSTOM_COMPANION_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_COMPANION_MOVE_TOOLTIP },
         { id = "ezohud.customLoot", section = "customLoot", order = 80, name = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE, tooltip = EZO_HUD_OPTION_CUSTOM_LOOT_MOVE_TOOLTIP },
+        { id = "ezohud.currencyPanel", section = "currencyPanel", order = 85, name = EZO_HUD_OPTION_CURRENCY_PANEL_MOVE, tooltip = EZO_HUD_OPTION_CURRENCY_PANEL_MOVE_TOOLTIP },
         { id = "ezohud.nativeCenterScreen", section = "nativeCenterScreen", order = 90, name = EZO_HUD_OPTION_NATIVE_CSA, tooltip = EZO_HUD_OPTION_NATIVE_CSA_HEADER_TOOLTIP },
         { id = "ezohud.nativeCombatTips", section = "nativeCombatTips", order = 91, name = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS, tooltip = EZO_HUD_OPTION_NATIVE_COMBAT_TIPS_HEADER_TOOLTIP },
         { id = "ezohud.nativeDeathPrompt", section = "nativeDeathPrompt", order = 92, name = EZO_HUD_OPTION_NATIVE_DEATH_PROMPT, tooltip = EZO_HUD_OPTION_NATIVE_DEATH_PROMPT_HEADER_TOOLTIP },
@@ -514,6 +543,8 @@ function EZO_HUD:SaveMoveModeSectionPosition(sectionName)
         self:SaveCustomCompanionPosition()
     elseif sectionName == "customLoot" and self.SaveCustomLootPosition then
         self:SaveCustomLootPosition()
+    elseif sectionName == "currencyPanel" and self.SaveCurrencyPanelPosition then
+        self:SaveCurrencyPanelPosition()
     end
 end
 
@@ -604,6 +635,10 @@ function EZO_HUD:Initialize()
 
     if self.InitializeCustomLoot ~= nil then
         self:InitializeCustomLoot()
+    end
+
+    if self.InitializeCurrencyPanel ~= nil then
+        self:InitializeCurrencyPanel()
     end
 
     self:RegisterLayoutWithEZOCore()

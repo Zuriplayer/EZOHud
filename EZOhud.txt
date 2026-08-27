@@ -1,8 +1,8 @@
 ## Title: E|cB040FFZ|rOhud
 ## Author: @Zuriplayer
 ## Description: Experimental HUD framework for EZO-family overlays and visual utilities. Optional add-ons: LibChatMessage, LibDebugLogger, DebugLogViewer, EZOCore.
-## Version: 0.1.154
-## AddOnVersion: 10154
+## Version: 0.1.159
+## AddOnVersion: 10159
 ## APIVersion: 101049 101050
 ## DependsOn: LibAddonMenu-2.0
 ## OptionalDependsOn: LibChatMessage LibDebugLogger DebugLogViewer EZOCore
@@ -16,6 +16,7 @@ modules/core.lua
 modules/debug.lua
 modules/crux_debug.lua
 modules/lam_registry.lua
+modules/currency_panel.lua
 modules/persistence.lua
 modules/ui.lua
 modules/hud_visibility.lua

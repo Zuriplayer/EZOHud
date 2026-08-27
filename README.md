@@ -1,7 +1,7 @@
 # EZOhud
 
 Prefer Spanish? Read the [Spanish README](README.es.md).
-EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, custom action bars, execute opportunities, Arcanist Crux tracking, limited native widget positioning tweaks, custom quest tracking, custom synergy, custom group-search status, a custom companion frame, and custom loot history while keeping the implementation small and testable.
+EZOhud is a beta HUD addon for The Elder Scrolls Online in the EZO addon family. Its current purpose is to provide configurable, visual HUD indicators for player resources, ultimate readiness, custom action bars, execute opportunities, Arcanist Crux tracking, limited native widget positioning tweaks, custom quest tracking, custom synergy, custom group-search status, a custom companion frame, custom loot history, and a currency information panel while keeping the implementation small and testable.
 
 Support, bug reports, and suggestions: <https://discord.gg/ekw8zUAcRm>
 
@@ -11,8 +11,8 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.146`
-- AddOnVersion: `10146`
+- Addon version: `0.1.157`
+- AddOnVersion: `10157`
 - APIVersion: `101049 101050`
 - Status: public beta
 
@@ -65,8 +65,9 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Custom Group Search label that hides ESO's native on-screen Activity Finder status tracker, keeps a compact native-style category/status format, and adds smaller left-aligned selected-activity or instance, search-duration, and visible group-role lines.
 - Custom Companion Frame for the local active companion with name, a native-inspired health bar, optional numeric health formats, solo/group visibility modes, saved movement, scale, width, opacity, and optional hiding of ESO's local solo companion frame without changing native group or raid companion rows.
 - Custom Loot History module that fully replaces the native game's loot UI with a modern, right-aligned scrolling panel with memory, bottom-hover review, scrolling, and adjustable fade.
+- Currency Information Panel with per-currency selection for Gold, Alliance Points, Archival Fortunes, Imperial Fragments, Tel Var Stones, Tome Points, Trade Bars, Transmute Crystals, Undaunted Keys, Writ Vouchers, and Crowns. It supports horizontal or vertical layout, text/icon/text-plus-icon presentation, temporary mouse movement, hover details, and optional hiding during combat.
 - HUD-scene visibility handling so visual controls are intended for the normal HUD and HUD UI scenes, not menus.
-- Custom Action Bars, Custom Loot History, custom Quest Tracker, custom Group Search, Custom Companion Frame, and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
+- Custom Action Bars, Custom Loot History, Currency Information Panel, custom Quest Tracker, custom Group Search, Custom Companion Frame, and custom Synergy windows are restricted to HUD scenes so native menu panels remain accessible.
 - English and Spanish localization with shared EZOCore, Automatic, English, and Spanish language selection, including localized fallback labels for custom HUD text when ESO does not expose a native string.
 - Debug options in a dedicated settings section, with optional LibDebugLogger output and optional chat output.
 - Local `/ezohudcrux` debug command for focused Crux diagnostics.
@@ -77,7 +78,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 EZOhud follows the EZO-family settings style: every settings section uses a purple 26 px information icon in its heading. Hover the heading for the general purpose and scope of that section, and hover each individual field for field-specific help.
 
-When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Custom Action Bars, Execute, Crux, custom Quest Tracker, custom Synergy, custom Group Search, Custom Companion Frame, custom Loot History, and Native UI Tweaks surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel.
+When EZOCore is active, the complete panel is rendered inside `Settings > EZO` and is not duplicated in the standard Addons settings list. Attribute, Ultimate, Custom Action Bars, Execute, Crux, Currency Information Panel, custom Quest Tracker, custom Synergy, custom Group Search, Custom Companion Frame, custom Loot History, and Native UI Tweaks surfaces are registered independently in the shared interface layout mode. Without EZOCore, the same options and temporary local movement controls remain available through the normal LibAddonMenu panel.
 
 Master enable controls defer their settings refresh until the current LAM callback finishes. In the EZOCore-hosted panel this requests a forced rebuild, so dependent controls immediately recalculate their enabled state instead of remaining visually greyed out.
 
@@ -95,6 +96,7 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Custom Group Search: enable the custom Activity Finder status label, allow movement, and adjust scale. The label replaces only the small HUD status tracker, not the full finder window, and shows left-aligned selected-activity or current-instance, search-duration, and visible group-role lines. While queued it labels the requested activity as `Selection`; it labels a final/current activity as `Instance` only when ESO exposes that LFG activity id, otherwise it keeps the instance pending instead of reusing a potentially misleading queue request. For role-based dungeon searches it reports visible group composition as `T 0/1 H 1/1 DD 1/2` so missing roles are visible without claiming to know hidden matchmaking roles.
 - Custom Companion Frame: enable a custom frame for the local active companion, optionally hide ESO's local solo companion frame, choose solo/group visibility, move the frame, select hidden/percent/current-maximum/both health values, and adjust scale, width, and opacity. Group and raid companion rows remain native and unchanged.
 - Custom Loot History: enable the custom loot panel, allow movement, and adjust scale and the time loot remains visible before fading.
+- Currency Information Panel: enable the panel, optionally hide it during combat, choose horizontal or vertical orientation, choose text/icon/text plus icon, choose one common player/player-plus-bank balance mode, move it temporarily, adjust scale and spacing, and enable currencies one by one. In player-plus-bank mode, the two balances are shown separately as `player / bank`, never added together. The panel checks ESO's `CanCurrencyBeStoredInLocation` capability for each currency: the common mode applies only when both player and bank are supported; bank-only and account-only currencies keep their ESO-defined location. Hover entries with the mouse for detailed balances and ESO's currency description when available.
 - Debug: enable debug logging and optionally mirror debug output to chat.
 
 ## Safety Limits
@@ -108,6 +110,8 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 - Custom Group Search is informational only. It can hide the native on-screen Activity Finder tracker while enabled, but it does not join, leave, accept, decline, or automate group-finder actions. Instance and role details are limited to the Activity Finder and group-role data exposed by ESO's UI API.
 - Custom Companion Frame is informational only and follows the local player's active companion. Its native-hide option affects only ESO's local solo companion frame; it does not hide or replace companion rows in native group or raid frames.
 - Custom Action Bars, Custom Loot History, custom Quest Tracker, custom Group Search, Custom Companion Frame, and custom Synergy surfaces are hidden outside normal HUD scenes, and Custom Loot only captures the mouse while its move mode is active.
+- The Currency Information Panel is hidden outside normal HUD scenes and can optionally be hidden during combat. Its common balance mode is limited to currencies that ESO reports as storable in both player and bank locations; crowns and other account-only currencies do not become bankable because of this setting. Its hover details are positioned above or below the hovered row to keep the icon and value visible; they require a mouse, add no keyboard or gamepad navigation, and do not change native currency controls.
+- Bank and account values are limited to the currency data currently exposed and cached by ESO. The panel refreshes on currency/bank events and bank opening, but it cannot force a server-side balance query while the bank is closed.
 - Move modes are temporary UI positioning helpers and reset on `/reloadui` or logout; saved HUD positions remain persisted.
 - EZOhud does not add keybinds or input handling and is intended to remain compatible with keyboard and gamepad play.
 - Debug tools are diagnostics only and should remain disabled during normal play unless troubleshooting.
@@ -118,6 +122,7 @@ Recommended beta checks:
 
 - Test on Arcanist and non-Arcanist characters to confirm Crux HUD visibility is correct.
 - Test normal HUD, HUD UI, menus, champion points, Tales of Tribute, and other non-HUD scenes.
+- Enable the Currency Information Panel, test its combat-visibility option, each currency location, horizontal/vertical and text/icon/text-plus-icon modes, hover every entry, move it, reload the UI, open/close a bank, and repeat the visual checks in keyboard and gamepad preferred modes. Static checks do not replace these in-game tests.
 - Test native configuration panels such as Skills and Settings while Custom Loot History is enabled to confirm HUD-only panels do not block them.
 - Test Custom Quest Tracker with several tracked quests, `T` / Cycle Focused Quest on keyboard, and the matching gamepad button to confirm the custom panel follows the native focused quest without breaking cycling. Hover the custom panel in HUD UI to confirm the tooltip draws above the tracker and shows the title, level/repeatable metadata when available, quest text, and current tasks. Confirm optional hints remain right-aligned when one or two hint lines are visible.
 - Test Custom Group Search while queued for a dungeon or other Activity Finder activity, during ready check, and after queue completion to confirm the native tracker hides, the native-style category/status text updates, the selected activity is not mislabeled as the final instance, final/current instance data appears only when ESO exposes it, the left-aligned search-duration and visible group-role lines display, role counts update when group members or roles change, the label can be dragged in move mode, and it disappears outside HUD scenes.

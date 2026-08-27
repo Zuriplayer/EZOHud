@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.1.159 - Currency Tooltip Placement
+
+- Moved currency details above or below the hovered row so the tooltip no longer covers the currency icon or value.
+
+## 0.1.158 - Currency Display Formatting
+
+- Player-plus-bank mode now displays the player and bank balances separately with `/` instead of adding them together.
+- Normalized the text, icon, and text-plus-icon display choices so LAM values and previously saved labels resolve consistently.
+
+## 0.1.157 - Common Currency Balance Mode
+
+- Changed the player/player-plus-bank selection to one common panel option.
+- Added per-currency storage-capability detection through ESO's `CanCurrencyBeStoredInLocation` API; account-only currencies such as Crowns remain account-wide.
+
+## 0.1.156 - Currency Panel Combat Visibility
+
+- Added an optional combat-visibility setting that hides the panel while the player is in combat.
+
+## 0.1.155 - Currency Information Panel
+
+- Added a disabled-by-default HUD currency panel with individual selection for Gold, Alliance Points, Archival Fortunes, Imperial Fragments, Tel Var Stones, Tome Points, Trade Bars, Transmute Crystals, Undaunted Keys, Writ Vouchers, and Crowns.
+- Added horizontal/vertical layout, text/icon/text-plus-icon display modes, hover details, temporary movement, currency/bank event refresh, and EZOCore shared layout integration.
+
 ## 0.1.148 - Health-State Overlays and Preview
 
 - Added health-state overlays for active damage shields, trauma, and blocked healing.
