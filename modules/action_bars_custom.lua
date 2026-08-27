@@ -3,13 +3,6 @@ local EZO_HUD = EZOhud
 
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local WEAPON_ICON_UNKNOWN = "EZOhud/media/weapons/weapon_unknown.dds"
-local WEAPON_ICON_ONE_HAND = "EZOhud/media/weapons/weapon_one_hand.dds"
-local WEAPON_ICON_DUAL = "EZOhud/media/weapons/weapon_dual.dds"
-local WEAPON_ICON_TWO_HANDED = "EZOhud/media/weapons/weapon_two_handed.dds"
-local WEAPON_ICON_DESTRUCTION_STAFF = "EZOhud/media/weapons/weapon_destruction_staff.dds"
-local WEAPON_ICON_RESTORATION_STAFF = "EZOhud/media/weapons/weapon_restoration_staff.dds"
-local WEAPON_ICON_SWORD_SHIELD = "EZOhud/media/weapons/weapon_sword_shield.dds"
-local WEAPON_ICON_BOW = "EZOhud/media/weapons/weapon_bow.dds"
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
 local QUICK_SLOT_NAME = "EZOhud_CustomActionBars_Quickslot"
 local SLOT_FIRST = 3
@@ -85,44 +78,6 @@ local SLOT_KEY_BY_ACTION_SLOT = {}
 for slotKey, actionSlotIndex in pairs(ACTION_SLOT_BY_KEY) do
     SLOT_KEY_BY_ACTION_SLOT[actionSlotIndex] = slotKey
 end
-
-local function BuildSet(...)
-    local set = {}
-    for index = 1, select("#", ...) do
-        local value = select(index, ...)
-        if value ~= nil then
-            set[value] = true
-        end
-    end
-    return set
-end
-
-local ONE_HAND_WEAPONS = BuildSet(
-    WEAPONTYPE_AXE,
-    WEAPONTYPE_DAGGER,
-    WEAPONTYPE_HAMMER,
-    WEAPONTYPE_SWORD
-)
-
-local TWO_HANDED_WEAPONS = BuildSet(
-    WEAPONTYPE_TWO_HANDED_AXE,
-    WEAPONTYPE_TWO_HANDED_HAMMER,
-    WEAPONTYPE_TWO_HANDED_SWORD
-)
-
-local DESTRUCTION_STAVES = BuildSet(
-    WEAPONTYPE_FIRE_STAFF,
-    WEAPONTYPE_FROST_STAFF,
-    WEAPONTYPE_LIGHTNING_STAFF
-)
-
-local RESTORATION_STAVES = BuildSet(
-    WEAPONTYPE_HEALING_STAFF,
-    WEAPONTYPE_RESTORATION_STAFF
-)
-
-local SHIELD_WEAPONS = BuildSet(WEAPONTYPE_SHIELD)
-local BOW_WEAPONS = BuildSet(WEAPONTYPE_BOW)
 
 local function DeepCopyTable(source)
     local copy = {}
@@ -382,58 +337,65 @@ local function ShouldShowBar(barName)
     return mode == DISPLAY_BOTH or mode == barName
 end
 
-local function GetWeaponIcon(barName)
-    local bar = BAR_DEFS[barName]
-    if not (bar and BAG_WORN) then
-        return WEAPON_ICON_UNKNOWN
-    end
+local function IsValidWeaponTexture(texture)
+    return type(texture) == "string"
+        and texture ~= ""
+        and (ZO_NO_TEXTURE_FILE == nil or texture ~= ZO_NO_TEXTURE_FILE)
+end
 
-    local function getWeaponType(slot)
-        if slot == nil then return nil end
-        if type(GetItemWeaponType) == "function" then
-            local weaponType = GetItemWeaponType(BAG_WORN, slot)
-            if weaponType ~= nil and weaponType ~= WEAPONTYPE_NONE then
-                return weaponType
-            end
-        end
-        if type(GetItemLink) == "function" and type(GetItemLinkWeaponType) == "function" then
-            local itemLink = GetItemLink(BAG_WORN, slot)
-            if itemLink and itemLink ~= "" then
-                local weaponType = GetItemLinkWeaponType(itemLink)
-                if weaponType ~= nil and weaponType ~= WEAPONTYPE_NONE then
-                    return weaponType
-                end
-            end
-        end
+local function GetEquippedWeaponIcon(equipSlot)
+    if BAG_WORN == nil or equipSlot == nil or type(GetItemInfo) ~= "function" then
         return nil
     end
 
-    local mainType = getWeaponType(bar.equipSlot)
-    local offType = getWeaponType(bar.offSlot)
+    local texture = GetItemInfo(BAG_WORN, equipSlot)
+    return IsValidWeaponTexture(texture) and texture or nil
+end
 
-    if ONE_HAND_WEAPONS[mainType] == true and SHIELD_WEAPONS[offType] == true then
-        return WEAPON_ICON_SWORD_SHIELD
-    end
-    if ONE_HAND_WEAPONS[mainType] == true and ONE_HAND_WEAPONS[offType] == true then
-        return WEAPON_ICON_DUAL
-    end
-    if TWO_HANDED_WEAPONS[mainType] == true then
-        return WEAPON_ICON_TWO_HANDED
-    end
-    if DESTRUCTION_STAVES[mainType] == true then
-        return WEAPON_ICON_DESTRUCTION_STAFF
-    end
-    if RESTORATION_STAVES[mainType] == true then
-        return WEAPON_ICON_RESTORATION_STAFF
-    end
-    if BOW_WEAPONS[mainType] == true then
-        return WEAPON_ICON_BOW
-    end
-    if ONE_HAND_WEAPONS[mainType] == true then
-        return WEAPON_ICON_ONE_HAND
+local function GetOutfitWeaponIcon(outfitIndex, outfitSlot)
+    if outfitIndex == nil
+        or outfitIndex <= 0
+        or outfitSlot == nil
+        or RESTYLE_MODE_OUTFIT == nil
+        or type(GetRestyleSlotIcon) ~= "function" then
+        return nil
     end
 
-    return WEAPON_ICON_UNKNOWN
+    local texture = GetRestyleSlotIcon(RESTYLE_MODE_OUTFIT, outfitIndex, outfitSlot)
+    return IsValidWeaponTexture(texture) and texture or nil
+end
+
+local function GetWeaponIcon(barName)
+    local bar = BAR_DEFS[barName]
+    if not bar then
+        return WEAPON_ICON_UNKNOWN
+    end
+
+    local outfitIndex
+    local outfitMainSlot
+    local outfitOffSlot
+    if GAMEPLAY_ACTOR_CATEGORY_PLAYER ~= nil
+        and type(GetEquippedOutfitIndex) == "function"
+        and type(GetOutfitSlotsForEquippedWeapons) == "function" then
+        outfitIndex = GetEquippedOutfitIndex(GAMEPLAY_ACTOR_CATEGORY_PLAYER)
+        if type(outfitIndex) == "number" and outfitIndex > 0 then
+            local mainHandOutfitSlot, offHandOutfitSlot, backupMainHandOutfitSlot, backupOffHandOutfitSlot =
+                GetOutfitSlotsForEquippedWeapons(GAMEPLAY_ACTOR_CATEGORY_PLAYER)
+            if barName == "main" then
+                outfitMainSlot = mainHandOutfitSlot
+                outfitOffSlot = offHandOutfitSlot
+            else
+                outfitMainSlot = backupMainHandOutfitSlot
+                outfitOffSlot = backupOffHandOutfitSlot
+            end
+        end
+    end
+
+    local mainTexture = GetOutfitWeaponIcon(outfitIndex, outfitMainSlot)
+        or GetEquippedWeaponIcon(bar.equipSlot)
+    local offTexture = GetOutfitWeaponIcon(outfitIndex, outfitOffSlot)
+        or GetEquippedWeaponIcon(bar.offSlot)
+    return mainTexture or WEAPON_ICON_UNKNOWN, offTexture
 end
 
 local function GetActionSlotIcon(slotKey, hotbarCategory)
@@ -611,6 +573,7 @@ local function UpdateSlotUseAnimation(slot, suppressed)
         slot.flash:SetHidden(true)
         slot.flash:SetAlpha(0)
         slot.icon:SetScale(1)
+        if slot.offIcon then slot.offIcon:SetScale(1) end
         return
     end
 
@@ -620,6 +583,7 @@ local function UpdateSlotUseAnimation(slot, suppressed)
         slot.flash:SetHidden(true)
         slot.flash:SetAlpha(0)
         slot.icon:SetScale(1)
+        if slot.offIcon then slot.offIcon:SetScale(1) end
         return
     end
 
@@ -627,6 +591,7 @@ local function UpdateSlotUseAnimation(slot, suppressed)
     slot.flash:SetHidden(false)
     slot.flash:SetAlpha(0.72 * ratio)
     slot.icon:SetScale(1 + ((SLOT_USE_SCALE - 1) * ratio))
+    if slot.offIcon then slot.offIcon:SetScale(1 + ((SLOT_USE_SCALE - 1) * ratio)) end
 end
 
 local function UpdateSlotTimer(slot, effect, visible, alpha, warningRatio, timerR, timerG, timerB, timerA)
@@ -793,7 +758,7 @@ local function UpdateSlotKeybind(slot, slotKey, mode, iconSize, visible, hasAbil
     end
 end
 
-local function CreateSlot(parent, name, keyLabelParent)
+local function CreateSlot(parent, name, keyLabelParent, isWeapon)
     local root = WINDOW_MANAGER:CreateControl(name, parent, CT_CONTROL)
     root:SetMouseEnabled(false)
 
@@ -803,6 +768,13 @@ local function CreateSlot(parent, name, keyLabelParent)
 
     local icon = WINDOW_MANAGER:CreateControl(name .. "_Icon", root, CT_TEXTURE)
     icon:SetMouseEnabled(false)
+
+    local offIcon
+    if isWeapon then
+        offIcon = WINDOW_MANAGER:CreateControl(name .. "_OffIcon", root, CT_TEXTURE)
+        offIcon:SetMouseEnabled(false)
+        offIcon:SetHidden(true)
+    end
 
     local border = WINDOW_MANAGER:CreateControl(name .. "_Border", root, CT_BACKDROP)
     border:SetCenterColor(0, 0, 0, 0)
@@ -886,6 +858,7 @@ local function CreateSlot(parent, name, keyLabelParent)
         root = root,
         bg = bg,
         icon = icon,
+        offIcon = offIcon,
         border = border,
         flash = flash,
         timerBg = timerBg,
@@ -918,7 +891,7 @@ local function BuildActionBar(parent, barName)
 
     local slots = {}
     for _, slotKey in ipairs(SLOT_ORDER) do
-        slots[slotKey] = CreateSlot(root, root:GetName() .. "_" .. slotKey, root)
+        slots[slotKey] = CreateSlot(root, root:GetName() .. "_" .. slotKey, root, slotKey == "weapon")
     end
 
     return {
@@ -1099,6 +1072,30 @@ function EZO_HUD:ApplyCustomQuickslotLayout()
     self:RefreshCustomQuickslot()
 end
 
+local function LayoutWeaponIcons(slot, iconSize, showOffhand)
+    if not slot or not slot.icon then return end
+
+    local fullIconSize = math.max(16, iconSize - 4)
+    slot.icon:ClearAnchors()
+    slot.icon:SetAnchor(CENTER, slot.root, CENTER, 0, 0)
+    slot.icon:SetDimensions(fullIconSize, fullIconSize)
+
+    if not slot.offIcon then return end
+
+    slot.offIcon:ClearAnchors()
+    if showOffhand then
+        local compositeIconSize = math.max(16, zo_floor(iconSize * 0.46))
+        local compositeOffset = zo_floor(iconSize * 0.27)
+        slot.icon:SetAnchor(CENTER, slot.root, CENTER, -compositeOffset, 0)
+        slot.icon:SetDimensions(compositeIconSize, compositeIconSize)
+        slot.offIcon:SetAnchor(CENTER, slot.root, CENTER, compositeOffset, 0)
+        slot.offIcon:SetDimensions(compositeIconSize, compositeIconSize)
+    else
+        slot.offIcon:SetAnchor(CENTER, slot.root, CENTER, 0, 0)
+        slot.offIcon:SetDimensions(fullIconSize, fullIconSize)
+    end
+end
+
 function EZO_HUD:ApplyCustomActionBarsLayout()
     if not self.customActionBars then return end
 
@@ -1139,9 +1136,7 @@ function EZO_HUD:ApplyCustomActionBarsLayout()
             slot.bg:SetAnchorFill(slot.root)
             slot.bg:SetColor(0.02, 0.025, 0.03, 0.82)
 
-            slot.icon:ClearAnchors()
-            slot.icon:SetAnchor(CENTER, slot.root, CENTER, 0, 0)
-            slot.icon:SetDimensions(iconSize - 4, iconSize - 4)
+            LayoutWeaponIcons(slot, iconSize, false)
 
             slot.border:ClearAnchors()
             slot.border:SetAnchorFill(slot.root)
@@ -1262,6 +1257,7 @@ function EZO_HUD:RefreshCustomActionBars()
     local inactiveAlpha = Clamp(settings.inactiveAlpha, 0.2, 1.0)
     local dimmedAlpha = Clamp(settings.dimmedAlpha, 0.05, 1.0)
     local showTimers = settings.showTimers == true
+    local iconSize = Clamp(settings.iconSize, 28, MAX_ICON_SIZE)
     local keybindMode = GetKeybindMode(settings)
     local warningRatio = GetTimerWarningPercent(settings) / 100
     local timerR, timerG, timerB, timerA = GetTimerBarColor(settings)
@@ -1292,9 +1288,10 @@ function EZO_HUD:RefreshCustomActionBars()
             local slot = entry.slots[slotKey]
             local hideInactiveWeapon = slotKey == "weapon" and not isActive
             local texture
+            local offTexture
             local hasAbility = true
             if slotKey == "weapon" then
-                texture = GetWeaponIcon(barName)
+                texture, offTexture = GetWeaponIcon(barName)
             else
                 texture, hasAbility = GetActionSlotIcon(slotKey, bar.hotbarCategory)
             end
@@ -1326,9 +1323,17 @@ function EZO_HUD:RefreshCustomActionBars()
             if slotKey == "ultimate" and ultimateState ~= nil and not ultimateState.ready then
                 iconAlpha = math.min(iconAlpha, 0.38)
             end
+            if slotKey == "weapon" then
+                LayoutWeaponIcons(slot, iconSize, offTexture ~= nil)
+            end
             slot.icon:SetTexture(texture)
             slot.icon:SetHidden(ultimateProgressOnly)
             slot.icon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
+            if slot.offIcon then
+                slot.offIcon:SetTexture(offTexture or WHITE_TEXTURE)
+                slot.offIcon:SetHidden(offTexture == nil or ultimateProgressOnly)
+                slot.offIcon:SetColor(1, 1, 1, hasAbility and iconAlpha or 0.18)
+            end
             slot.bg:SetAlpha(shouldShow and not ultimateProgressOnly and 1 or 0)
             UpdateSlotTimer(slot, effect, shouldShow and showTimers and hasAbility and not hideInactiveSkill, alpha, warningRatio, timerR, timerG, timerB, timerA)
             UpdateSlotUltimate(

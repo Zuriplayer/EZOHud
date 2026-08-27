@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.162 - Outfit Weapon Icons
+
+- Custom Action Bars now prefer the icon assigned to each weapon by the active outfit, with the exact equipped-item icon as fallback.
+- Main-hand and off-hand icons remain independent; single weapons keep the full icon size while dual-wield and sword-and-shield layouts stay separated.
+
+## 0.1.161 - Weapon Icon Load Compatibility
+
+- Fixed Custom Action Bars failing to load when ESO does not expose an optional weapon-type constant.
+
+## 0.1.160 - Native Custom Action Bar Weapon Icons
+
+- Replaced the custom weapon-category drawings with ESO's native inventory and trading-house weapon filter icons, including distinct fire, frost, and lightning staff silhouettes.
+- Split dual-wield and sword-and-shield indicators into separate main/off-hand icons with deliberate spacing so the two weapons remain recognizable.
+
 ## 0.1.159 - Currency Tooltip Placement
 
 - Moved currency details above or below the hovered row so the tooltip no longer covers the currency icon or value.
