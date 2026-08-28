@@ -307,14 +307,14 @@ function EZO_HUD:InitializeCrux()
     }
 
     self.crux.root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("crux") then
             self.cruxDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     self.crux.root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("crux") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("crux") then
             control:StopMovingOrResizing()
             self.cruxDragActive = false
             control:SetMovable(false)

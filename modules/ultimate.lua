@@ -301,14 +301,14 @@ function EZO_HUD:InitializeUltimate()
     for _, barName in ipairs(ULTIMATE_ORDER) do
         local entry = BuildUltimateBar(barName)
         entry.root:SetHandler("OnMouseDown", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
+            if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("ultimate") then
                 self.ultimateDragActive[barName] = true
                 control:SetMovable(true)
                 control:StartMoving()
             end
         end)
         entry.root:SetHandler("OnMouseUp", function(control, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("ultimate") then
+            if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("ultimate") then
                 control:StopMovingOrResizing()
                 self.ultimateDragActive[barName] = false
                 control:SetMovable(false)

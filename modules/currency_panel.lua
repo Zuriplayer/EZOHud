@@ -523,14 +523,14 @@ function EZO_HUD:InitializeCurrencyPanel()
     end
 
     root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("currencyPanel") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("currencyPanel") then
             self.currencyPanelDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("currencyPanel") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("currencyPanel") then
             control:StopMovingOrResizing()
             self.currencyPanelDragActive = false
             control:SetMovable(false)

@@ -3,6 +3,8 @@ local EZO_HUD = EZOhud
 
 local WHITE_TEXTURE = "EZOhud/media/radial/white.dds"
 local WEAPON_ICON_UNKNOWN = "EZOhud/media/weapons/weapon_unknown.dds"
+local BOUND_ARMAMENTS_ABILITY_ID = 24165
+local BOUND_ARMAMENTS_STACK_ABILITY_ID = 203447
 local ACTION_BARS_NAME = "EZOhud_CustomActionBars"
 local QUICK_SLOT_NAME = "EZOhud_CustomActionBars_Quickslot"
 local SLOT_FIRST = 3
@@ -438,11 +440,58 @@ local function GetUltimateSlotState(slotKey, hotbarCategory)
     }
 end
 
+local function IsBoundArmamentsSlot(slotIndex, hotbarCategory)
+    if slotIndex == nil or type(GetSlotBoundId) ~= "function" then return false end
+
+    local abilityId = GetSlotBoundId(slotIndex, hotbarCategory)
+    if abilityId == BOUND_ARMAMENTS_ABILITY_ID then return true end
+
+    if type(GetEffectiveAbilityIdForAbilityOnHotbar) == "function" and abilityId ~= nil and abilityId ~= 0 then
+        local effectiveAbilityId = GetEffectiveAbilityIdForAbilityOnHotbar(abilityId, hotbarCategory)
+        return effectiveAbilityId == BOUND_ARMAMENTS_ABILITY_ID
+    end
+
+    return false
+end
+
+local function ScanBoundArmamentsStacks()
+    if type(GetNumBuffs) ~= "function" or type(GetUnitBuffInfo) ~= "function" then
+        return nil
+    end
+
+    local numBuffs = GetNumBuffs("player") or 0
+    for buffIndex = 1, numBuffs do
+        local _, _, _, _, stackCount, _, _, _, _, _, abilityId = GetUnitBuffInfo("player", buffIndex)
+        if abilityId == BOUND_ARMAMENTS_STACK_ABILITY_ID then
+            return math.max(0, tonumber(stackCount) or 0)
+        end
+    end
+
+    return nil
+end
+
+local function GetBoundArmamentsFallbackStacks()
+    local customActionBars = EZO_HUD.customActionBars
+    if customActionBars and customActionBars.boundArmamentsStackCount ~= nil then
+        local cachedStackCount = math.max(0, tonumber(customActionBars.boundArmamentsStackCount) or 0)
+        if cachedStackCount > 0 then
+            return cachedStackCount
+        end
+    end
+
+    return ScanBoundArmamentsStacks()
+end
+
 local function ReadActionSlotEffect(slotIndex, hotbarCategory)
-    local remainingMs = GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0
+    local remainingMs = type(GetActionSlotEffectTimeRemaining) == "function"
+        and (GetActionSlotEffectTimeRemaining(slotIndex, hotbarCategory) or 0)
+        or 0
     local stackCount = 0
     if type(GetActionSlotEffectStackCount) == "function" then
         stackCount = GetActionSlotEffectStackCount(slotIndex, hotbarCategory) or 0
+    end
+    if stackCount <= 0 and IsBoundArmamentsSlot(slotIndex, hotbarCategory) then
+        stackCount = GetBoundArmamentsFallbackStacks() or 0
     end
     if remainingMs <= 0 and stackCount <= 0 then return nil end
 
@@ -465,7 +514,11 @@ end
 local function GetActionSlotEffect(barName, slotKey)
     local slotIndex = ACTION_SLOT_BY_KEY[slotKey]
     local bar = BAR_DEFS[barName]
-    if not slotIndex or not bar or type(GetActionSlotEffectTimeRemaining) ~= "function" then return nil end
+    if not slotIndex
+        or not bar
+        or (type(GetActionSlotEffectTimeRemaining) ~= "function" and type(GetActionSlotEffectStackCount) ~= "function") then
+        return nil
+    end
 
     if IsActiveBar(barName) then
         if type(GetActiveHotbarCategory) == "function" then
@@ -1441,9 +1494,21 @@ local function RegisterEvents()
     end
     if EVENT_EFFECT_CHANGED then
         EVENT_MANAGER:RegisterForEvent(namespace, EVENT_EFFECT_CHANGED, function(
-            _, changeType, _, _, unitTag, _, _, _, _, _, _, _, _, _, _, abilityId
+            _, changeType, _, _, unitTag, _, _, stackCount, _, _, _, _, _, _, _, abilityId
         )
-            if unitTag ~= "player" or changeType == (EFFECT_RESULT_FADED or 2) then return end
+            if unitTag ~= "player" then return end
+
+            if abilityId == BOUND_ARMAMENTS_STACK_ABILITY_ID then
+                if EZO_HUD.customActionBars then
+                    EZO_HUD.customActionBars.boundArmamentsStackCount =
+                        changeType == (EFFECT_RESULT_FADED or 2)
+                            and 0
+                            or math.max(0, tonumber(stackCount) or 0)
+                end
+                refresh()
+            end
+
+            if changeType == (EFFECT_RESULT_FADED or 2) then return end
             StartShalkTimer(EZO_HUD, abilityId)
         end)
         if REGISTER_FILTER_UNIT_TAG then
@@ -1497,14 +1562,14 @@ function EZO_HUD:InitializeCustomActionBars()
     end
 
     actionBarsRoot:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBars") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("customActionBars") then
             self.customActionBarsDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     actionBarsRoot:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBars") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("customActionBars") then
             control:StopMovingOrResizing()
             self.customActionBarsDragActive = false
             control:SetMovable(false)
@@ -1522,14 +1587,14 @@ function EZO_HUD:InitializeCustomActionBars()
 
     local quickslot = BuildQuickslot()
     quickslot.root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBarQuickslot") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("customActionBarQuickslot") then
             self.customActionBarsQuickslotDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     quickslot.root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("customActionBarQuickslot") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("customActionBarQuickslot") then
             control:StopMovingOrResizing()
             self.customActionBarsQuickslotDragActive = false
             control:SetMovable(false)

@@ -205,7 +205,7 @@ local function BuildCustomCompanionPanel()
     end
 
     root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD:IsMoveModeEnabled("customCompanion") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and EZO_HUD:IsMoveModeEnabled("customCompanion") then
             EZO_HUD.customCompanionDragActive = true
             control:SetMovable(true)
             control:StartMoving()
@@ -213,7 +213,7 @@ local function BuildCustomCompanionPanel()
     end)
 
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD:IsMoveModeEnabled("customCompanion") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and EZO_HUD:IsMoveModeEnabled("customCompanion") then
             control:StopMovingOrResizing()
             EZO_HUD.customCompanionDragActive = false
             control:SetMovable(false)

@@ -135,7 +135,29 @@ local function BuildCustomLootIndicator()
         buffer:SetScrollPosition(newPos)
     end)
 
+    root:SetHandler("OnMouseDown", function(control, button)
+        if button ~= MOUSE_BUTTON_INDEX_RIGHT or not EZO_HUD:IsMoveModeEnabled("customLoot") then
+            return
+        end
+
+        root.ezohudDragActive = true
+        control:SetMovable(true)
+        control:StartMoving()
+    end)
+
+    root:SetHandler("OnMouseUp", function(control, button)
+        if button ~= MOUSE_BUTTON_INDEX_RIGHT or root.ezohudDragActive ~= true then
+            return
+        end
+
+        control:StopMovingOrResizing()
+        root.ezohudDragActive = false
+        control:SetMovable(false)
+    end)
+
     root:SetHandler("OnMoveStop", function()
+        root.ezohudDragActive = false
+        root:SetMovable(false)
         if EZO_HUD.SaveCustomLootPosition then
             EZO_HUD:SaveCustomLootPosition()
         end
@@ -229,8 +251,10 @@ function EZO_HUD:RefreshCustomLootMovementState()
     if not self.customLoot then return end
 
     local isMovable = self:IsMoveModeEnabled("customLoot")
-    self.customLoot.root:SetMovable(isMovable)
+    self.customLoot.root:SetMovable(isMovable and self.customLoot.root.ezohudDragActive == true)
     self.customLoot.root:SetMouseEnabled(isMovable)
+    self.customLoot.buffer:SetMouseEnabled(not isMovable)
+    self.customLoot.scrollbar:SetMouseEnabled(not isMovable)
     self.customLoot.interactionHotspot:SetMouseEnabled(not isMovable)
 
     if isMovable then

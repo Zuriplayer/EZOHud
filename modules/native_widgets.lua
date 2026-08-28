@@ -73,7 +73,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         label:SetText(GetString(_G[widget.stringIds.header] or 0) .. "\n" .. GetString(_G["EZO_HUD_NATIVE_WIDGET_MOVE_HANDLE"] or 0))
 
         previewRoot:SetHandler("OnMouseDown", function(self, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT then
+            if button == MOUSE_BUTTON_INDEX_RIGHT then
                 self.ezohudStartCenterX, self.ezohudStartCenterY = self:GetCenter()
                 self:SetMovable(true)
                 self:StartMoving()
@@ -81,7 +81,7 @@ local function GetOrCreatePreviewBackdrop(control, widget)
         end)
 
         previewRoot:SetHandler("OnMouseUp", function(self, button)
-            if button == MOUSE_BUTTON_INDEX_LEFT then
+            if button == MOUSE_BUTTON_INDEX_RIGHT then
                 self:StopMovingOrResizing()
                 self:SetMovable(false)
             end

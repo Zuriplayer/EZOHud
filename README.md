@@ -51,6 +51,7 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 - Ultimate icon size setting, progress bar, current ultimate value, cost, readiness, and active-bar state.
 - Custom Action Bars that show the main and backup ability bars as one movable two-row block, with an optional toggle to hide ESO's native HUD action bar only while a normal primary or backup weapon bar is active. Temporary and mechanic-specific native action bars remain visible.
 - Custom Action Bars display modes: off, main, backup, both, or active bar only.
+- Custom Action Bars display Bound Armaments charges from ESO's player-effect stack data when the native action-slot stack API returns no value.
 - Parallel horizontal Custom Action Bars with the icon of each equipped weapon's active outfit style when ESO exposes it, falling back to the exact equipped-item icon and then a safe unknown icon, separate non-overlapping main/off-hand icons for dual wield and sword-and-shield, inactive weapon-icon hiding, optional hiding of backup-row abilities when that row is inactive and both their native effect time and stack count reach zero, slot-use flash animation, larger centered white native effect timers with a bold thick-outline font, six- and nine-second fallback timers for the delayed Subterranean Assault and Deep Fissure shalk cycles, enlarged orange upper-right stack counts, a configurable proportional timer-warning threshold, one optional scalable set of native key labels below the lowest visible row, configurable shared timer-bar color, icon size up to 96 px, spacing, inactive-bar alpha, dimmed-slot alpha, a smaller independently centered ultimate readiness percentage with `%` plus current/cost below, not-ready dimming, an optional active-ultimate mode that replaces its not-ready icon and both text rows with a purple charge bar, and saved global dimming choices for weapon, ability 1-5, and ultimate slots. The main row always remains complete, while timed backup abilities remain visible until their native effect ends.
 - Independent active quickslot icon for Custom Action Bars, movable separately and scaled from the same icon-size setting. When ESO reports a quickslot cooldown, the icon dims, refills vertically as the cooldown completes, and shows remaining time instead of the item count until ready.
 - Execute HUD that scans slotted execute abilities on the active bar and shows an alert when the current target is inside the detected threshold.
@@ -101,6 +102,9 @@ With EZOCore active, EZOhud follows the EZO family preference storage policy: or
 
 ## Safety Limits
 
+- Every movable EZOhud surface uses the right mouse button only while its move
+  mode is active. Left-click interactions remain unchanged; native controls and
+  fixed/unit-bound markers are not converted into free movable surfaces.
 - EZOhud is visual only.
 - It does not cast abilities, press keys, automate rotations, block, dodge, interrupt, target enemies, or make gameplay decisions.
 - Execute, ultimate, custom action bar, resource, and Crux indicators are informational only.

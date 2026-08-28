@@ -398,14 +398,14 @@ function EZO_HUD:InitializeExecute()
     self.execute = BuildExecuteIndicator()
 
     self.execute.root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("execute") then
             self.executeDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     self.execute.root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("execute") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("execute") then
             control:StopMovingOrResizing()
             self.executeDragActive = false
             control:SetMovable(false)

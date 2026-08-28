@@ -932,14 +932,14 @@ function EZO_HUD:InitializeOverlay()
     }
 
     root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("overlay") then
             self.overlayDragActive = true
             control:SetMovable(true)
             control:StartMoving()
         end
     end)
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and self:IsMoveModeEnabled("overlay") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and self:IsMoveModeEnabled("overlay") then
             control:StopMovingOrResizing()
             self.overlayDragActive = false
             control:SetMovable(false)

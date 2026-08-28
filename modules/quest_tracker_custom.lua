@@ -378,7 +378,7 @@ local function BuildCustomQuestTracker()
 
     root:SetHandler("OnMouseDown", function(control, button)
         HideCustomQuestTooltip()
-        if button == MOUSE_BUTTON_INDEX_LEFT
+        if button == MOUSE_BUTTON_INDEX_RIGHT
             and EZO_HUD:IsMoveModeEnabled("customQuestTracker")
             and not EZO_HUD.customQuestTrackerDragActive then
             control:SetMovable(true)
@@ -387,7 +387,7 @@ local function BuildCustomQuestTracker()
         end
     end)
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD.customQuestTrackerDragActive then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and EZO_HUD.customQuestTrackerDragActive then
             control:StopMovingOrResizing()
             EZO_HUD.customQuestTrackerDragActive = false
             control:SetMovable(false)

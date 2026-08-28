@@ -47,6 +47,37 @@ local function BuildCustomSynergyIndicator()
     local keybind = WINDOW_MANAGER:CreateControlFromVirtual(CUSTOM_SYNERGY_NAME .. "_Keybind", root, "ZO_KeybindButton")
     keybind:SetKeybind("USE_SYNERGY")
 
+    root:SetHandler("OnMouseDown", function(control, button)
+        if button ~= MOUSE_BUTTON_INDEX_RIGHT or not EZO_HUD:IsMoveModeEnabled("customSynergy") then
+            return
+        end
+
+        root.ezohudDragActive = true
+        control:SetMovable(true)
+        keybind:SetMouseEnabled(false)
+        control:StartMoving()
+    end)
+
+    root:SetHandler("OnMouseUp", function(control, button)
+        if button ~= MOUSE_BUTTON_INDEX_RIGHT or root.ezohudDragActive ~= true then
+            return
+        end
+
+        control:StopMovingOrResizing()
+        root.ezohudDragActive = false
+        control:SetMovable(false)
+        keybind:SetMouseEnabled(true)
+    end)
+
+    root:SetHandler("OnMoveStop", function()
+        root.ezohudDragActive = false
+        root:SetMovable(false)
+        keybind:SetMouseEnabled(true)
+        if EZO_HUD.SaveCustomSynergyPosition then
+            EZO_HUD:SaveCustomSynergyPosition()
+        end
+    end)
+
     return {
         root = root,
         bg = bg,
@@ -101,8 +132,9 @@ function EZO_HUD:RefreshCustomSynergyMovementState()
     if not self.customSynergy then return end
 
     local isMovable = self:IsMoveModeEnabled("customSynergy")
-    self.customSynergy.root:SetMovable(isMovable)
+    self.customSynergy.root:SetMovable(isMovable and self.customSynergy.root.ezohudDragActive == true)
     self.customSynergy.root:SetMouseEnabled(isMovable)
+    self.customSynergy.keybind:SetMouseEnabled(not isMovable)
 
     if isMovable then
         if ZO_SynergyTopLevel then

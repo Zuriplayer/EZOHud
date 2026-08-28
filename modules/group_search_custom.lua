@@ -390,7 +390,7 @@ local function BuildCustomGroupSearchPanel()
     end
 
     root:SetHandler("OnMouseDown", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD:IsMoveModeEnabled("customGroupSearch") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and EZO_HUD:IsMoveModeEnabled("customGroupSearch") then
             EZO_HUD.customGroupSearchDragActive = true
             control:SetMovable(true)
             control:StartMoving()
@@ -398,7 +398,7 @@ local function BuildCustomGroupSearchPanel()
     end)
 
     root:SetHandler("OnMouseUp", function(control, button)
-        if button == MOUSE_BUTTON_INDEX_LEFT and EZO_HUD:IsMoveModeEnabled("customGroupSearch") then
+        if button == MOUSE_BUTTON_INDEX_RIGHT and EZO_HUD:IsMoveModeEnabled("customGroupSearch") then
             control:StopMovingOrResizing()
             EZO_HUD.customGroupSearchDragActive = false
             control:SetMovable(false)

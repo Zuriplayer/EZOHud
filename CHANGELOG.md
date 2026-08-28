@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Standardizes all movable HUD surfaces on right-mouse-button dragging while
+  preserving native and normal left-click interactions.
+
+## 0.1.164 - Bound Armaments Stack Display
+
+- Custom Action Bars query ESO's native action-slot stack count first.
+- Bound Armaments falls back to its player-effect stack data when ESO returns
+  no stack count through the action-slot API, and refreshes when that effect
+  changes.
+
 ## 0.1.162 - Outfit Weapon Icons
 
 - Custom Action Bars now prefer the icon assigned to each weapon by the active outfit, with the exact equipped-item icon as fallback.
