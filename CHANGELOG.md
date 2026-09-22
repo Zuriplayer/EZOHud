@@ -5,6 +5,12 @@
 - Standardizes all movable HUD surfaces on right-mouse-button dragging while
   preserving native and normal left-click interactions.
 
+## 0.1.165 - Stable Currency Icon Colors
+
+- The Currency Information Panel consistently uses ESO's colored keyboard
+  currency icons, including when the mouse cursor or gamepad mode is active.
+- ESO's gamepad currency icon remains a fallback if a keyboard icon is missing.
+
 ## 0.1.164 - Bound Armaments Stack Display
 
 - Custom Action Bars query ESO's native action-slot stack count first.

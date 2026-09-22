@@ -179,15 +179,14 @@ local function GetIconPath(currencyType)
         return nil
     end
 
-    local useGamepad = type(IsInGamepadPreferredMode) == "function" and IsInGamepadPreferredMode()
-    if useGamepad and type(GetCurrencyGamepadIcon) == "function" then
-        local icon = GetCurrencyGamepadIcon(currencyType)
+    if type(GetCurrencyKeyboardIcon) == "function" then
+        local icon = GetCurrencyKeyboardIcon(currencyType)
         if icon and icon ~= "" then
             return icon
         end
     end
-    if type(GetCurrencyKeyboardIcon) == "function" then
-        local icon = GetCurrencyKeyboardIcon(currencyType)
+    if type(GetCurrencyGamepadIcon) == "function" then
+        local icon = GetCurrencyGamepadIcon(currencyType)
         if icon and icon ~= "" then
             return icon
         end
@@ -557,11 +556,6 @@ function EZO_HUD:InitializeCurrencyPanel()
     end
     if EVENT_OPEN_BANK then
         EVENT_MANAGER:RegisterForEvent("EZOhud_CurrencyPanelOpenBank", EVENT_OPEN_BANK, function()
-            self:RefreshCurrencyPanelValues()
-        end)
-    end
-    if EVENT_GAMEPAD_PREFERRED_MODE_CHANGED then
-        EVENT_MANAGER:RegisterForEvent("EZOhud_CurrencyPanelInputMode", EVENT_GAMEPAD_PREFERRED_MODE_CHANGED, function()
             self:RefreshCurrencyPanelValues()
         end)
     end
