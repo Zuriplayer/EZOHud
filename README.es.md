@@ -11,10 +11,12 @@ EZOhud está en calidad beta pública. El addon es utilizable para pruebas, pero
 
 ## Metadatos de versión
 
-- Versión del addon: `0.1.162`
-- AddOnVersion: `10162`
-- APIVersion: `101049 101050`
+- Versión del addon: `0.1.166`
+- AddOnVersion: `10166`
+- APIVersion: `101050 101051`
 - Estado: beta pública
+
+La entrada `101051` del manifiesto declara compatibilidad de API con Update 51. Las interacciones con Editar HUD nativo y los logros fijados aún requieren una comprobación dentro del cliente LIVE.
 
 ## Requisitos
 

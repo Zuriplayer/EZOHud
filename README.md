@@ -11,10 +11,12 @@ EZOhud is public beta quality. The addon is usable for testing, but layout, visu
 
 ## Version Metadata
 
-- Addon version: `0.1.162`
-- AddOnVersion: `10162`
-- APIVersion: `101049 101050`
+- Addon version: `0.1.166`
+- AddOnVersion: `10166`
+- APIVersion: `101050 101051`
 - Status: public beta
+
+The `101051` manifest entry declares Update 51 API compatibility. Native Edit HUD and pinned-achievement interactions still require an in-game check on the Live client.
 
 ## Requirements
 

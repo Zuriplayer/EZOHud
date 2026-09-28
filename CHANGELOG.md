@@ -5,6 +5,12 @@
 - Standardizes all movable HUD surfaces on right-mouse-button dragging while
   preserving native and normal left-click interactions.
 
+## 0.1.166 - Update 51 API
+
+- Declares ESO API 101051 while retaining 101050 for the previous Live client.
+- Confirms the PTS action-bar key-label visibility fix is already present in
+  Live; no duplicate code port was needed.
+
 ## 0.1.165 - Stable Currency Icon Colors
 
 - The Currency Information Panel consistently uses ESO's colored keyboard
