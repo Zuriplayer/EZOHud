@@ -9,8 +9,8 @@ local layoutSurfacesRegistered = false
 local debugControllerRegistered = false
 
 EZO_HUD.ADDON_NAME = "EZOhud"
-EZO_HUD.ADDON_VERSION = "0.1.166"
-EZO_HUD.ADDON_VERSION_NUM = 10166
+EZO_HUD.ADDON_VERSION = "0.1.167"
+EZO_HUD.ADDON_VERSION_NUM = 10167
 EZO_HUD.AUTHOR = "@Zuriplayer"
 EZO_HUD.LANGUAGE_INHERIT = LANGUAGE_INHERIT
 EZO_HUD.LANGUAGE_AUTO = LANGUAGE_AUTO
@@ -195,6 +195,14 @@ EZO_HUD.defaults = {
             undauntedKeys = { enabled = false },
             writVouchers = { enabled = false },
             crowns = { enabled = false },
+            crownGems = { enabled = false },
+            seals = { enabled = false },
+            styleStones = { enabled = false },
+            tomeChallengeRerolls = { enabled = false },
+            tomePointCaches = { enabled = false },
+            tomeTokens = { enabled = false },
+            undauntedCrests = { enabled = false },
+            nowhereKeys = { enabled = false },
         },
     },
 }

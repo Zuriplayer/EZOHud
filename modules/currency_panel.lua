@@ -15,6 +15,8 @@ local LOCATION_PLAYER = "player"
 local LOCATION_PLAYER_BANK = "playerBank"
 local LOCATION_BANK = "bank"
 local LOCATION_ACCOUNT = "account"
+local NOWHERE_KEY_ITEM_ID = 224302
+local ITEM_ICON_FALLBACK = "EsoUI/Art/Inventory/inventory_tabIcon_quest_up.dds"
 
 local CURRENCY_DEFINITIONS = {
     { key = "gold", currencyType = "CURT_MONEY", labelId = "EZO_HUD_CURRENCY_GOLD", fallbackLocation = LOCATION_PLAYER_BANK, order = 10 },
@@ -28,6 +30,14 @@ local CURRENCY_DEFINITIONS = {
     { key = "undauntedKeys", currencyType = "CURT_UNDAUNTED_KEYS", labelId = "EZO_HUD_CURRENCY_UNDAUNTED_KEYS", fallbackLocation = LOCATION_ACCOUNT, order = 90 },
     { key = "writVouchers", currencyType = "CURT_WRIT_VOUCHERS", labelId = "EZO_HUD_CURRENCY_WRIT_VOUCHERS", fallbackLocation = LOCATION_PLAYER_BANK, order = 100 },
     { key = "crowns", currencyType = "CURT_CROWNS", labelId = "EZO_HUD_CURRENCY_CROWNS", fallbackLocation = LOCATION_ACCOUNT, order = 110 },
+    { key = "crownGems", currencyType = "CURT_CROWN_GEMS", labelId = "EZO_HUD_CURRENCY_CROWN_GEMS", fallbackLocation = LOCATION_ACCOUNT, order = 120 },
+    { key = "seals", currencyType = "CURT_SEALS", labelId = "EZO_HUD_CURRENCY_SEALS", fallbackLocation = LOCATION_ACCOUNT, order = 130 },
+    { key = "styleStones", currencyType = "CURT_STYLE_STONES", labelId = "EZO_HUD_CURRENCY_STYLE_STONES", fallbackLocation = LOCATION_ACCOUNT, order = 140 },
+    { key = "tomeChallengeRerolls", currencyType = "CURT_TOME_CHALLENGE_REROLLS", labelId = "EZO_HUD_CURRENCY_TOME_CHALLENGE_REROLLS", fallbackLocation = LOCATION_ACCOUNT, order = 150 },
+    { key = "tomePointCaches", currencyType = "CURT_TOME_POINT_CACHES", labelId = "EZO_HUD_CURRENCY_TOME_POINT_CACHES", fallbackLocation = LOCATION_ACCOUNT, order = 160 },
+    { key = "tomeTokens", currencyType = "CURT_TOME_TOKENS", labelId = "EZO_HUD_CURRENCY_TOME_TOKENS", fallbackLocation = LOCATION_ACCOUNT, order = 170 },
+    { key = "undauntedCrests", currencyType = "CURT_UNDAUNTED_CRESTS", labelId = "EZO_HUD_CURRENCY_UNDAUNTED_CRESTS", fallbackLocation = LOCATION_ACCOUNT, order = 180 },
+    { key = "nowhereKeys", itemId = NOWHERE_KEY_ITEM_ID, labelId = "EZO_HUD_CURRENCY_NOWHERE_KEYS", fallbackLocation = LOCATION_PLAYER_BANK, order = 190 },
 }
 
 local function GetLocalized(idName)
@@ -91,7 +101,7 @@ local function GetSettings()
 end
 
 local function GetCurrencyType(definition)
-    return _G[definition.currencyType]
+    return definition.currencyType and _G[definition.currencyType] or nil
 end
 
 local function ReadCurrencyAmount(currencyType, location)
@@ -116,6 +126,9 @@ local function CanStoreCurrency(currencyType, location)
 end
 
 local function GetStorageProfile(definition)
+    if definition.itemId then
+        return { player = true, bank = true, account = false }
+    end
     local currencyType = GetCurrencyType(definition)
     local profile = {
         player = CanStoreCurrency(currencyType, _G.CURRENCY_LOCATION_CHARACTER),
@@ -139,12 +152,53 @@ local function GetStorageProfile(definition)
     return profile
 end
 
+local function ReadItemAmounts(definition)
+    if type(GetBagSize) ~= "function" or type(GetItemId) ~= "function"
+        or type(GetSlotStackSize) ~= "function" then
+        return 0, 0, nil
+    end
+
+    local player, bank, icon = 0, 0, nil
+    local trackedSlots = {}
+    local bags = { BAG_BACKPACK, BAG_BANK, BAG_SUBSCRIBER_BANK }
+    for _, bagId in ipairs(bags) do
+        if bagId ~= nil then
+            local count = 0
+            local bagSlots = {}
+            for slotIndex = 0, (GetBagSize(bagId) or 0) - 1 do
+                if GetItemId(bagId, slotIndex) == definition.itemId then
+                    count = count + (GetSlotStackSize(bagId, slotIndex) or 0)
+                    bagSlots[slotIndex] = true
+                    if not icon and type(GetItemInfo) == "function" then
+                        icon = GetItemInfo(bagId, slotIndex)
+                    end
+                end
+            end
+            trackedSlots[bagId] = bagSlots
+            if bagId == BAG_BACKPACK then
+                player = count
+            else
+                bank = bank + count
+            end
+        end
+    end
+    if EZO_HUD.currencyPanel then
+        EZO_HUD.currencyPanel.itemSlots = trackedSlots
+    end
+    return player, bank, icon
+end
+
 local function IsPlayerBankCurrency(definition)
     local profile = GetStorageProfile(definition)
     return profile.player and profile.bank
 end
 
 local function GetAmounts(definition, locationName)
+    if definition.itemId then
+        local player, bank, icon = ReadItemAmounts(definition)
+        local selectedAmount = locationName == LOCATION_BANK and bank or player
+        return selectedAmount, player, bank, 0, icon
+    end
     local currencyType = GetCurrencyType(definition)
     local player = ReadCurrencyAmount(currencyType, _G.CURRENCY_LOCATION_CHARACTER)
     local bank = ReadCurrencyAmount(currencyType, _G.CURRENCY_LOCATION_BANK)
@@ -174,10 +228,14 @@ local function FormatAmount(amount)
     return sign .. formatted
 end
 
-local function GetIconPath(currencyType)
-    if currencyType == nil then
-        return nil
+local function GetIconPath(currencyType, itemIcon, isItem)
+    if itemIcon then
+        return itemIcon
     end
+    if isItem then
+        return ITEM_ICON_FALLBACK
+    end
+    if currencyType == nil then return nil end
 
     if type(GetCurrencyKeyboardIcon) == "function" then
         local icon = GetCurrencyKeyboardIcon(currencyType)
@@ -254,11 +312,11 @@ local function GetRowWidth(displayMode)
 end
 
 local function GetDisplayText(definition, locationName)
-    local amount, player, bank = GetAmounts(definition, locationName)
+    local amount, player, bank, _, itemIcon = GetAmounts(definition, locationName)
     if locationName == LOCATION_PLAYER_BANK then
-        return FormatAmount(player) .. " / " .. FormatAmount(bank)
+        return FormatAmount(player) .. " / " .. FormatAmount(bank), itemIcon
     end
-    return FormatAmount(amount)
+    return FormatAmount(amount), itemIcon
 end
 
 local function BuildTooltip(definition)
@@ -283,6 +341,8 @@ local function BuildTooltip(definition)
         if description and description ~= "" then
             lines[#lines + 1] = description
         end
+    elseif definition.itemId then
+        lines[#lines + 1] = GetLocalized(definition.labelId .. "_TOOLTIP")
     end
     return table.concat(lines, "\n")
 end
@@ -323,13 +383,18 @@ local function RefreshRow(self, definition)
 
     local settings = GetSettings()
     local itemSettings = GetItemSettings(definition)
+    if itemSettings.enabled ~= true then
+        row:SetHidden(true)
+        return
+    end
     local displayMode = GetDisplayMode(settings)
     local locationName = GetSelectedLocation(definition)
     local currencyType = GetCurrencyType(definition)
 
-    row.icon:SetTexture(GetIconPath(currencyType))
+    local displayText, itemIcon = GetDisplayText(definition, locationName)
+    row.icon:SetTexture(GetIconPath(currencyType, itemIcon, definition.itemId ~= nil))
     row.icon:SetHidden(displayMode == DISPLAY_TEXT)
-    row.label:SetText(GetDisplayText(definition, locationName))
+    row.label:SetText(displayText)
     row.label:SetHidden(displayMode == DISPLAY_ICON)
     row:SetWidth(GetRowWidth(displayMode))
 
@@ -343,7 +408,7 @@ local function RefreshRow(self, definition)
         row.label:SetAnchor(LEFT, row, LEFT, 0, 0)
     end
 
-    row:SetHidden(itemSettings.enabled ~= true)
+    row:SetHidden(false)
 end
 
 function EZO_HUD:RefreshCurrencyPanelVisibility()
@@ -557,6 +622,24 @@ function EZO_HUD:InitializeCurrencyPanel()
     if EVENT_OPEN_BANK then
         EVENT_MANAGER:RegisterForEvent("EZOhud_CurrencyPanelOpenBank", EVENT_OPEN_BANK, function()
             self:RefreshCurrencyPanelValues()
+        end)
+    end
+    if EVENT_INVENTORY_SINGLE_SLOT_UPDATE then
+        EVENT_MANAGER:RegisterForEvent("EZOhud_CurrencyPanelItem", EVENT_INVENTORY_SINGLE_SLOT_UPDATE, function(_, bagId, slotIndex)
+            if not GetItemSettings(CURRENCY_DEFINITIONS[#CURRENCY_DEFINITIONS]).enabled then return end
+            if bagId ~= BAG_BACKPACK and bagId ~= BAG_BANK and bagId ~= BAG_SUBSCRIBER_BANK then return end
+            local tracked = self.currencyPanel.itemSlots
+            local wasKey = tracked and tracked[bagId] and tracked[bagId][slotIndex]
+            if wasKey or (type(GetItemId) == "function" and GetItemId(bagId, slotIndex) == NOWHERE_KEY_ITEM_ID) then
+                self:RefreshCurrencyPanelValues()
+            end
+        end)
+    end
+    if EVENT_INVENTORY_FULL_UPDATE then
+        EVENT_MANAGER:RegisterForEvent("EZOhud_CurrencyPanelItems", EVENT_INVENTORY_FULL_UPDATE, function()
+            if GetItemSettings(CURRENCY_DEFINITIONS[#CURRENCY_DEFINITIONS]).enabled then
+                self:RefreshCurrencyPanelValues()
+            end
         end)
     end
     if EVENT_PLAYER_COMBAT_STATE then
